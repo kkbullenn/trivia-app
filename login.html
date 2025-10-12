@@ -1,11 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quiz App</title>
-</head>
-<body>
-    
-</body>
+  </head>
+  <body>
+    <div>
+      <h1>Quiz App</h1>
+      <h1>Login</h1>
+      <form action="login" method="POST">
+        <label>Email:</label>
+        <input type="text" name="user_id" />
+        <br /><br />
+        <div></div>
+        <label>Password:</label>
+        <input type="password" name="password" id="pswd" />
+        <br /><br />
+        <input
+          id="submitButton"
+          type="submit"
+          value="Sign in"
+          onclick="return handleLogin()"
+        />
+      </form>
+    </div>
+  </body>
 </html>
