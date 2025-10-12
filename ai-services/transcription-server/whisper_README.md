@@ -20,5 +20,5 @@ Whisper will not work without these requirements and dependencies.
 cd ai-services/trancription-server # go to location
 python -m venv venv # create env
 source venv/bin/activate # or venv\Scripts\activate on Windows
-pip install fastapi uvicorn faster-whisper ffmpeg-python # deps
+pip install fastapi uvicorn faster-whisper ffmpeg-python python-multipart # deps
 python whisper_service.py # run the server locally
