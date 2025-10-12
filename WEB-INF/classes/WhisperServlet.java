@@ -12,8 +12,8 @@ public final class WhisperServlet extends HttpServlet {
     private static final String WHISPER_HOST = "localhost";
     private static final int WHISPER_PORT = 8888;
     private static final URI WHISPER_URI = URI.create("http://" + WHISPER_HOST + ":" + WHISPER_PORT);
-    private static final URI WHISPER_GET_URI = WHISPER_URI;
-    private static final URI WHISPER_POST_URI = URI.create(WHISPER_URI + "/transcribe");
+    private static final URI WHISPER_GET_URI = URI.create(WHISPER_URI + "/whisper");
+    private static final URI WHISPER_POST_URI = URI.create(WHISPER_GET_URI + "/transcribe");
 
     /**
      * Connects to the Whisper service in order to test if a connection has been established.
@@ -21,7 +21,7 @@ public final class WhisperServlet extends HttpServlet {
      * (NOT required for MVP only for BE testing purposes)
      *
      * @param request  (Does not matter)
-     * @param response Message in JSON saying connection is successful\
+     * @param response Message in JSON saying connection is successful
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {

@@ -33,11 +33,11 @@ DEFAULT_FILE_FORMAT = "wav"
 app = FastAPI(title="Whisper AI Transcriber")
 model = WhisperModel(MODEL_SIZE, device="cpu", compute_type="int8")
 
-@app.get("/")
+@app.get("/whisper")
 async def root():
     return {"message": "Whisper AI Transcriber is running. Use POST /transcribe to transcribe audio into English text."}
 
-@app.post("/transcribe")
+@app.post("/whisper/transcribe")
 async def transcribe_audio(
     # expected multipart form data
     file: UploadFile = File(...),
