@@ -1,52 +1,62 @@
-from fastapi import FastAPI, Form, HTTPException
+from fastapi import FastAPI, Form
 from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
+import torch
 import uvicorn
 
-# Model setup
+app = FastAPI(title="M2M100 Translator API", version="1.0")
+
+# -------------------------------------------------------------
+# Load model once at startup
+# -------------------------------------------------------------
 MODEL_NAME = "facebook/m2m100_418M"
 
-tok = M2M100Tokenizer.from_pretrained(MODEL_NAME)
-mdl = M2M100ForConditionalGeneration.from_pretrained(MODEL_NAME)
+print(f"🔄 Loading model {MODEL_NAME} (this may take a minute the first time)...")
+tokenizer = M2M100Tokenizer.from_pretrained(MODEL_NAME)
+model = M2M100ForConditionalGeneration.from_pretrained(MODEL_NAME)
+model.to("cpu")
+print("✅ Model loaded and ready.")
 
-# supported ISO language codes
-SUPPORTED = {
-    "en",  # English
-    "es",  # Spanish
-    "pt",  # Portuguese
-    "zh",  # Chinese
-    "ja",  # Japanese
-    "tl",  # Tagalog
-    "ko",  # Korean
-    "fr",  # French
-    "pa"   # Punjabi
-}
-
-# FastAPI app
-app = FastAPI(title=f"M2M100 Translator ({MODEL_NAME})")
-
-@app.get("/health")
-def health():
-    return {"ok": True, "supported": sorted(SUPPORTED)}
-
+# -------------------------------------------------------------
+# Endpoint: POST /translate
+# -------------------------------------------------------------
 @app.post("/translate")
 def translate(
     text: str = Form(...),
-    source: str = Form("en"),
     target: str = Form(...)
 ):
-    source, target = source.lower().strip(), target.lower().strip()
-    if source not in SUPPORTED or target not in SUPPORTED:
-        raise HTTPException(400, f"Use languages in {sorted(SUPPORTED)}")
+    """
+    Translate English text into the target language.
+    Target should be an ISO 639-1 code (e.g., 'fr', 'es', 'tl', 'ja').
+    """
+    try:
+        # Set the tokenizer language (source English, target user-chosen)
+        tokenizer.src_lang = "en"
+        tokenizer.tgt_lang = target
 
-    tok.src_lang = source
-    forced = tok.get_lang_id(target)
-    inputs = tok(text, return_tensors="pt")
-    outputs = mdl.generate(**inputs, forced_bos_token_id=forced, max_length=512)
-    out = tok.batch_decode(outputs, skip_special_tokens=True)[0]
-    return {"translation": out}
+        inputs = tokenizer(text, return_tensors="pt")
+        with torch.no_grad():
+            generated_tokens = model.generate(
+                **inputs,
+                forced_bos_token_id=tokenizer.get_lang_id(target),
+                max_length=512
+            )
+        translation = tokenizer.decode(generated_tokens[0], skip_special_tokens=True)
+        return {"translation": translation}
+    except Exception as e:
+        return {"error": str(e)}
 
-# 👇 Add this part to run with host/port
+# -------------------------------------------------------------
+# Health check
+# -------------------------------------------------------------
+@app.get("/")
+def root():
+    return {"message": "M2M100 Translator is running."}
+
+# -------------------------------------------------------------
+# Run server with fixed host/port
+# -------------------------------------------------------------
 if __name__ == "__main__":
-    HOST = "0.0.0.0"   # or "127.0.0.1" if you want local-only access
-    PORT = 8893
-    uvicorn.run(app, host=HOST, port=PORT)
+    HOST = "0.0.0.0"
+    PORT = 8892
+    print(f"🚀 Starting M2M100 Translator on http://{HOST}:{PORT}")
+    uvicorn.run("m2m_service:app", host=HOST, port=PORT, reload=False)
