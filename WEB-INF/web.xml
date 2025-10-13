@@ -1,0 +1,28 @@
+<web-app>
+    <!-- Example of an endpoint for our server: -->
+    <!--   <servlet>-->
+    <!--        <servlet-name>bob</servlet-name>-->
+    <!--        <servlet-class>HitServlet</servlet-class>-->
+    <!--    </servlet>-->
+
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>bob</servlet-name>-->
+    <!--        <url-pattern>/hits</url-pattern>-->
+    <!--    </servlet-mapping>-->
+
+    <servlet>
+        <servlet-name>WhisperServlet</servlet-name>
+        <servlet-class>WhisperServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>WhisperServlet</servlet-name>
+        <url-pattern>/whisper</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>WhisperServlet</servlet-name>
+        <url-pattern>/whisper/transcribe</url-pattern>
+    </servlet-mapping>
+
+</web-app>
