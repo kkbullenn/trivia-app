@@ -13,11 +13,12 @@ public class LoginServlet extends HttpServlet {
 
 
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException{
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException, ServletException{
         RequestDispatcher dispatcher = request.getRequestDispatcher("/login.html");
         dispatcher.forward(request, response);
     }
-    -
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -36,7 +37,7 @@ public class LoginServlet extends HttpServlet {
                     if (rs.next()) {
                         // Successful login
                         HttpSession session = request.getSession(true);
-                        session.getAttribute("user_id", username);
+                        session.setAttribute("user_id", userId);
                         response.sendRedirect("main");
                     } else {
                         // Invalid login
@@ -52,5 +53,4 @@ public class LoginServlet extends HttpServlet {
             e.printStackTrace();
         }
     }
-}
 }
