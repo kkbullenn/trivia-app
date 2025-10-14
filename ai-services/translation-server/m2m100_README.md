@@ -19,5 +19,5 @@ M2M100 will not work without these dependencies.
 cd ai-services/translation-server   # go to location
 python -m venv venv                 # create virtual environment
 source venv/bin/activate            # or venv\Scripts\activate on Windows
-pip install fastapi uvicorn transformers torch # install dependencies
+pip install fastapi uvicorn transformers torch sentencepiece python-multipart # install dependencies
 python m2m100_service.py            # run the server locally
