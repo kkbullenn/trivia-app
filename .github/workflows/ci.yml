@@ -1,5 +1,6 @@
 name: Java CI
 
+# Run CI on these branches
 on:
   push:
     branches: [ main, dev, 'feature/**', 'sprint**' ]
@@ -8,9 +9,11 @@ on:
 
 jobs:
   build:
+    # Use Ubuntu as the virtual machine
     runs-on: ubuntu-latest
 
     steps:
+      # Pull the code from the repo
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -28,5 +31,6 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
 
+      # Clean, build, and test
       - name: Build with Maven
         run: mvn -B clean verify
