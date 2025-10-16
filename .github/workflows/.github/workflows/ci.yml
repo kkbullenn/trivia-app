@@ -20,5 +20,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Compile Java files
+        run: |
+          mkdir -p out
+          javac -d out $(find WEB-INF/classes -name "*.java")
+
+      # [Update when test are available]
+      - name: Run tests (if available)
+        run: |
+          if ls WEB-INF/classes/*Test.java 1> /dev/null 2>&1; then
+            javac -cp out -d out $(find WEB-INF/classes -name "*Test.java")
+            java -cp out org.junit.runner.JUnitCore
+          else
+          echo "No test files found. Skipping test step."
+          fi
+
       - name: Build with Maven
         run: mvn -B clean verify
