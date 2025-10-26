@@ -1,4 +1,4 @@
-package main.java.com.triviaapp.connection;
+package com.triviaapp.connection;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
