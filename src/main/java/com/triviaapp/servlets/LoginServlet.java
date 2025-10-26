@@ -1,6 +1,8 @@
+package com.triviaapp.servlets;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.WebServlet;
+
 import java.io.*;
 import java.sql.*;
 
