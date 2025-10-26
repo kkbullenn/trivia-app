@@ -23,6 +23,9 @@
 hs_err_pid*
 replay_pid*
 
+# Environmental files
+*.env
+
 # IDE files
 *.idea
 
@@ -35,3 +38,7 @@ replay_pid*
 
 # env file
 .env
+*.iml
+
+# Maven build folder
+target
