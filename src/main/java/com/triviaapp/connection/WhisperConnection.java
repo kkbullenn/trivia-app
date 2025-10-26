@@ -1,4 +1,4 @@
-package main.java.com.triviaapp.connection;
+package com.triviaapp.connection;
 
 public final class WhisperConnection {
 }
