@@ -14,7 +14,7 @@ A Flask-based microservice using vikhyatk/moondream2 to generate captions for im
 
 
 ```bash
-cd ai-services/moondream_service # go to location
+cd ai-services/image-transcription-server # go to location
 python -m venv venv # create env
 source venv/bin/activate # or venv\Scripts\activate on Windows
 pip install flask transformers pillow torch # deps
