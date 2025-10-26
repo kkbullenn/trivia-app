@@ -1,3 +1,4 @@
+package main.java.com.triviaapp.servlets;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;

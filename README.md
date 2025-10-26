@@ -134,7 +134,7 @@ AI team if you are stuck.
 
 ---
 
-## 4️⃣ Production Deployment
+## 4️⃣ Production Deployment (for DevOps team)
 
 **Goal:** Build a clean WAR file and deploy it for hosting.
 
@@ -187,3 +187,29 @@ AI team if you are stuck.
 * Production deploy → build WAR → copy WAR → restart Tomcat (for hosting)
 
 ---
+# Project Structure
+```angular2html
+trivia-app/       ← project root (Tomcat webapp root for local dev, place this in your tomcat webapps folder)
+├── WEB-INF/
+│   ├── web.xml                                                     ← servlet configuration, BE team put your URL mappings here
+│   ├── classes/com/triviaapp/servlets/                             ← (can ignore) compiled .class files go here after mvn compile
+│   │               ├── CreateQuizServlet.class (for example)
+│   └── lib/                                                        ← (can ignore) runtime JAR dependencies copied here by Maven
+│
+├── src/
+│   └── main/
+│       └── java/
+│           └── com/
+│               └── triviaapp/                                      ← Other files can go in new folders from triviaapp folder
+│                   └── servlets/                                   ← BE servlets
+│                       ├── CreateQuizServlet.java
+│                       └── OtherServlet.java
+│
+├── src/webapp/                                                     ← FE files go here
+│   ├── index.html
+│   ├── styles.css
+│   └── scripts.js
+│
+├── pom.xml                                                         ← Maven project file (for dependencies and project build)
+└── README.md
+```

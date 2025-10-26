@@ -1,6 +1,7 @@
+package main.java.com.triviaapp.servlets;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.WebServlet;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -12,7 +12,7 @@
 
     <servlet>
         <servlet-name>WhisperServlet</servlet-name>
-        <servlet-class>WhisperServlet</servlet-class>
+        <servlet-class>src.main.java.com.triviaapp.servlets.WhisperServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

@@ -37,23 +37,12 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}</sourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
 
-        <!-- Set the WAR name explicitly -->
         <finalName>trivia-app-prod</finalName>
 
         <plugins>
-            <!-- WAR plugin for production packaging -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-
-            <!-- Compiler plugin for local development -->
+            <!-- Compiler plugin (dev & prod) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -61,30 +50,43 @@
                 <configuration>
                     <source>11</source>
                     <target>11</target>
+                    <!-- Output compiled classes directly into WEB-INF/classes -->
+                    <outputDirectory>${project.basedir}/WEB-INF/classes</outputDirectory>
                 </configuration>
             </plugin>
 
+            <!-- WAR plugin (prod) -->
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                    <webXml>${project.basedir}/WEB-INF/web.xml</webXml>
+                    <classesDirectory>${project.basedir}/WEB-INF/classes</classesDirectory>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <!--- Copies deps to local dev output (root /WEB-INF) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
+                        <id>copy-dependencies</id>
                         <phase>compile</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.basedir}/WEB-INF/classes</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.outputDirectory}</directory>
-                                </resource>
-                            </resources>
+                            <outputDirectory>${project.basedir}/WEB-INF/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
