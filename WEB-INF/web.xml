@@ -25,4 +25,18 @@
         <url-pattern>/whisper/transcribe</url-pattern>
     </servlet-mapping>
 
+
+    <servlet>
+        <servlet-name>MoondreamServlet</servlet-name>
+        <servlet-class>MoondreamServlet</servlet-class>  
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MoondreamServlet</servlet-name>
+        <url-pattern>/moondream</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MoondreamServlet</servlet-name>
+        <url-pattern>/moondream/caption</url-pattern>
+    </servlet-mapping>
+
 </web-app>
