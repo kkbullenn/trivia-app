@@ -1,7 +1,7 @@
 <web-app>
     <servlet>
         <servlet-name>WhisperServlet</servlet-name>
-        <servlet-class>src.main.java.com.triviaapp.servlets.WhisperServlet</servlet-class>
+        <servlet-class>main.java.com.triviaapp.servlets.WhisperServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -14,10 +14,20 @@
         <url-pattern>/whisper/transcribe</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>SignUpServlet</servlet-name>
+        <servlet-class>main.java.com.triviaapp.servlets.SignUpServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SignUpServlet</servlet-name>
+        <url-pattern>/signup</url-pattern>
+    </servlet-mapping>
+
     <!-- M2M100 Translator proxy -->
     <servlet>
         <servlet-name>M2M100Servlet</servlet-name>
-        <servlet-class>src.main.java.com.triviaapp.servlets.M2M100Servlet</servlet-class>
+        <servlet-class>main.java.com.triviaapp.servlets.M2M100Servlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
