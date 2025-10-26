@@ -205,7 +205,7 @@ trivia-app/       ← project root (Tomcat webapp root for local dev, place this
 │                       ├── CreateQuizServlet.java
 │                       └── OtherServlet.java
 │
-├── src/webapp/                                                     ← FE files go here
+├── src/main/webapp/                                                ← IMPORTANT: FE files go here (otherwise they will be git-ignored. This is required.)
 │   ├── index.html
 │   ├── styles.css
 │   └── scripts.js

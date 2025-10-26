@@ -6,7 +6,6 @@ import jakarta.servlet.annotation.WebServlet;
 import java.io.*;
 import java.sql.*;
 
-@WebServlet("/signup")
 public class SignUpServlet extends HttpServlet {
 
     private static final String DB_URL = "jdbc:mysql://shuttle.proxy.rlwy.net:24339/trivia_app";

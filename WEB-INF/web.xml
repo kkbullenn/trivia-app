@@ -1,15 +1,4 @@
 <web-app>
-    <!-- Example of an endpoint for our server: -->
-    <!--   <servlet>-->
-    <!--        <servlet-name>bob</servlet-name>-->
-    <!--        <servlet-class>HitServlet</servlet-class>-->
-    <!--    </servlet>-->
-
-    <!--    <servlet-mapping>-->
-    <!--        <servlet-name>bob</servlet-name>-->
-    <!--        <url-pattern>/hits</url-pattern>-->
-    <!--    </servlet-mapping>-->
-
     <servlet>
         <servlet-name>WhisperServlet</servlet-name>
         <servlet-class>src.main.java.com.triviaapp.servlets.WhisperServlet</servlet-class>
@@ -28,7 +17,7 @@
     <!-- M2M100 Translator proxy -->
     <servlet>
         <servlet-name>M2M100Servlet</servlet-name>
-        <servlet-class>M2M100Servlet</servlet-class>
+        <servlet-class>src.main.java.com.triviaapp.servlets.M2M100Servlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
