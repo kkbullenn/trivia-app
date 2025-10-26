@@ -8,31 +8,61 @@
     <title>Select Quiz</title>
 </head>
 
-<body class="px-6">
-    <div class="flex flex-row justify-between">
-        <button class="flex flex-row">
-            <img id="icon" src="" alt="">
-            <div>Welcome, </div> 
-            <div id="username">user</div>
-        </button>
-        <button>EXIT</button>
+<body class="font-mono">
+    <div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
+        <form action="USER" , method="GET">
+            <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M8 7C9.65685 7 11 5.65685 11 4C11 2.34315 9.65685 1 8 1C6.34315 1 5 2.34315 5 4C5 5.65685 6.34315 7 8 7Z"
+                            fill="#000000"></path>
+                        <path d="M14 12C14 10.3431 12.6569 9 11 9H5C3.34315 9 2 10.3431 2 12V15H14V12Z" fill="#000000">
+                        </path>
+                    </g>
+                </svg>
+                <div class="text-white">Welcome, </div>
+                <div class="font-bold text-yellow-400" id="username">User</div>
+            </button>
+        </form>
+        <form action="EXIT" , method="POST">
+            <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        </path>
+                        <path d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                    </g>
+                </svg>
+            </button>
+        </form>
     </div>
-    <div>Select a quiz category</div>
-    <div class="py-8 flex flex-col items-center">
-        <div class="grid grid-cols-3 gap-10">
-            <div>Category 1</div>
-            <div>Category 2</div>
-            <div>Category 3</div>
-            <div>Category 4</div>
-            <div>Category 5</div>
-            <div>Category 6</div>
-            <div>Category 7</div>
-            <div>Category 8</div>
-            <div>Category 9</div>
-        
-        </div>
-    </div>
+    <div class="px-4">
+        <div class="py-8">Quiz Categories</div>
+        <div class="py-8 flex flex-col items-center">
+            <div id="category" class="grid grid-cols-3 gap-10">
+                <!-- Categories will be injected here -->
+                <button>Category 1</button>
+                <button>Category 2</button>
+                <button>Category 3</button>
+                <button>Category 4</button>
+                <button>Category 5</button>
+                <button>Category 6</button>
+                <button>Category 7</button>
+                <button>Category 8</button>
+                <button>Category 9</button>
 
+            </div>
+        </div>
+        <div>My Quizzes</div>
+    </div>
 
 
 
