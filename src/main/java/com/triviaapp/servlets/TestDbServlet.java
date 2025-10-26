@@ -48,7 +48,7 @@ public class TestDbServlet extends HttpServlet {
                 e.printStackTrace(out);
             }
 
-            // Run DAO tests (each test is in its own method to keep doGet concise)
+            // Run DAO tests
             out.println();
             testRoleDAO(out);
             out.println();

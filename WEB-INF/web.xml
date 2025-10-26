@@ -1,28 +1,15 @@
 <web-app>
-    <!-- Example of an endpoint for our server: -->
-    <!--   <servlet>-->
-    <!--        <servlet-name>bob</servlet-name>-->
-    <!--        <servlet-class>HitServlet</servlet-class>-->
-    <!--    </servlet>-->
 
-    <!--    <servlet-mapping>-->
-    <!--        <servlet-name>bob</servlet-name>-->
-    <!--        <url-pattern>/hits</url-pattern>-->
-    <!--    </servlet-mapping>-->
-
+    <!-- Test Database Servlet (will be deleted)-->
     <servlet>
-        <servlet-name>WhisperServlet</servlet-name>
-        <servlet-class>WhisperServlet</servlet-class>
+        <servlet-name>TestDbServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.TestDbServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>WhisperServlet</servlet-name>
-        <url-pattern>/whisper</url-pattern>
+        <servlet-name>TestDbServlet</servlet-name>
+        <url-pattern>/test-db</url-pattern>
     </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>WhisperServlet</servlet-name>
-        <url-pattern>/whisper/transcribe</url-pattern>
-    </servlet-mapping>
+    <!-- Test Database Servlet (will be deleted)-->
 
 </web-app>
