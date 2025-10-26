@@ -1,14 +1,4 @@
 <web-app>
-    <!-- Example of an endpoint for our server: -->
-    <!--   <servlet>-->
-    <!--        <servlet-name>bob</servlet-name>-->
-    <!--        <servlet-class>HitServlet</servlet-class>-->
-    <!--    </servlet>-->
-
-    <!--    <servlet-mapping>-->
-    <!--        <servlet-name>bob</servlet-name>-->
-    <!--        <url-pattern>/hits</url-pattern>-->
-    <!--    </servlet-mapping>-->
 
     <servlet>
         <servlet-name>WhisperServlet</servlet-name>

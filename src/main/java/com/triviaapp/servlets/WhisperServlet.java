@@ -3,6 +3,7 @@ package main.java.com.triviaapp.servlets;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import main.java.com.triviaapp.connection.WhisperConnection;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,18 +22,18 @@ import java.net.http.HttpResponse;
  * Available methods: POST (see doPost).
  */
 public final class WhisperServlet extends HttpServlet {
-    private static final String WHISPER_HOST = "localhost";
-    private static final int WHISPER_PORT = 8888;
-    private static final URI WHISPER_URI = URI.create("http://" + WHISPER_HOST + ":" + WHISPER_PORT);
-    private static final URI WHISPER_GET_URI = URI.create(WHISPER_URI + "/whisper");
-    private static final URI WHISPER_POST_URI = URI.create(WHISPER_GET_URI + "/transcribe");
+    private static final WhisperConnection CONNECTION = new WhisperConnection();
+
+    private static final URI WHISPER_GET_URI;
     private static final URL WHISPER_POST_URL;
 
     static {
+        WHISPER_GET_URI = CONNECTION.makeURI("/whisper");
+
         try {
-            WHISPER_POST_URL = WHISPER_POST_URI.toURL();
+            WHISPER_POST_URL = CONNECTION.makeURL("/transcribe");
         } catch (final MalformedURLException e) {
-            throw new RuntimeException(WHISPER_POST_URI + " is not a valid URL", e);
+            throw new RuntimeException("/transcribe is not a valid URL extension", e);
         }
     }
 
