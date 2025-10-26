@@ -190,7 +190,7 @@ AI team if you are stuck.
 # Project Structure
 ```angular2html
 trivia-app/       ← project root (Tomcat webapp root for local dev, place this in your tomcat webapps folder)
-├── WEB-INF/
+├── WEB-INF/                                                        ← What tomcat actually understands (Ex: if you are trying to find html files route according to here)
 │   ├── web.xml                                                     ← servlet configuration, BE team put your URL mappings here
 │   ├── classes/com/triviaapp/servlets/                             ← (can ignore) compiled .class files go here after mvn compile
 │   │               ├── CreateQuizServlet.class (for example)
@@ -205,7 +205,7 @@ trivia-app/       ← project root (Tomcat webapp root for local dev, place this
 │                       ├── CreateQuizServlet.java
 │                       └── OtherServlet.java
 │
-├── src/webapp/                                                     ← FE files go here
+├── src/main/webapp/                                                ← IMPORTANT: FE files go here (otherwise they will be git-ignored. This is required.)
 │   ├── index.html
 │   ├── styles.css
 │   └── scripts.js
