@@ -1,7 +1,13 @@
 package com.triviaapp.connection;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -30,7 +36,7 @@ public final class WhisperConnection extends ServerConnection {
         PORT = ENV_MODE.equals(DEV_MODE) ? WHISPER_LOCAL_PORT : Integer.parseInt(ENV.get("WHISPER_PORT"));
         WHISPER_URI = createURI();
         WHISPER_GET_URI = URI.create(WHISPER_URI + "/whisper");
-        WHISPER_POST_URI = URI.create(WHISPER_URI + "/transcribe");
+        WHISPER_POST_URI = URI.create(WHISPER_GET_URI + "/transcribe");
     }
 
     @Override
@@ -49,6 +55,35 @@ public final class WhisperConnection extends ServerConnection {
         } catch (final MalformedURLException e) {
             throw new RuntimeException(WHISPER_POST_URI + "is not a valid URL extension", e);
         }
+    }
+
+    /**
+     * Calls the whisper service api with the given request and returns it's output (via InputStream).
+     *
+     * @param request The request to forward
+     * @return The output from the server.
+     */
+    public InputStream getTranscription(final HttpServletRequest request, final HttpURLConnection connection) throws IOException {
+        final String contentType = request.getContentType();
+        final String contentLength = String.valueOf(request.getContentLength());
+
+        // For multipart form data
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", contentType);
+        connection.setRequestProperty("Content-Length", contentLength);
+
+        final InputStream reqInputStream = request.getInputStream();
+        final OutputStream whisperOutputStream = connection.getOutputStream();
+
+        // forward data to whisper by writing inputStream to outputStream
+        if (reqInputStream != null) {
+            reqInputStream.transferTo(whisperOutputStream);
+            reqInputStream.close();
+        }
+        whisperOutputStream.close();
+
+        return connection.getInputStream();
     }
 
     private static String getMode(final String mode) {
