@@ -1,0 +1,12 @@
+package com.triviaapp.connection;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ * This class offers base functionality for external connections to other servers.
+ */
+abstract class ServerConnection {
+    protected abstract URL getPostURL() throws MalformedURLException;
+    protected abstract URL getGetURL() throws MalformedURLException;
+}

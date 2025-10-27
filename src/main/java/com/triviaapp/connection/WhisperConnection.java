@@ -6,7 +6,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
-public final class WhisperConnection extends AbstractConnection {
+public final class WhisperConnection extends ServerConnection {
+    public static final URI WHISPER_GET_URI;
+    public static final URI WHISPER_POST_URI;
+
     private static final Dotenv ENV;
     private static final String ENV_MODE;
 
@@ -23,26 +26,18 @@ public final class WhisperConnection extends AbstractConnection {
         HOST = ENV_MODE.equals(DEV_MODE) ? "localhost" : ENV.get("WHISPER_HOST");
         PORT = ENV_MODE.equals(DEV_MODE) ? WHISPER_LOCAL_PORT : Integer.parseInt(ENV_MODE);
         WHISPER_URI = createURI();
+        WHISPER_GET_URI = URI.create(WHISPER_URI + "/whisper");
+        WHISPER_POST_URI = URI.create(WHISPER_URI + "/transcribe");
     }
 
     @Override
-    public URL getBaseURL() throws MalformedURLException {
-        return WHISPER_URI.toURL();
+    public URL getPostURL() throws MalformedURLException {
+        return WHISPER_POST_URI.toURL();
     }
 
     @Override
-    public URI getBaseURI() {
-        return WHISPER_URI;
-    }
-
-    @Override
-    public URI makeURI(final String uri) {
-        return URI.create(WHISPER_URI + uri);
-    }
-
-    @Override
-    public URL makeURL(final String url) throws MalformedURLException {
-        return URI.create(WHISPER_URI + url).toURL();
+    public URL getGetURL() throws MalformedURLException {
+        return WHISPER_GET_URI.toURL();
     }
 
     private static String getMode(final String mode) {

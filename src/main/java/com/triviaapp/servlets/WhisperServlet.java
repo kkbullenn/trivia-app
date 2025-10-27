@@ -3,14 +3,14 @@ package com.triviaapp.servlets;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.java.com.triviaapp.connection.WhisperConnection;
+
+import com.triviaapp.connection.WhisperConnection;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -23,15 +23,11 @@ import java.net.http.HttpResponse;
  */
 public final class WhisperServlet extends HttpServlet {
     private static final WhisperConnection CONNECTION = new WhisperConnection();
-
-    private static final URI WHISPER_GET_URI;
     private static final URL WHISPER_POST_URL;
 
     static {
-        WHISPER_GET_URI = CONNECTION.makeURI("/whisper");
-
         try {
-            WHISPER_POST_URL = CONNECTION.makeURL("/transcribe");
+            WHISPER_POST_URL = CONNECTION.getPostURL();
         } catch (final MalformedURLException e) {
             throw new RuntimeException("/transcribe is not a valid URL extension", e);
         }
@@ -50,21 +46,19 @@ public final class WhisperServlet extends HttpServlet {
 
         // request given does not matter
 
-        final HttpRequest httpRequest = HttpRequest.newBuilder().uri(WHISPER_GET_URI).build();
+        final HttpRequest httpRequest = HttpRequest.newBuilder().uri(WhisperConnection.WHISPER_GET_URI).build();
         final HttpClient httpClient = HttpClient.newHttpClient();
         // response is a string of a JSON object, FE will need to parse this
         final HttpResponse<String> whisperResponse;
 
         try {
-            whisperResponse = httpClient.send(httpRequest,
-                    HttpResponse.BodyHandlers.ofString());
+            whisperResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             response.setContentType("application/json");
             response.setStatus(whisperResponse.statusCode());
             response.getWriter().println(whisperResponse.body());
         } catch (final Exception ex) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "WhisperServlet Error: " + ex.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "WhisperServlet Error: " + ex.getMessage());
         }
     }
 
@@ -75,31 +69,30 @@ public final class WhisperServlet extends HttpServlet {
      * <p>
      * Please see this <a href="https://github.com/SYSTRAN/faster-whisper">link</a> for supported languages and file extensions
      *
-     * @param request multipart form-data containing the file and optionally the source_lang
-     * <p>
-     * Sample multipart form-data:
-     * <p>
-     * POST /whisper/transcribe HTTP/1.1
-     * Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryXyZ123
-     *
-     * ------WebKitFormBoundaryXyZ123
-     * Content-Disposition: form-data; name="file"; filename="audio.wav"
-     * Content-Type: audio/wav
-     *
-     * <binary audio data here>
-     * ------WebKitFormBoundaryXyZ123
-     * Content-Disposition: form-data; name="source_lang"
-     *
-     * auto
-     * ------WebKitFormBoundaryXyZ123--
-     *
+     * @param request  multipart form-data containing the file and optionally the source_lang
+     *                 <p>
+     *                 Sample multipart form-data:
+     *                 <p>
+     *                 POST /whisper/transcribe HTTP/1.1
+     *                 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryXyZ123
+     *                 <p>
+     *                 ------WebKitFormBoundaryXyZ123
+     *                 Content-Disposition: form-data; name="file"; filename="audio.wav"
+     *                 Content-Type: audio/wav
+     *                 <p>
+     *                 <binary audio data here>
+     *                 ------WebKitFormBoundaryXyZ123
+     *                 Content-Disposition: form-data; name="source_lang"
+     *                 <p>
+     *                 auto
+     *                 ------WebKitFormBoundaryXyZ123--
      * @param response Gives the response as a JSON object in the following format:
-     * <p>
-     * {
-     *   "detected_language":"pt",
-     *   "duration_sec":8.96,
-     *   "translated_text":"I don't want the terrible limitation of the one who lived only the one who was able to make a sense.I don't want the truth invented."
-     * }
+     *                 <p>
+     *                 {
+     *                 "detected_language":"pt",
+     *                 "duration_sec":8.96,
+     *                 "translated_text":"I don't want the terrible limitation of the one who lived only the one who was able to make a sense.I don't want the truth invented."
+     *                 }
      */
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
