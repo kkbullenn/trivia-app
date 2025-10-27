@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -23,15 +21,6 @@ import java.net.http.HttpResponse;
  */
 public final class WhisperServlet extends HttpServlet {
     private static final WhisperConnection CONNECTION = new WhisperConnection();
-    private static final URL WHISPER_POST_URL;
-
-    static {
-        try {
-            WHISPER_POST_URL = CONNECTION.getPostURL();
-        } catch (final MalformedURLException e) {
-            throw new RuntimeException("/transcribe is not a valid URL extension", e);
-        }
-    }
 
     /**
      * Connects to the Whisper service in order to test if a connection has been established.
@@ -102,7 +91,7 @@ public final class WhisperServlet extends HttpServlet {
         final String contentLength = String.valueOf(request.getContentLength());
 
         // For multipart form data
-        final HttpURLConnection connection = (HttpURLConnection) WHISPER_POST_URL.openConnection();
+        final HttpURLConnection connection = (HttpURLConnection) CONNECTION.getPostURL().openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", contentType);

@@ -6,6 +6,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
+/**
+ * This class offers functionality for managing Whisper server's URLs/URIs.
+ */
 public final class WhisperConnection extends ServerConnection {
     public static final URI WHISPER_GET_URI;
     public static final URI WHISPER_POST_URI;
@@ -31,13 +34,21 @@ public final class WhisperConnection extends ServerConnection {
     }
 
     @Override
-    public URL getPostURL() throws MalformedURLException {
-        return WHISPER_POST_URI.toURL();
+    public URL getPostURL() {
+        try {
+            return WHISPER_POST_URI.toURL();
+        } catch (final MalformedURLException e) {
+            throw new RuntimeException(WHISPER_POST_URI + "is not a valid URL extension", e);
+        }
     }
 
     @Override
-    public URL getGetURL() throws MalformedURLException {
-        return WHISPER_GET_URI.toURL();
+    public URL getGetURL() {
+        try {
+            return WHISPER_GET_URI.toURL();
+        } catch (final MalformedURLException e) {
+            throw new RuntimeException(WHISPER_POST_URI + "is not a valid URL extension", e);
+        }
     }
 
     private static String getMode(final String mode) {
