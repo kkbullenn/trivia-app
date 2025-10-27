@@ -53,7 +53,7 @@
     <!-- login redirect -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>main.java.com.triviaapp.servlets.SLoginServlet</servlet-class>
+        <servlet-class>main.java.com.triviaapp.servlets.LoginServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
