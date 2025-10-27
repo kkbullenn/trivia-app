@@ -36,6 +36,7 @@ public class MainServlet extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        int userId = (Integer) session.getAttribute("user_id");
 
         // Create DAO object to grab available categories from database
         CategoryDAO categoryDAO = new CategoryDAOImpl();
@@ -48,19 +49,45 @@ public class MainServlet extends HttpServlet {
             return;
         }
 
-        // Build JSON array using org.json
-        JSONArray jsonArray = new JSONArray();
+        // Create Session DAO object to grab available sessions from database
+        SessionDAO sessionDAO = new SessionDAOImpl();
+        List<Map<String, String>> sessions;
+        try {
+            sessions = sessionDAO.findSessionsByHost(userId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
+            return;
+        }
+
+        // Build JSON array for categories using org.json
+        JSONArray categoriesArray = new JSONArray();
         for (Map.Entry<Integer, String> entry : categories.entrySet()) {
             JSONObject obj = new JSONObject();
             obj.put("id", entry.getKey());
             obj.put("name", entry.getValue());
-            jsonArray.put(obj);
+            categoriesArray.put(obj);
         }
+
+        // Build JSON array for sessions (Quiz) using org.json
+        JSONArray quizzesArray = new JSONArray();
+        for (Map<String, String> quiz : sessions) {
+            JSONObject obj = new JSONObject();
+            obj.put("session_id", quiz.get("session_id"));
+            obj.put("quiz_name", quiz.get("quiz_name"));
+            obj.put("status", quiz.get("status"));
+            quizzesArray.put(obj);
+        }
+
+        // wrap both arrays in a single JSON object
+        JSONObject responseJson = new JSONObject();
+        responseJson.put("categories", categoriesArray);
+        responseJson.put("quizzes", quizzesArray);
         
         // Return JSON response
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(jsonArray.toString());
+        response.getWriter().write(responseJson.toString());
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/select-quiz.html");
         dispatcher.forward(request, response);
