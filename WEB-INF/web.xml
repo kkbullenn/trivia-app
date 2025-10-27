@@ -9,9 +9,14 @@
         <url-pattern>/whisper</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>MainServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.MainServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
-        <servlet-name>WhisperServlet</servlet-name>
-        <url-pattern>/whisper/transcribe</url-pattern>
+        <servlet-name>MainServlet</servlet-name>
+        <url-pattern>/main</url-pattern>
     </servlet-mapping>
 
     <servlet>
