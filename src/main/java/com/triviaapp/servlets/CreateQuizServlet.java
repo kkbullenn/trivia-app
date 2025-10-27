@@ -1,6 +1,10 @@
+package com.triviaapp.servlets;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.WebServlet;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.*;
 import java.sql.*;
 
@@ -29,7 +33,7 @@ public class CreateQuizServlet extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-        int uploadedBy = session.getAttribute("user_id");
+        int uploadedBy = (int) session.getAttribute("user_id");
 
         // Retrieve form parameters
         int categoryId = Integer.parseInt(request.getParameter("category_id"));
