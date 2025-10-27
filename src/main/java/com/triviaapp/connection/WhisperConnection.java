@@ -27,7 +27,7 @@ public final class WhisperConnection extends ServerConnection {
         ENV = Dotenv.load();
         ENV_MODE = getMode(ENV.get("WHISPER_MODE"));
         HOST = ENV_MODE.equals(DEV_MODE) ? "localhost" : ENV.get("WHISPER_HOST");
-        PORT = ENV_MODE.equals(DEV_MODE) ? WHISPER_LOCAL_PORT : Integer.parseInt(ENV_MODE);
+        PORT = ENV_MODE.equals(DEV_MODE) ? WHISPER_LOCAL_PORT : Integer.parseInt(ENV.get("WHISPER_PORT"));
         WHISPER_URI = createURI();
         WHISPER_GET_URI = URI.create(WHISPER_URI + "/whisper");
         WHISPER_POST_URI = URI.create(WHISPER_URI + "/transcribe");
