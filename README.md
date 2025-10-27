@@ -213,3 +213,12 @@ trivia-app/       ← project root (Tomcat webapp root for local dev, place this
 ├── pom.xml                                                         ← Maven project file (for dependencies and project build)
 └── README.md
 ```
+
+---
+## Database (.env)
+
+Place a `.env` file in the project root (do NOT commit). Include these variables:
+
+JDBC_URL=jdbc:mysql://shuttle.proxy.rlwy.net:24339/trivia_app?useSSL=true&serverTimezone=UTC
+JDBC_USER=username
+JDBC_PASS=password
