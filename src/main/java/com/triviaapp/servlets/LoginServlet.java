@@ -1,15 +1,17 @@
+package com.triviaapp.servlets;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.WebServlet;
+
 import java.io.*;
 import java.sql.*;
 
 
 public class LoginServlet extends HttpServlet {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/quizapp";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "password"; // change this when server is set up
+    private static final String DB_URL = "jdbc:mysql://shuttle.proxy.rlwy.net:24339/trivia_app";
+    private static final String DB_USER = "backend_team";
+    private static final String DB_PASSWORD = "BackTeam!123";
 
 
     @Override
@@ -23,19 +25,20 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        String userId = request.getParameter("user_id");
+        String userEmail = request.getParameter("email");
         String password = request.getParameter("password");
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
 
             String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, userId);
+                stmt.setString(1, userEmail);
                 stmt.setString(2, password);
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         // Successful login
+                        int userId = rs.getInt("user_id");
                         HttpSession session = request.getSession(true);
                         session.setAttribute("user_id", userId);
                         response.sendRedirect("main");

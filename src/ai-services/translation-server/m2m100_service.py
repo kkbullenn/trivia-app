@@ -225,4 +225,4 @@ def translate_questions_answers(req: QARequest):
 # ---------------- run server ----------------
 if __name__ == "__main__":
     print(f"Starting M2M100 Translator at http://{HOST}:{PORT}")
-    uvicorn.run("m2m_service:app", host=HOST, port=PORT, reload=False)
+    uvicorn.run("m2m100_service:app", host=HOST, port=PORT, reload=False)
