@@ -25,20 +25,19 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        String userEmail = request.getParameter("email");
+        String userId = request.getParameter("user_id");
         String password = request.getParameter("password");
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
 
             String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, userEmail);
+                stmt.setString(1, userId);
                 stmt.setString(2, password);
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         // Successful login
-                        int userId = rs.getInt("user_id");
                         HttpSession session = request.getSession(true);
                         session.setAttribute("user_id", userId);
                         response.sendRedirect("main");
