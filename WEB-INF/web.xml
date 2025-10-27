@@ -15,6 +15,36 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>MainDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.MainDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>MainDataServlet</servlet-name>
+        <url-pattern>/main/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CategoryLobbiesServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.CategoryLobbiesServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>CategoryLobbiesServlet</servlet-name>
+        <url-pattern>/category-lobbies</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CategoryLobbiesDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.CategoryLobbiesDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>CategoryLobbiesDataServlet</servlet-name>
+        <url-pattern>/category-lobbies/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>SignUpServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.SignUpServlet</servlet-class>
     </servlet>
