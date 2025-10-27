@@ -20,6 +20,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>MainDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.MainDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>MainDataServlet</servlet-name>
+        <url-pattern>/main/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>SignUpServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.SignUpServlet</servlet-class>
     </servlet>
