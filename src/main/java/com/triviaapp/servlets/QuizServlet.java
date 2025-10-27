@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/active-lobby/quiz")
+@WebServlet("/quiz")
 public class QuizServlet extends HttpServlet {
 
     @Override
