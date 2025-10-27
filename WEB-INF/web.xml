@@ -50,4 +50,14 @@
         <url-pattern>/m2m100/translate/questions-answers</url-pattern>
     </servlet-mapping>
 
+    <!-- login redirect -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>main.java.com.triviaapp.servlets.SLoginServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
 </web-app>
