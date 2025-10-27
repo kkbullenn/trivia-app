@@ -2,10 +2,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Locale.Category;
 import java.util.Map;
-
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,7 +24,7 @@ public class MainDataServlet extends HttpServlet {
         String ajaxHeader = request.getHeader("AJAX-Requested-With");
         if (session == null || session.getAttribute("user_id") == null) {
             // Not logged in, redirect to main page or login page
-            response.sendRedirect("main"); // or "login"
+            response.sendRedirect("login"); // or "login"
             return;
         } else if (ajaxHeader == null || !ajaxHeader.equals("fetch")) {
             response.sendRedirect("main");
