@@ -9,9 +9,9 @@ import java.sql.*;
 
 public class LoginServlet extends HttpServlet {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/quizapp";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "password"; // change this when server is set up
+    private static final String DB_URL = "jdbc:mysql://shuttle.proxy.rlwy.net:24339/trivia_app";
+    private static final String DB_USER = "backend_team";
+    private static final String DB_PASSWORD = "BackTeam!123";
 
 
     @Override
