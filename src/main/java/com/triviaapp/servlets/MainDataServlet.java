@@ -74,7 +74,7 @@ public class MainDataServlet extends HttpServlet {
         JSONArray quizzesArray = new JSONArray();
         for (Map<String, String> quiz : sessions) {
             JSONObject obj = new JSONObject();
-            obj.put("session_id", quiz.get("session_id"));
+            obj.put("session_id", Integer.parseInt(quiz.get("session_id")));
             obj.put("quiz_name", quiz.get("quiz_name"));
             obj.put("status", quiz.get("status"));
             quizzesArray.put(obj);
