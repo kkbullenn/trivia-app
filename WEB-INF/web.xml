@@ -1,11 +1,54 @@
 <web-app>
 
+    <servlet>
+        <servlet-name>WhisperServlet</servlet-name>
+        <servlet-class>main.java.com.triviaapp.servlets.WhisperServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>SignUpServlet</servlet-name>
+        <servlet-class>main.java.com.triviaapp.servlets.SignUpServlet</servlet-class>
+    </servlet>
+
     <!-- Test Database Servlet (will be deleted)-->
     <servlet>
         <servlet-name>TestDbServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.TestDbServlet</servlet-class>
     </servlet>
+    <!-- Test Database Servlet (will be deleted)-->
 
+    <servlet-mapping>
+        <servlet-name>SignUpServlet</servlet-name>
+        <url-pattern>/signup</url-pattern>
+    </servlet-mapping>
+
+    <!-- M2M100 Translator proxy -->
+    <servlet>
+        <servlet-name>M2M100Servlet</servlet-name>
+        <servlet-class>main.java.com.triviaapp.servlets.M2M100Servlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>M2M100Servlet</servlet-name>
+        <url-pattern>/m2m100</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>M2M100Servlet</servlet-name>
+        <url-pattern>/m2m100/languages</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>M2M100Servlet</servlet-name>
+        <url-pattern>/m2m100/translate</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>M2M100Servlet</servlet-name>
+        <url-pattern>/m2m100/translate/questions-answers</url-pattern>
+    </servlet-mapping>
+
+    <!-- Test Database Servlet (will be deleted)-->
     <servlet-mapping>
         <servlet-name>TestDbServlet</servlet-name>
         <url-pattern>/test-db</url-pattern>

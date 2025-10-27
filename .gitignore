@@ -33,12 +33,10 @@ replay_pid*
 /WEB-INF/classes/
 /WEB-INF/lib/
 
-# local backups
-/backup/
-
-# env file
-.env
 *.iml
 
 # Maven build folder
 target
+
+# ignore root .html files (the root files are only for local dev and are duplicates. Actualy files should be in src/main/webapps)
+/*.html
