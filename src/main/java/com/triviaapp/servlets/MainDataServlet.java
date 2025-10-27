@@ -3,14 +3,21 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.triviaapp.dao.CategoryDAO;
+import com.triviaapp.dao.SessionDAO;
+import com.triviaapp.dao.impl.CategoryDAOImpl;
+import com.triviaapp.dao.impl.SessionDAOImpl;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 @WebServlet("/main/data")
 public class MainDataServlet extends HttpServlet {

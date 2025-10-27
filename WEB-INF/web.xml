@@ -83,11 +83,23 @@
     <!-- login redirect -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>main.java.com.triviaapp.servlets.LoginServlet</servlet-class>
+        <servlet-class>com.triviaapp.servlets.LoginServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
+
+    <!-- Test Database Servlet (will be deleted)-->
+    <servlet>
+        <servlet-name>TestDbServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.TestDbServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>TestDbServlet</servlet-name>
+        <url-pattern>/test-db</url-pattern>
+    </servlet-mapping>
+    <!-- Test Database Servlet (will be deleted)-->
 </web-app>
