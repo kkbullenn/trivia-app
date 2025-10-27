@@ -1,22 +1,30 @@
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Locale.Category;
+import java.util.Map;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import java.io.*;
-import java.sql.*;
-import java.util.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @WebServlet("/main")
 public class MainServlet extends HttpServlet {
 
-    private static final String DB_URL = String.format(
-    "jdbc:mysql://%s:%s/%s",
-    System.getenv("MYSQLHOST"),
-    System.getenv("MYSQLPORT"),
-    System.getenv("MYSQLDATABASE")
-    );
-
-    private static final String DB_USER = System.getenv("MYSQLUSER");
-    private static final String DB_PASSWORD = System.getenv("MYSQLPASSWORD");
+    // private static final String DB_URL = String.format(
+    // "jdbc:mysql://%s:%s/%s",
+    // System.getenv("MYSQLHOST"),
+    // System.getenv("MYSQLPORT"),
+    // System.getenv("MYSQLDATABASE")
+    // );
+    // private static final String DB_USER = System.getenv("MYSQLUSER");
+    // private static final String DB_PASSWORD = System.getenv("MYSQLPASSWORD");
     
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
@@ -29,28 +37,30 @@ public class MainServlet extends HttpServlet {
             return;
         }
 
-        // Grab available categories from database
-        List<Map<String, String>> categories = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT category_id, name FROM categories ORDER BY display_order ASC";
-            try (PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    Map<String, String> category = new HashMap<>();
-                    category.put("id", rs.getString("category_id"));
-                    category.put("name", rs.getString("name"));
-                    categories.add(category);
-                }
-                stmt.close();
-            }
-            
-            conn.close();
+        // Create DAO object to grab available categories from database
+        CategoryDAO categoryDAO = new CategoryDAOImpl();
+        Map<Integer, String> categories;
+        try {
+            categories = categoryDAO.findAllCategories();
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
             return;
         }
+
+        // Build JSON array using org.json
+        JSONArray jsonArray = new JSONArray();
+        for (Map.Entry<Integer, String> entry : categories.entrySet()) {
+            JSONObject obj = new JSONObject();
+            obj.put("id", entry.getKey());
+            obj.put("name", entry.getValue());
+            jsonArray.put(obj);
+        }
+        
+        // Return JSON response
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonArray.toString());
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/select-quiz.html");
         dispatcher.forward(request, response);
@@ -59,6 +69,6 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {
-        
+        // Will implement later if needed
     }
 }
