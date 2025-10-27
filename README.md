@@ -215,10 +215,9 @@ trivia-app/       ← project root (Tomcat webapp root for local dev, place this
 ```
 
 ---
-## Database (.env)
-
-Place a `.env` file in the project root (do NOT commit). Include these variables:
-
+# Database (.env)
+```env
 JDBC_URL=jdbc:mysql://shuttle.proxy.rlwy.net:24339/trivia_app?useSSL=true&serverTimezone=UTC
 JDBC_USER=username
 JDBC_PASS=password
+```
