@@ -22,7 +22,7 @@ public class CreateQuizServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    @Override
+@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
@@ -33,7 +33,7 @@ public class CreateQuizServlet extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-        int uploadedBy = (int) session.getAttribute("user_id");
+        int uploadedBy = (Integer) session.getAttribute("user_id");
 
         // Retrieve form parameters
         int categoryId = Integer.parseInt(request.getParameter("category_id"));
