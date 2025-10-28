@@ -51,6 +51,7 @@ public class LoginServlet extends HttpServlet {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new ServletException("Login failed due to a database error.", e);
         }
     }
 }
