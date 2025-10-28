@@ -1,4 +1,4 @@
-package com.triviaapp.connection;
+package com.triviaapp.externalapi;
 
 import java.net.URL;
 

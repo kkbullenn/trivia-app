@@ -3,7 +3,7 @@ package com.triviaapp.servlets;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.triviaapp.connection.WhisperConnection;
+import com.triviaapp.externalapi.WhisperConnection;
 
 import java.io.IOException;
 
