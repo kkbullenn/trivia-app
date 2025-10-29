@@ -1,3 +1,5 @@
+package com.triviaapp.servlets;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -13,13 +15,11 @@ import com.triviaapp.dao.impl.CategoryDAOImpl;
 import com.triviaapp.dao.impl.SessionDAOImpl;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/main/data")
 public class MainDataServlet extends HttpServlet {
 
     @Override
