@@ -1,10 +1,10 @@
-import jakarta.servlet.annotation.WebServlet;
+package com.triviaapp.servlets;
+
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/quiz-complete")
 public class QuizCompleteServlet extends HttpServlet
 {
     @Override

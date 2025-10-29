@@ -1,3 +1,5 @@
+package com.triviaapp.servlets;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -11,13 +13,11 @@ import com.triviaapp.dao.SessionDAO;
 import com.triviaapp.dao.impl.SessionDAOImpl;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/category-lobbies/data")
 public class CategoryLobbiesData extends HttpServlet {
     
     @Override

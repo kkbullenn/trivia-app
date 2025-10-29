@@ -69,6 +69,27 @@
                 </configuration>
             </plugin>
 
+            <!-- Clean plugin: deletes extra directories before compile/package (except WEB.xml) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.basedir}/WEB-INF</directory>
+                            <followSymlinks>false</followSymlinks>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*.xml</exclude>
+                            </excludes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
             <!-- WAR plugin (prod) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
