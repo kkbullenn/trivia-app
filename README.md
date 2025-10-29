@@ -182,10 +182,10 @@ AI team if you are stuck.
 
 ## ✅ Summary
 
-| Environment | Command             | What Happens                                                      |
-| ----------- | ------------------- | ----------------------------------------------------------------- |
-| Local Dev   | `mvn compile`       | Compiles `.class` files into `WEB-INF\classes\` for Tomcat to use |
-| Production  | `mvn clean package` | Generates `trivia-app.war` in `target\` ready to deploy           |
+| Environment | Command                              | What Happens                                                      |
+| ----------- |--------------------------------------| ----------------------------------------------------------------- |
+| Local Dev   | `mvn compile` OR `mvn clean compile` | Compiles `.class` files into `WEB-INF\classes\` for Tomcat to use |
+| Production  | `mvn clean package`                  | Generates `trivia-app.war` in `target\` ready to deploy           |
 
 * Local edits → compile → restart Tomcat (local dev)
 * Production deploy → build WAR → copy WAR → restart Tomcat (for hosting)
