@@ -1,3 +1,5 @@
+package com.triviaapp.servlets;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -11,13 +13,11 @@ import com.triviaapp.dao.SessionDAO;
 import com.triviaapp.dao.impl.SessionDAOImpl;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/category-lobbies/data")
 public class CategoryLobbiesData extends HttpServlet {
     
     @Override
@@ -51,7 +51,8 @@ public class CategoryLobbiesData extends HttpServlet {
         JSONArray sessionsArray = new JSONArray();
         for (Map<String, String> sessionData : sessions) {
             JSONObject sessionJson = new JSONObject();
-            sessionJson.put("session_name", sessionData.get("session_name"));
+            sessionJson.put("lobby_id", sessionData.get("session_id"));
+            sessionJson.put("lobby_name", sessionData.get("session_name"));
             sessionJson.put("host_username", sessionData.get("host_username"));
             sessionJson.put("num_players", sessionData.get("num_players"));
             sessionsArray.put(sessionJson);

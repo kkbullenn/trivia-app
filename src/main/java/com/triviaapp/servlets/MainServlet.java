@@ -1,19 +1,13 @@
+package com.triviaapp.servlets;
+
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Locale.Category;
-import java.util.Map;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-@WebServlet("/main")
 public class MainServlet extends HttpServlet {
 
     @Override
