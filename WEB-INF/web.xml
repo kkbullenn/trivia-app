@@ -14,6 +14,18 @@
         <url-pattern>/whisper/transcribe</url-pattern>
     </servlet-mapping>
 
+    <!-- Main Servlets -->
+
+    <servlet>
+        <servlet-name>MainServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.MainServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>MainServlet</servlet-name>
+        <url-pattern>/main</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>MainDataServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.MainDataServlet</servlet-class>
@@ -24,6 +36,7 @@
         <url-pattern>/main/data</url-pattern>
     </servlet-mapping>
 
+    <!-- Category Lobbies Servlets -->
     <servlet>
         <servlet-name>CategoryLobbiesServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.CategoryLobbiesServlet</servlet-class>
@@ -45,13 +58,13 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>SignUpServlet</servlet-name>
-        <servlet-class>com.triviaapp.servlets.SignUpServlet</servlet-class>
+        <servlet-name>JoinCategoryServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.JoinCategoryServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>SignUpServlet</servlet-name>
-        <url-pattern>/signup</url-pattern>
+        <servlet-name>JoinCategoryServlet</servlet-name>
+        <url-pattern>/join-category</url-pattern>
     </servlet-mapping>
 
     <!-- M2M100 Translator proxy -->
@@ -89,6 +102,17 @@
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+
+    <!-- sign up redirect -->
+    <servlet>
+        <servlet-name>SignUpServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.SignUpServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SignUpServlet</servlet-name>
+        <url-pattern>/signup</url-pattern>
     </servlet-mapping>
 
     <!-- Test Database Servlet (will be deleted)-->
