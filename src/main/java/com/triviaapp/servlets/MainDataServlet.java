@@ -30,11 +30,8 @@ public class MainDataServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         String ajaxHeader = request.getHeader("AJAX-Requested-With");
         if (session == null || session.getAttribute("user_id") == null) {
-            // Not logged in, redirect to main page or login page
-            response.sendRedirect("login"); // or "login"
-            return;
-        } else if (ajaxHeader == null || !ajaxHeader.equals("fetch")) {
-            response.sendRedirect("main");
+            // Not logged in, redirect to  login page
+            response.sendRedirect("login"); 
             return;
         }
         int userId = (Integer) session.getAttribute("user_id");
@@ -65,8 +62,8 @@ public class MainDataServlet extends HttpServlet {
         JSONArray categoriesArray = new JSONArray();
         for (Map.Entry<Integer, String> entry : categories.entrySet()) {
             JSONObject obj = new JSONObject();
-            obj.put("id", entry.getKey());
-            obj.put("name", entry.getValue());
+            obj.put("category-id", entry.getKey());
+            obj.put("category-name", entry.getValue());
             categoriesArray.put(obj);
         }
 
@@ -74,9 +71,9 @@ public class MainDataServlet extends HttpServlet {
         JSONArray quizzesArray = new JSONArray();
         for (Map<String, String> quiz : sessions) {
             JSONObject obj = new JSONObject();
-            obj.put("session_id", quiz.get("session_id"));
-            obj.put("quiz_name", quiz.get("quiz_name"));
-            obj.put("status", quiz.get("status"));
+            obj.put("quiz-id", quiz.get("session_id"));
+            obj.put("quiz-name", quiz.get("quiz_name"));
+            obj.put("quiz-category", quiz.get("status")); // Temporary since category not stored in session table, and MVP prototype doesn't need it
             quizzesArray.put(obj);
         }
 
