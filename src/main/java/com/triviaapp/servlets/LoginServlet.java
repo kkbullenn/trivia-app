@@ -38,17 +38,14 @@ public class LoginServlet extends HttpServlet {
 
                 // Successful login
                 HttpSession session = request.getSession(true);
-                try(Connection conn = DBConnectionManager.getConnection()){
-                    PreparedStatement ps = conn.prepareStatement("SELECT user_id FROM users WHERE email = ?");
-                    ps.setString(1, email);
-                    ResultSet rs = ps.executeQuery();
-                    if (rs.next()) {
-                        int user_id = rs.getInt("user_id");
-                        session.setAttribute("user_id", user_id);
-                    }
+                int user_id = userDAO.findUserIDByEmail(email);
+                if (user_id == -1) {
+                    throw new SQLException("Database inconsistency: User found but ID not found.");
+                } else {
+                    session.setAttribute("user_id", user_id);
+                    response.sendRedirect("main");
                 }
 
-                response.sendRedirect("main");
 
             } else {
                 // Invalid login
@@ -56,6 +53,7 @@ public class LoginServlet extends HttpServlet {
                 PrintWriter out = response.getWriter();
                 out.println("<h3>Invalid email or password.</h3>");
                 out.println("<a href='login'>Try again</a>");
+                response.sendRedirect("login");
             }
 
 
