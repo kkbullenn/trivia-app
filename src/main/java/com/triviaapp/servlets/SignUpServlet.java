@@ -14,7 +14,7 @@ public class SignUpServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/signup.html");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/signUp.html");
         dispatcher.forward(request, response);
     }
 
