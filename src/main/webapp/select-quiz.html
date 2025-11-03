@@ -10,7 +10,7 @@
 
 <body class="font-mono bg-blue-900">
     <div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
-        <form action="USER" , method="GET">
+        <form action="USER" method="GET">
             <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
                 <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -27,7 +27,7 @@
                 <div class="font-bold text-yellow-400" id="username">User</div>
             </button>
         </form>
-        <form action="EXIT" , method="POST">
+        <form action="EXIT" method="POST">
             <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -46,7 +46,7 @@
     </div>
     <div class="px-4">
         <div class="py-5 font-bold text-2xl text-yellow-400 text-center">Categories</div>
-        <form action="USER" , method="GET">
+        <form action="category-lobbies" method="GET">
             <div class="py-1 flex flex-col items-center">
                 <div id="category" class="grid grid-cols-3 gap-5">
                     <button
@@ -172,8 +172,72 @@
 
         </div>
     </div>
+    <template id="categoryTpl">
+        <form action="/join-category" method="POST" class="w-full">
+            <input type="hidden" name="categoryId" class="category-id" value="">
+            <button type="submit"
+                class="w-full bg-blue-950 text-yellow-300 rounded-lg p-6 shadow hover:bg-blue-900 focus:outline-none">
+                <span class="category-name"></span>
+            </button>
+        </form>
+    </template>
 
+    <template id="quizTpl">
+        <form action="/quiz" method="POST" class="w-full">
+            <input type="hidden" name="quizId" class="quiz-id" value="">
+            <button type="submit"
+                class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 text-left">
+                <div>
+                    <div class="quiz-name font-bold text-yellow-400"></div>
+                    <div class="quiz-category text-yellow-300 text-sm"></div>
+                </div>
+                <div class="quiz-meta text-sm"></div>
+            </button>
+        </form>
+    </template>
 
+<script>
+(async function () {
+  try {
+    const res = await fetch('/main/data', {
+      method: 'GET',
+      headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
+      credentials: 'same-origin'
+    });
+    if (!res.ok) throw new Error('Network error: ' + res.status);
+    const data = await res.json();
+
+    // Categories
+    const catContainer = document.getElementById('category');
+    const catTpl = document.getElementById('categoryTpl');
+    if (catContainer && catTpl && Array.isArray(data.categories)) {
+      catContainer.innerHTML = '';
+      data.categories.forEach(cat => {
+        const node = catTpl.content.cloneNode(true);
+        node.querySelector('.category-id').value = cat.id ?? (cat.name || '');
+        node.querySelector('.category-name').textContent = cat.name ?? String(cat);
+        catContainer.appendChild(node);
+      });
+    }
+
+    // Quizzes — use keys returned by MainDataServlet
+    const quizContainer = document.getElementById('MyQuizzes');
+    const quizTpl = document.getElementById('quizTpl');
+    if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
+      quizContainer.innerHTML = '';
+      data.quizzes.forEach(q => {
+        const node = quizTpl.content.cloneNode(true);
+        node.querySelector('.quiz-id').value = q.session_id ?? '';
+        node.querySelector('.quiz-name').textContent = q.quiz_name ?? 'Untitled';
+        node.querySelector('.quiz-category').textContent = q.status ?? '';
+        quizContainer.appendChild(node);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to load data', err);
+  }
+})();
+</script>
 
 </body>
 

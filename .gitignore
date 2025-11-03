@@ -40,3 +40,6 @@ target
 
 # ignore root .html files (the root files are only for local dev and are duplicates. Actualy files should be in src/main/webapps)
 /*.html
+
+# media files
+*.aac

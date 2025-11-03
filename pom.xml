@@ -41,6 +41,13 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>8.1.0</version>
         </dependency>
+
+        <dependency>
+            <!--Bcrypt password hashing used by loginServlet-->
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -59,6 +66,27 @@
                     <target>11</target>
                     <!-- Output compiled classes directly into WEB-INF/classes -->
                     <outputDirectory>${project.basedir}/WEB-INF/classes</outputDirectory>
+                </configuration>
+            </plugin>
+
+            <!-- Clean plugin: deletes extra directories before compile/package (except WEB.xml) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.basedir}/WEB-INF</directory>
+                            <followSymlinks>false</followSymlinks>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*.xml</exclude>
+                            </excludes>
+                        </fileset>
+                    </filesets>
                 </configuration>
             </plugin>
 

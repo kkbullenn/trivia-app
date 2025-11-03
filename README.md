@@ -100,6 +100,8 @@ AI team if you are stuck.
 
    ```cmd
    mvn compile
+   # OR:
+   mvn clean compile # to ensure old compiled files are gone
    ```
 
     * Compiled `.class` files will be placed in:
@@ -122,6 +124,8 @@ AI team if you are stuck.
    ```cmd
    cd C:\tomcat\webapps\trivia-app
    mvn compile
+   # OR:
+   mvn clean compile # to ensure old compiled files are gone
    ```
 
 6. Restart Tomcat to see changes:
@@ -178,10 +182,10 @@ AI team if you are stuck.
 
 ## ✅ Summary
 
-| Environment | Command             | What Happens                                                      |
-| ----------- | ------------------- | ----------------------------------------------------------------- |
-| Local Dev   | `mvn compile`       | Compiles `.class` files into `WEB-INF\classes\` for Tomcat to use |
-| Production  | `mvn clean package` | Generates `trivia-app.war` in `target\` ready to deploy           |
+| Environment | Command                              | What Happens                                                      |
+| ----------- |--------------------------------------| ----------------------------------------------------------------- |
+| Local Dev   | `mvn compile` OR `mvn clean compile` | Compiles `.class` files into `WEB-INF\classes\` for Tomcat to use |
+| Production  | `mvn clean package`                  | Generates `trivia-app.war` in `target\` ready to deploy           |
 
 * Local edits → compile → restart Tomcat (local dev)
 * Production deploy → build WAR → copy WAR → restart Tomcat (for hosting)
