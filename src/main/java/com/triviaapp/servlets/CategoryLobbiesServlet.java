@@ -21,6 +21,10 @@ public class CategoryLobbiesServlet extends HttpServlet {
             // User not logged in → redirect to login page
             response.sendRedirect("login");
             return;
+        } else if (session.getAttribute("category_id") == null) {
+            // No category selected → redirect to main page
+            response.sendRedirect("main");
+            return;
         }
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/category-lobbies.html");

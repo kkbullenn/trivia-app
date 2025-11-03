@@ -22,6 +22,8 @@ public class JoinCategoryServlet extends HttpServlet {
             return;
         }
 
+        int categoryId = Integer.parseInt(request.getParameter("category_id"));
+        session.setAttribute("category_id", categoryId);
         response.sendRedirect("category-lobbies");
     }
     
