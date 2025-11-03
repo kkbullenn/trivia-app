@@ -2,6 +2,7 @@ package com.triviaapp.servlets;
 
 import com.triviaapp.dao.UserDAO;
 import com.triviaapp.dao.impl.UserDAOImpl;
+import com.triviaapp.util.DBConnectionManager;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -37,8 +38,14 @@ public class LoginServlet extends HttpServlet {
 
                 // Successful login
                 HttpSession session = request.getSession(true);
-                session.setAttribute("user_id", email);
-                response.sendRedirect("main");
+                int user_id = userDAO.findUserIDByEmail(email);
+                if (user_id == -1) {
+                    throw new SQLException("Database inconsistency: User found but ID not found.");
+                } else {
+                    session.setAttribute("user_id", user_id);
+                    response.sendRedirect("main");
+                }
+
 
             } else {
                 // Invalid login
@@ -46,6 +53,7 @@ public class LoginServlet extends HttpServlet {
                 PrintWriter out = response.getWriter();
                 out.println("<h3>Invalid email or password.</h3>");
                 out.println("<a href='login'>Try again</a>");
+                response.sendRedirect("login");
             }
 
 
