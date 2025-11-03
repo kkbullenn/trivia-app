@@ -17,10 +17,19 @@ public class SessionDAOImpl implements SessionDAO {
 
     private static final String SQL_FIND_BY_ID = "SELECT * FROM sessions WHERE session_id = ?";
     private static final String SQL_LIST_BY_HOST = "SELECT * FROM sessions WHERE host_user_id = ? ORDER BY start_at DESC";
-    private static final String SQL_INSERT = "INSERT INTO sessions (host_user_id, session_name, max_participants, status, start_at, end_at) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT = "INSERT INTO sessions (host_user_id, session_name, category_id, max_participants, status, start_at, end_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE_STATUS = "UPDATE sessions SET status = ?, end_at = CASE WHEN ? = 'completed' THEN CURRENT_TIMESTAMP ELSE end_at END WHERE session_id = ?";
     private static final String SQL_END_SESSION_NOW = "UPDATE sessions SET status = 'completed', end_at = CURRENT_TIMESTAMP WHERE session_id = ? AND status <> 'completed'";
     private static final String SQL_DELETE = "DELETE FROM sessions WHERE session_id = ?";
+    // session_questions helper SQL
+    private static final String SQL_DELETE_SESSION_QUESTIONS = "DELETE FROM session_questions WHERE session_id = ?";
+    private static final String SQL_INSERT_FROM_CATEGORY = "INSERT INTO session_questions (session_id, question_id) SELECT ?, q.question_id FROM questions q WHERE q.category_id = ?";
+    private static final String SQL_SELECT_SESSION_QUESTION_IDS = "SELECT question_id FROM session_questions WHERE session_id = ? ORDER BY question_id ASC";
+
+    // current_index management on sessions table (multiplayer host-driven sync)
+    private static final String SQL_GET_CURRENT_INDEX = "SELECT current_index FROM sessions WHERE session_id = ?";
+    private static final String SQL_INCREMENT_CURRENT_INDEX = "UPDATE sessions SET current_index = current_index + 1 WHERE session_id = ?";
+    private static final String SQL_DECREMENT_CURRENT_INDEX = "UPDATE sessions SET current_index = current_index - 1 WHERE session_id = ? AND current_index > 0";
     
     private static final String SQL_LIST_ACTIVE_SUMMARY = String.join("\n",
             "SELECT s.session_id, s.session_name, s.host_user_id, s.max_participants, s.status, COALESCE(sp.cnt,0) AS current_participants",
@@ -96,21 +105,22 @@ public class SessionDAOImpl implements SessionDAO {
     }
 
     @Override
-    public boolean createSession(int hostUserId, String sessionName, Integer maxParticipants, String status, Timestamp startAt, Timestamp endAt) throws SQLException {
+    public boolean createSession(int hostUserId, String sessionName, Integer categoryId, Integer maxParticipants, String status, Timestamp startAt, Timestamp endAt) throws SQLException {
         try (Connection conn = DBConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(SQL_INSERT)) {
             ps.setInt(1, hostUserId);
             ps.setString(2, sessionName);
-            if (maxParticipants != null) ps.setInt(3, maxParticipants); else ps.setNull(3, java.sql.Types.INTEGER);
-            ps.setString(4, status);
+            if (categoryId != null) ps.setInt(3, categoryId); else ps.setNull(3, java.sql.Types.INTEGER);
+            if (maxParticipants != null) ps.setInt(4, maxParticipants); else ps.setNull(4, java.sql.Types.INTEGER);
+            ps.setString(5, status);
             // start_at column is NOT NULL with DEFAULT CURRENT_TIMESTAMP in schema.
             // If caller provides null, insert current time instead of explicit NULL to avoid constraint violation.
             if (startAt != null) {
-                ps.setTimestamp(5, startAt);
+                ps.setTimestamp(6, startAt);
             } else {
-                ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+                ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
             }
-            if (endAt != null) ps.setTimestamp(6, endAt); else ps.setNull(6, java.sql.Types.TIMESTAMP);
+            if (endAt != null) ps.setTimestamp(7, endAt); else ps.setNull(7, java.sql.Types.TIMESTAMP);
             int rows = ps.executeUpdate();
             return rows > 0;
         }
@@ -209,6 +219,136 @@ public class SessionDAOImpl implements SessionDAO {
             ps.setInt(2, participantId);
             int rows = ps.executeUpdate();
             return rows > 0;
+        }
+    }
+
+    // insertRandomQuestionsForSession removed — callers should use insertAllQuestionsForSession and, if random selection is desired,
+    // perform random selection in application logic or add a separate utility that uses SQL with ORDER BY RAND() when appropriate.
+
+    @Override
+    public boolean insertAllQuestionsForSession(int sessionId, int categoryId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection()) {
+            boolean oldAuto = conn.getAutoCommit();
+            try {
+                conn.setAutoCommit(false);
+                try (PreparedStatement del = conn.prepareStatement(SQL_DELETE_SESSION_QUESTIONS)) {
+                    del.setInt(1, sessionId);
+                    del.executeUpdate();
+                }
+                try (PreparedStatement ins = conn.prepareStatement(SQL_INSERT_FROM_CATEGORY)) {
+                    ins.setInt(1, sessionId);
+                    ins.setInt(2, categoryId);
+                    ins.executeUpdate();
+                }
+                conn.commit();
+                return true;
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(oldAuto);
+            }
+        }
+    }
+
+    @Override
+    public List<Integer> findQuestionIdsForSession(int sessionId) throws SQLException {
+        List<Integer> ids = new ArrayList<>();
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_SELECT_SESSION_QUESTION_IDS)) {
+            ps.setInt(1, sessionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ids.add(rs.getInt("question_id"));
+                }
+            }
+        }
+        return ids;
+    }
+
+    @Override
+    public Integer getCurrentIndex(int sessionId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_GET_CURRENT_INDEX)) {
+            ps.setInt(1, sessionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int v = rs.getInt("current_index");
+                    if (rs.wasNull()) return null;
+                    return v;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Integer incrementAndGetCurrentIndex(int sessionId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection()) {
+            boolean oldAuto = conn.getAutoCommit();
+            try {
+                conn.setAutoCommit(false);
+                try (PreparedStatement up = conn.prepareStatement(SQL_INCREMENT_CURRENT_INDEX)) {
+                    up.setInt(1, sessionId);
+                    int rows = up.executeUpdate();
+                    if (rows == 0) {
+                        conn.rollback();
+                        return null;
+                    }
+                }
+                try (PreparedStatement ps = conn.prepareStatement(SQL_GET_CURRENT_INDEX)) {
+                    ps.setInt(1, sessionId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            int v = rs.getInt("current_index");
+                            conn.commit();
+                            return v;
+                        }
+                    }
+                }
+                conn.rollback();
+                return null;
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(oldAuto);
+            }
+        }
+    }
+
+    @Override
+    public Integer decrementAndGetCurrentIndex(int sessionId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection()) {
+            boolean oldAuto = conn.getAutoCommit();
+            try {
+                conn.setAutoCommit(false);
+                try (PreparedStatement down = conn.prepareStatement(SQL_DECREMENT_CURRENT_INDEX)) {
+                    down.setInt(1, sessionId);
+                    int rows = down.executeUpdate();
+                    if (rows == 0) {
+                        conn.rollback();
+                        return null;
+                    }
+                }
+                try (PreparedStatement ps = conn.prepareStatement(SQL_GET_CURRENT_INDEX)) {
+                    ps.setInt(1, sessionId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            int v = rs.getInt("current_index");
+                            conn.commit();
+                            return v;
+                        }
+                    }
+                }
+                conn.rollback();
+                return null;
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(oldAuto);
+            }
         }
     }
 }

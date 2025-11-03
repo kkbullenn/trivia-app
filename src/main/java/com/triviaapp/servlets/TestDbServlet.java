@@ -299,7 +299,7 @@ public class TestDbServlet extends HttpServlet {
             String ts = String.valueOf(System.currentTimeMillis());
             String sessionName = "test_session_" + ts;
 
-            boolean created = sDao.createSession(hostUserId, sessionName, 10, "active", null, null);
+            boolean created = sDao.createSession(hostUserId, sessionName, null, 10, "active", null, null);
             out.println("createSession returned: " + created);
 
             // find sessions by host and locate the one we created
@@ -339,6 +339,50 @@ public class TestDbServlet extends HttpServlet {
                 boolean ended = sDao.endSessionNow(foundId);
                 out.println("endSessionNow returned: " + ended);
 
+                // --- NEW: test session_questions and current_index helpers added tonight ---
+                try {
+                    int testCategoryId = 1; // seeded category expected to exist
+                    out.println("Testing insertAllQuestionsForSession(sessionId=" + foundId + ", categoryId=" + testCategoryId + ")...");
+                    boolean insAll = sDao.insertAllQuestionsForSession(foundId, testCategoryId);
+                    out.println("insertAllQuestionsForSession returned: " + insAll);
+
+                    out.println("Testing findQuestionIdsForSession(sessionId=" + foundId + ")...");
+                    java.util.List<Integer> qids = sDao.findQuestionIdsForSession(foundId);
+                    out.println("findQuestionIdsForSession count=" + (qids == null ? 0 : qids.size()));
+                    if (qids != null && !qids.isEmpty()) {
+                        out.println("First 5 question ids (or fewer):");
+                        for (int i = 0; i < Math.min(5, qids.size()); i++) {
+                            out.println(" - " + qids.get(i));
+                        }
+                    }
+
+                    out.println("Testing getCurrentIndex(sessionId=" + foundId + ")...");
+                    Integer cur = sDao.getCurrentIndex(foundId);
+                    out.println("getCurrentIndex => " + cur);
+
+                    out.println("Testing incrementAndGetCurrentIndex(sessionId=" + foundId + ")...");
+                    Integer afterInc = sDao.incrementAndGetCurrentIndex(foundId);
+                    out.println("incrementAndGetCurrentIndex => " + afterInc);
+
+                    out.println("Testing decrementAndGetCurrentIndex(sessionId=" + foundId + ")...");
+                    Integer afterDec = sDao.decrementAndGetCurrentIndex(foundId);
+                    out.println("decrementAndGetCurrentIndex => " + afterDec);
+                } catch (Exception ex) {
+                    out.println("ERROR: session_questions/current_index helpers test failed:");
+                    ex.printStackTrace(out);
+                }
+
+                // cleanup session_questions (foreign key prevents deleting sessions while questions exist)
+                try (java.sql.Connection conn = DBConnectionManager.getConnection();
+                     java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM session_questions WHERE session_id = ?")) {
+                    ps.setInt(1, foundId);
+                    int delSq = ps.executeUpdate();
+                    out.println("Deleted session_questions rows: " + delSq);
+                } catch (Exception ex) {
+                    out.println("WARN: failed to cleanup session_questions before deleting session");
+                    ex.printStackTrace(out);
+                }
+
                 // delete session
                 boolean deleted = sDao.deleteSession(foundId);
                 out.println("deleteSession returned: " + deleted);
@@ -365,7 +409,7 @@ public class TestDbServlet extends HttpServlet {
             String sessionName = "test_modans_session_" + ts;
 
             // create session to attach moderated answers
-            boolean created = sDao.createSession(hostUserId, sessionName, 20, "active", null, null);
+            boolean created = sDao.createSession(hostUserId, sessionName, null, 20, "active", null, null);
             out.println("createSession for moderated answers returned: " + created);
 
             // locate session id
