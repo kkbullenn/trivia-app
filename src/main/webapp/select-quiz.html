@@ -196,43 +196,48 @@
         </form>
     </template>
 
-    <script>
-    (async function () {
-        try {
-            const res = await fetch('/main/data');
-            if (!res.ok) throw new Error('Network error');
-            const data = await res.json();
+<script>
+(async function () {
+  try {
+    const res = await fetch('/main/data', {
+      method: 'GET',
+      headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
+      credentials: 'same-origin'
+    });
+    if (!res.ok) throw new Error('Network error: ' + res.status);
+    const data = await res.json();
 
-            // Categories
-            const catContainer = document.getElementById('category');
-            const catTpl = document.getElementById('categoryTpl');
-            if (catContainer && catTpl && Array.isArray(data.categories)) {
-                catContainer.innerHTML = '';
-                data.categories.forEach(cat => {
-                    const node = catTpl.content.cloneNode(true);
-                    node.querySelector('.category-id').value = cat.id ?? (cat.name || '');
-                    node.querySelector('.category-name').textContent = cat.name ?? String(cat);
-                    catContainer.appendChild(node);
-                });
-            }
+    // Categories
+    const catContainer = document.getElementById('category');
+    const catTpl = document.getElementById('categoryTpl');
+    if (catContainer && catTpl && Array.isArray(data.categories)) {
+      catContainer.innerHTML = '';
+      data.categories.forEach(cat => {
+        const node = catTpl.content.cloneNode(true);
+        node.querySelector('.category-id').value = cat.id ?? (cat.name || '');
+        node.querySelector('.category-name').textContent = cat.name ?? String(cat);
+        catContainer.appendChild(node);
+      });
+    }
 
-            const quizContainer = document.getElementById('MyQuizzes');
-            const quizTpl = document.getElementById('quizTpl');
-            if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
-                quizContainer.innerHTML = '';
-                data.quizzes.forEach(q => {
-                    const node = quizTpl.content.cloneNode(true);
-                    node.querySelector('.quiz-id').value = q.id ?? '';
-                    node.querySelector('.quiz-name').textContent = q.name ?? 'Untitled';
-                    node.querySelector('.quiz-category').textContent = q.category ?? '';
-                    quizContainer.appendChild(node);
-                });
-            }
-        } catch (err) {
-            console.error('Failed to load data', err);
-        }
-    })();
-    </script>
+    // Quizzes — use keys returned by MainDataServlet
+    const quizContainer = document.getElementById('MyQuizzes');
+    const quizTpl = document.getElementById('quizTpl');
+    if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
+      quizContainer.innerHTML = '';
+      data.quizzes.forEach(q => {
+        const node = quizTpl.content.cloneNode(true);
+        node.querySelector('.quiz-id').value = q.session_id ?? '';
+        node.querySelector('.quiz-name').textContent = q.quiz_name ?? 'Untitled';
+        node.querySelector('.quiz-category').textContent = q.status ?? '';
+        quizContainer.appendChild(node);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to load data', err);
+  }
+})();
+</script>
 
 </body>
 
