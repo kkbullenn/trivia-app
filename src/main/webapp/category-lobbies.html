@@ -64,3 +64,53 @@
 </body>
 
 </html>
+<script>
+(async function () {
+  try {
+    const res = await fetch('/your-sessions-endpoint', {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error('Network error: ' + res.status);
+
+    const sessions = await res.json();
+
+    const container = document.getElementById('category');
+    const tpl = document.getElementById('lobbyTpl');
+    if (!container || !tpl) return;
+
+    container.innerHTML = '';
+
+    if (!Array.isArray(sessions) || sessions.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'text-yellow-300 text-center py-4';
+      empty.textContent = 'No lobbies available';
+      container.appendChild(empty);
+      return;
+    }
+
+    sessions.forEach(s => {
+      const node = tpl.content.cloneNode(true);
+      const form = node.querySelector('form');
+      const idInput = node.querySelector('.lobby-id');
+      const nameEl = node.querySelector('.username');
+      const roomEl = node.querySelector('.room');
+
+      if (idInput) idInput.value = s.lobby_id ?? '';
+      if (nameEl) nameEl.textContent = s.lobby_name ?? (s.host_username ?? 'Lobby');
+      if (roomEl) roomEl.textContent = (s.num_players ?? '') + (s.max_players ? ('/' + s.max_players) : '');
+
+      if (form) form.action = form.action || '/join'; 
+
+      container.appendChild(node);
+    });
+  } catch (err) {
+    console.error('Failed to load lobbies', err);
+    const container = document.getElementById('category');
+    if (container) {
+      container.innerHTML = '<div class="text-red-400">Failed to load lobbies</div>';
+    }
+  }
+})();
+</script>
