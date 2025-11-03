@@ -20,5 +20,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build with Maven
+      - name: Build and test with Maven
         run: mvn -B clean verify
+
+      - name: Run app in Docker (smoke test)
+        run: |
+          docker run -d -p 8080:8080 --name trivia-app trivia-app
+          sleep 10
+          docker ps -a
