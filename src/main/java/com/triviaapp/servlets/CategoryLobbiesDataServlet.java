@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-public class CategoryLobbiesData extends HttpServlet {
+public class CategoryLobbiesDataServlet extends HttpServlet {
     
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
@@ -27,12 +27,14 @@ public class CategoryLobbiesData extends HttpServlet {
         // Check if user is logged in
         HttpSession session = request.getSession(false);
         String ajaxHeader = request.getHeader("AJAX-Requested-With");
+
         if (session == null || session.getAttribute("user_id") == null) {
-            // Not logged in, redirect to category lobbies page or login page
+            // Not logged in -> redirect to login page
             response.sendRedirect("login");
             return;
         } else if (ajaxHeader == null || !ajaxHeader.equals("fetch")) {
-            response.sendRedirect("category-lobbies");
+            // Not an AJAX fetch request → redirect to main page
+            response.sendRedirect("main");
             return;
         }
 
@@ -51,10 +53,10 @@ public class CategoryLobbiesData extends HttpServlet {
         JSONArray sessionsArray = new JSONArray();
         for (Map<String, String> sessionData : sessions) {
             JSONObject sessionJson = new JSONObject();
-            sessionJson.put("lobby_id", sessionData.get("session_id"));
+            sessionJson.put("lobby_id", Integer.parseInt(sessionData.get("session_id")));
             sessionJson.put("lobby_name", sessionData.get("session_name"));
             sessionJson.put("host_username", sessionData.get("host_username"));
-            sessionJson.put("num_players", sessionData.get("num_players"));
+            sessionJson.put("num_players", Integer.parseInt(sessionData.get("num_players")));
             sessionsArray.put(sessionJson);
         }
 
