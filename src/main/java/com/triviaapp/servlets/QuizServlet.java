@@ -20,6 +20,9 @@ public class QuizServlet extends HttpServlet {
         if (session == null || session.getAttribute("user_id") == null) {
             response.sendRedirect("login");
             return;
+        } else if (session.getAttribute("category_id") == null) {
+            response.sendRedirect("main");
+            return;
         } else if (session.getAttribute("lobby_id") == null) {
             response.sendRedirect("category-lobbies");
             return;
