@@ -2,6 +2,7 @@ package com.triviaapp.servlets;
 
 import com.triviaapp.dao.UserDAO;
 import com.triviaapp.dao.impl.UserDAOImpl;
+import com.triviaapp.util.DBConnectionManager;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -37,7 +38,16 @@ public class LoginServlet extends HttpServlet {
 
                 // Successful login
                 HttpSession session = request.getSession(true);
-                session.setAttribute("user_id", email);
+                try(Connection conn = DBConnectionManager.getConnection()){
+                    PreparedStatement ps = conn.prepareStatement("SELECT user_id FROM users WHERE email = ?");
+                    ps.setString(1, email);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        int user_id = rs.getInt("user_id");
+                        session.setAttribute("user_id", user_id);
+                    }
+                }
+
                 response.sendRedirect("main");
 
             } else {
