@@ -1,3 +1,6 @@
+package com.triviaapp.servlets;
+
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +24,7 @@ import java.util.Collection;
  * ping.
  */
 @MultipartConfig
-public final class MoondreamServlet extends HttpServlet {
+public final class MoonDreamServlet extends HttpServlet {
     private static final String MOONDREAM_HOST = "localhost";
     private static final int MOONDREAM_PORT = 8082;
     private static final URI MOONDREAM_URI = URI.create("http://" + MOONDREAM_HOST + ":" + MOONDREAM_PORT);
@@ -44,7 +47,8 @@ public final class MoondreamServlet extends HttpServlet {
      *                 healthy).
      */
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
         final URL pingUrl;
         try {
             pingUrl = MOONDREAM_PING_URI.toURL();
@@ -81,7 +85,8 @@ public final class MoondreamServlet extends HttpServlet {
      *                 }
      */
     @Override
-    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
         final Collection<Part> parts = request.getParts();
         if (parts.isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No file provided");
