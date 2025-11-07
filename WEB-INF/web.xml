@@ -1,4 +1,5 @@
 <web-app>
+    <!-- Whisper AI Server Routes Start -->
     <servlet>
         <servlet-name>WhisperServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.WhisperServlet</servlet-class>
@@ -9,6 +10,7 @@
         <url-pattern>/whisper</url-pattern>
     </servlet-mapping>
 
+    <!-- Strictly for audio transcribing  -->
     <servlet-mapping>
         <servlet-name>WhisperServlet</servlet-name>
         <url-pattern>/whisper/transcribe</url-pattern>
@@ -48,6 +50,18 @@
         <servlet-name>MainServlet</servlet-name>
         <url-pattern>/main</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>WhisperAnswerCheckerServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.WhisperAnswerCheckerServlet</servlet-class>
+    </servlet>
+
+    <!-- Audio transcribing to see if vocal answer is correct -->
+    <servlet-mapping>
+        <servlet-name>WhisperAnswerCheckerServlet</servlet-name>
+        <url-pattern>/whisper/transcribe-answer</url-pattern>
+    </servlet-mapping>
+    <!-- Whisper AI Server Routes End -->
 
     <servlet>
         <servlet-name>MainDataServlet</servlet-name>

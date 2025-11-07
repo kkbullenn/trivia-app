@@ -1,40 +1,29 @@
 package com.triviaapp.servlets;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.*;
+
+import com.triviaapp.externalapi.WhisperConnection;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 /**
  * BE endpoint for transcribing an audio file (of any language supported) to English text.
+ * See WhisperAnswerCheckerServlet for answer checking functionality. This servlet is strictly for transcription.
  * <p>
  * Available methods: POST (see doPost).
  */
+@MultipartConfig
 public final class WhisperServlet extends HttpServlet {
-    private static final String WHISPER_HOST = "localhost";
-    private static final int WHISPER_PORT = 8888;
-    private static final URI WHISPER_URI = URI.create("http://" + WHISPER_HOST + ":" + WHISPER_PORT);
-    private static final URI WHISPER_GET_URI = URI.create(WHISPER_URI + "/whisper");
-    private static final URI WHISPER_POST_URI = URI.create(WHISPER_GET_URI + "/transcribe");
-    private static final URL WHISPER_POST_URL;
-
-    static {
-        try {
-            WHISPER_POST_URL = WHISPER_POST_URI.toURL();
-        } catch (final MalformedURLException e) {
-            throw new RuntimeException(WHISPER_POST_URI + " is not a valid URL", e);
-        }
-    }
+    private static final WhisperConnection CONNECTION = new WhisperConnection();
 
     /**
      * Connects to the Whisper service in order to test if a connection has been established.
@@ -46,92 +35,81 @@ public final class WhisperServlet extends HttpServlet {
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-
         // request given does not matter
 
-        final HttpRequest httpRequest = HttpRequest.newBuilder().uri(WHISPER_GET_URI).build();
+        final HttpRequest httpRequest = HttpRequest.newBuilder().uri(WhisperConnection.WHISPER_GET_URI).build();
         final HttpClient httpClient = HttpClient.newHttpClient();
         // response is a string of a JSON object, FE will need to parse this
         final HttpResponse<String> whisperResponse;
 
         try {
-            whisperResponse = httpClient.send(httpRequest,
-                    HttpResponse.BodyHandlers.ofString());
+            whisperResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             response.setContentType("application/json");
             response.setStatus(whisperResponse.statusCode());
             response.getWriter().println(whisperResponse.body());
         } catch (final Exception ex) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "WhisperServlet Error: " + ex.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "WhisperServlet Error: " + ex.getMessage());
         }
     }
 
     /**
+     * Strictly for transcription (speech to text). To check if the audio answer is correct see doPost in
+     * WhisperAnswerCheckerServlet.
+     * <p>
      * Takes an audio file and optionally the source language of the auto and transcribes it into English text.
      * <p>
      * Can accept almost all modern audio file extensions.
      * <p>
      * Please see this <a href="https://github.com/SYSTRAN/faster-whisper">link</a> for supported languages and file extensions
      *
-     * @param request multipart form-data containing the file and optionally the source_lang
-     * <p>
-     * Sample multipart form-data:
-     * <p>
-     * POST /whisper/transcribe HTTP/1.1
-     * Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryXyZ123
-     *
-     * ------WebKitFormBoundaryXyZ123
-     * Content-Disposition: form-data; name="file"; filename="audio.wav"
-     * Content-Type: audio/wav
-     *
-     * <binary audio data here>
-     * ------WebKitFormBoundaryXyZ123
-     * Content-Disposition: form-data; name="source_lang"
-     *
-     * auto
-     * ------WebKitFormBoundaryXyZ123--
-     *
+     * @param request  multipart form-data containing the file and optionally the source_lang
      * @param response Gives the response as a JSON object in the following format:
-     * <p>
-     * {
-     *   "detected_language":"pt",
-     *   "duration_sec":8.96,
-     *   "translated_text":"I don't want the terrible limitation of the one who lived only the one who was able to make a sense.I don't want the truth invented."
-     * }
+     *                 <p>
+     *                 {
+     *                 "detected_language":"pt",
+     *                 "duration_sec":8.96,
+     *                 "translated_text":"I don't want the terrible limitation of the one who lived only the one who was able to make a sense.I don't want the truth invented."
+     *                 }
      */
     @Override
-    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        // TODO: need to verify request integrity
-
-        final String contentType = request.getContentType();
-        final String contentLength = String.valueOf(request.getContentLength());
-
-        // For multipart form data
-        final HttpURLConnection connection = (HttpURLConnection) WHISPER_POST_URL.openConnection();
-        connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", contentType);
-        connection.setRequestProperty("Content-Length", contentLength);
-
-        final InputStream reqInputStream = request.getInputStream();
-        final OutputStream whisperOutputStream = connection.getOutputStream();
-
-        // forward data to whisper by writing inputStream to outputStream
-        if (reqInputStream != null) {
-            reqInputStream.transferTo(whisperOutputStream);
-            reqInputStream.close();
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException,
+            ServletException {
+        final HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user_id") == null) {
+            response.sendRedirect("/trivia-app/login");
+            return;
         }
-        whisperOutputStream.close();
+
+        final Part filePart = request.getPart("file");
+
+        // verifies that we have file audio
+        if (filePart == null) {
+            final PrintWriter resWriter = response.getWriter();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            final String data = "{"
+                    + "\"status\": \"error\","
+                    + "\"message\": \"Expected 'file' in multipart/form-data.\""
+                    + "}";
+            resWriter.write(data);
+            return;
+        }
+
+        final String fileName = filePart.getSubmittedFileName();
+        final byte[] audioBytes = filePart.getInputStream().readAllBytes();
+
+        final HttpURLConnection connection = (HttpURLConnection) CONNECTION.getPostURL().openConnection();
+        final InputStream whisperInputStream = WhisperConnection.getTranscription(audioBytes, fileName, connection);
+        final OutputStream resOutputStream = response.getOutputStream();
 
         // getting response from whisper service and giving it to FE
         final int responseCode = connection.getResponseCode();
-
         response.setStatus(responseCode);
         response.setContentType("application/json");
-
-        final InputStream whisperInputStream = connection.getInputStream();
-        final OutputStream resOutputStream = response.getOutputStream();
+        response.setCharacterEncoding("UTF-8");
 
         if (whisperInputStream != null) {
             whisperInputStream.transferTo(resOutputStream);
