@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-
 public class JoinQuizServlet extends HttpServlet {
 
     @Override
@@ -20,7 +19,6 @@ public class JoinQuizServlet extends HttpServlet {
             throws IOException, ServletException {
         
         HttpSession session = request.getSession(false);
-
         if (session == null || session.getAttribute("user_id") == null) {
             // User not logged in → redirect to login page
             response.sendRedirect("login");
