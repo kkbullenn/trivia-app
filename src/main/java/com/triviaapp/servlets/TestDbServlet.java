@@ -39,7 +39,8 @@ public class TestDbServlet extends HttpServlet {
             try (Connection c = DBConnectionManager.getConnection()) {
                 if (c != null && !c.isClosed()) {
                     out.println("OK: got connection");
-                    out.println("DB Product: " + c.getMetaData().getDatabaseProductName() + " " + c.getMetaData().getDatabaseProductVersion());
+                    out.println("DB Product: " + c.getMetaData().getDatabaseProductName() + " "
+                            + c.getMetaData().getDatabaseProductVersion());
                 } else {
                     out.println("FAIL: connection is null or closed");
                 }
@@ -100,22 +101,22 @@ public class TestDbServlet extends HttpServlet {
             boolean createdRole = false;
             int createdRoleId = -1;
 
-                // Use DAO to create user (tests createUser implementation)
-                boolean created = userDao.createUser(username, email, password, roleId);
-                out.println("userDao.createUser returned: " + created + " (roleId=" + roleId + ")");
+            // Use DAO to create user (tests createUser implementation)
+            boolean created = userDao.createUser(username, email, password, roleId);
+            out.println("userDao.createUser returned: " + created + " (roleId=" + roleId + ")");
 
-                // Verify via DAO read method; avoid printing plaintext password in logs
-                String pwFromDb = userDao.findPasswordByEmail(email);
-                out.println("Password found: " + (pwFromDb != null));
-                out.println("Password matches provided: " + (pwFromDb != null && pwFromDb.equals(password)));
+            // Verify via DAO read method; avoid printing plaintext password in logs
+            String pwFromDb = userDao.findPasswordByEmail(email);
+            out.println("Password found: " + (pwFromDb != null));
+            out.println("Password matches provided: " + (pwFromDb != null && pwFromDb.equals(password)));
 
-                // cleanup test user (direct SQL cleanup is OK for tests)
-                try (Connection conn = DBConnectionManager.getConnection();
-                     java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE email = ?")) {
-                    ps.setString(1, email);
-                    int del = ps.executeUpdate();
-                    out.println("Deleted rows: " + del);
-                }
+            // cleanup test user (direct SQL cleanup is OK for tests)
+            try (Connection conn = DBConnectionManager.getConnection();
+                    java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE email = ?")) {
+                ps.setString(1, email);
+                int del = ps.executeUpdate();
+                out.println("Deleted rows: " + del);
+            }
 
         } catch (Exception e) {
             out.println("ERROR: UserDAO test failed:");
@@ -166,7 +167,8 @@ public class TestDbServlet extends HttpServlet {
             String answersKey = "A";
             int points = 5;
 
-            boolean created = qDao.createQuestion(catId, xmlQuestion, youtubeUrl, questionText, answersJson, answersKey, points, uploadedBy);
+            boolean created = qDao.createQuestion(catId, xmlQuestion, youtubeUrl, questionText, answersJson, answersKey,
+                    points, uploadedBy);
             out.println("createQuestion returned: " + created);
 
             // 2) locate the created question id by scanning questions in the category
@@ -191,30 +193,36 @@ public class TestDbServlet extends HttpServlet {
             }
 
             if (foundQid == null) {
-                out.println("ERROR: could not find question created by createQuestion; aborting remaining question tests");
+                out.println(
+                        "ERROR: could not find question created by createQuestion; aborting remaining question tests");
             } else {
                 out.println("Located created question id=" + foundQid);
 
                 // 3) findQuestionById
                 Map<String, String> one = qDao.findQuestionById(foundQid);
-                out.println("findQuestionById returned: question_text=" + (one == null ? "<null>" : one.get("question_text")));
+                out.println("findQuestionById returned: question_text="
+                        + (one == null ? "<null>" : one.get("question_text")));
 
                 // 4) findQuestionIdsByCategory
                 java.util.List<Integer> ids2 = qDao.findQuestionIdsByCategory(catId);
-                out.println("findQuestionIdsByCategory count=" + ids2.size() + ", contains created id=" + ids2.contains(foundQid));
+                out.println("findQuestionIdsByCategory count=" + ids2.size() + ", contains created id="
+                        + ids2.contains(foundQid));
 
                 // 5) updateQuestion
                 String updatedText = questionText + " - updated";
-                boolean updated = qDao.updateQuestion(foundQid, catId, xmlQuestion, youtubeUrl, updatedText, answersJson, answersKey, points + 1);
+                boolean updated = qDao.updateQuestion(foundQid, catId, xmlQuestion, youtubeUrl, updatedText,
+                        answersJson, answersKey, points + 1);
                 out.println("updateQuestion returned: " + updated);
                 Map<String, String> after = qDao.findQuestionById(foundQid);
-                out.println("After update: question_text=" + (after == null ? "<null>" : after.get("question_text")) + ", points=" + (after == null ? "?" : after.get("points")));
+                out.println("After update: question_text=" + (after == null ? "<null>" : after.get("question_text"))
+                        + ", points=" + (after == null ? "?" : after.get("points")));
 
                 // 6) deleteQuestion
                 boolean deleted = qDao.deleteQuestion(foundQid);
                 out.println("deleteQuestion returned: " + deleted);
                 Map<String, String> afterDel = qDao.findQuestionById(foundQid);
-                out.println("findQuestionById after delete => " + (afterDel == null ? "null (deleted)" : "still exists"));
+                out.println(
+                        "findQuestionById after delete => " + (afterDel == null ? "null (deleted)" : "still exists"));
             }
         } catch (Exception e) {
             out.println("ERROR: QuestionDAO test failed:");
@@ -224,7 +232,8 @@ public class TestDbServlet extends HttpServlet {
             try {
                 if (createdUser && createdUserId != -1) {
                     try (java.sql.Connection conn = DBConnectionManager.getConnection();
-                         java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE user_id = ?")) {
+                            java.sql.PreparedStatement ps = conn
+                                    .prepareStatement("DELETE FROM users WHERE user_id = ?")) {
                         ps.setInt(1, createdUserId);
                         int d = ps.executeUpdate();
                         out.println("Deleted temporary user " + createdUserId + ": " + d);
@@ -237,7 +246,8 @@ public class TestDbServlet extends HttpServlet {
             try {
                 if (createdCategory && createdCategoryId != -1) {
                     try (java.sql.Connection conn = DBConnectionManager.getConnection();
-                         java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM categories WHERE category_id = ?")) {
+                            java.sql.PreparedStatement ps = conn
+                                    .prepareStatement("DELETE FROM categories WHERE category_id = ?")) {
                         ps.setInt(1, createdCategoryId);
                         int d = ps.executeUpdate();
                         out.println("Deleted temporary category " + createdCategoryId + ": " + d);
@@ -268,7 +278,8 @@ public class TestDbServlet extends HttpServlet {
             out.println("findAnswersByUser count: " + answers.size());
             if (!answers.isEmpty()) {
                 Map<String, String> first = answers.get(0);
-                out.println("Latest answer id=" + first.get("answer_id") + ", question_id=" + first.get("question_id") + ", selected=" + first.get("selected_answer") + ", score=" + first.get("score"));
+                out.println("Latest answer id=" + first.get("answer_id") + ", question_id=" + first.get("question_id")
+                        + ", selected=" + first.get("selected_answer") + ", score=" + first.get("score"));
 
                 // record id for cleanup
                 int answerId = Integer.parseInt(first.get("answer_id"));
@@ -278,7 +289,8 @@ public class TestDbServlet extends HttpServlet {
 
                 // cleanup the created answer
                 try (java.sql.Connection conn = DBConnectionManager.getConnection();
-                     java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM individual_answers WHERE answer_id = ?")) {
+                        java.sql.PreparedStatement ps = conn
+                                .prepareStatement("DELETE FROM individual_answers WHERE answer_id = ?")) {
                     ps.setInt(1, answerId);
                     int del = ps.executeUpdate();
                     out.println("Deleted individual_answers rows: " + del);
@@ -299,7 +311,7 @@ public class TestDbServlet extends HttpServlet {
             String ts = String.valueOf(System.currentTimeMillis());
             String sessionName = "test_session_" + ts;
 
-            boolean created = sDao.createSession(hostUserId, sessionName, 10, "active", null, null);
+            boolean created = sDao.createSession(hostUserId, sessionName, null, 10, "active", null, null);
             out.println("createSession returned: " + created);
 
             // find sessions by host and locate the one we created
@@ -339,6 +351,50 @@ public class TestDbServlet extends HttpServlet {
                 boolean ended = sDao.endSessionNow(foundId);
                 out.println("endSessionNow returned: " + ended);
 
+                // --- NEW: test session_questions and current_index helpers added tonight ---
+                try {
+                    int testCategoryId = 1; // seeded category expected to exist
+                    out.println("Testing insertAllQuestionsForSession(sessionId=" + foundId + ", categoryId=" + testCategoryId + ")...");
+                    boolean insAll = sDao.insertAllQuestionsForSession(foundId, testCategoryId);
+                    out.println("insertAllQuestionsForSession returned: " + insAll);
+
+                    out.println("Testing findQuestionIdsForSession(sessionId=" + foundId + ")...");
+                    java.util.List<Integer> qids = sDao.findQuestionIdsForSession(foundId);
+                    out.println("findQuestionIdsForSession count=" + (qids == null ? 0 : qids.size()));
+                    if (qids != null && !qids.isEmpty()) {
+                        out.println("First 5 question ids (or fewer):");
+                        for (int i = 0; i < Math.min(5, qids.size()); i++) {
+                            out.println(" - " + qids.get(i));
+                        }
+                    }
+
+                    out.println("Testing getCurrentIndex(sessionId=" + foundId + ")...");
+                    Integer cur = sDao.getCurrentIndex(foundId);
+                    out.println("getCurrentIndex => " + cur);
+
+                    out.println("Testing incrementAndGetCurrentIndex(sessionId=" + foundId + ")...");
+                    Integer afterInc = sDao.incrementAndGetCurrentIndex(foundId);
+                    out.println("incrementAndGetCurrentIndex => " + afterInc);
+
+                    out.println("Testing decrementAndGetCurrentIndex(sessionId=" + foundId + ")...");
+                    Integer afterDec = sDao.decrementAndGetCurrentIndex(foundId);
+                    out.println("decrementAndGetCurrentIndex => " + afterDec);
+                } catch (Exception ex) {
+                    out.println("ERROR: session_questions/current_index helpers test failed:");
+                    ex.printStackTrace(out);
+                }
+
+                // cleanup session_questions (foreign key prevents deleting sessions while questions exist)
+                try (java.sql.Connection conn = DBConnectionManager.getConnection();
+                     java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM session_questions WHERE session_id = ?")) {
+                    ps.setInt(1, foundId);
+                    int delSq = ps.executeUpdate();
+                    out.println("Deleted session_questions rows: " + delSq);
+                } catch (Exception ex) {
+                    out.println("WARN: failed to cleanup session_questions before deleting session");
+                    ex.printStackTrace(out);
+                }
+
                 // delete session
                 boolean deleted = sDao.deleteSession(foundId);
                 out.println("deleteSession returned: " + deleted);
@@ -365,7 +421,7 @@ public class TestDbServlet extends HttpServlet {
             String sessionName = "test_modans_session_" + ts;
 
             // create session to attach moderated answers
-            boolean created = sDao.createSession(hostUserId, sessionName, 20, "active", null, null);
+            boolean created = sDao.createSession(hostUserId, sessionName, null, 20, "active", null, null);
             out.println("createSession for moderated answers returned: " + created);
 
             // locate session id
@@ -391,14 +447,16 @@ public class TestDbServlet extends HttpServlet {
             boolean isCorrect = true;
             int score = 5;
 
-            boolean createdAns = mDao.createModeratedAnswer(sessionId, questionId, participantId, selected, isCorrect, score);
+            boolean createdAns = mDao.createModeratedAnswer(sessionId, questionId, participantId, selected, isCorrect,
+                    score);
             out.println("createModeratedAnswer returned: " + createdAns);
 
             java.util.List<Map<String, String>> bySession = mDao.findAnswersBySession(sessionId);
             out.println("findAnswersBySession count: " + bySession.size());
             if (!bySession.isEmpty()) {
                 Map<String, String> a = bySession.get(0);
-                out.println("Latest moderated answer id=" + a.get("answer_id") + ", participant=" + a.get("participant_id") + ", score=" + a.get("score"));
+                out.println("Latest moderated answer id=" + a.get("answer_id") + ", participant="
+                        + a.get("participant_id") + ", score=" + a.get("score"));
             }
 
             java.util.List<Map<String, String>> byParticipant = mDao.findAnswersByParticipant(participantId, sessionId);
@@ -408,12 +466,14 @@ public class TestDbServlet extends HttpServlet {
             out.println("getSessionLeaderboard count: " + leaderboard.size());
             if (!leaderboard.isEmpty()) {
                 Map<String, String> top = leaderboard.get(0);
-                out.println("Top participant=" + top.get("participant_id") + ", username=" + top.get("username") + ", total_score=" + top.get("total_score"));
+                out.println("Top participant=" + top.get("participant_id") + ", username=" + top.get("username")
+                        + ", total_score=" + top.get("total_score"));
             }
 
             // cleanup moderated answers for this session
             try (java.sql.Connection conn = DBConnectionManager.getConnection();
-                 java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM moderated_answers WHERE session_id = ?")) {
+                    java.sql.PreparedStatement ps = conn
+                            .prepareStatement("DELETE FROM moderated_answers WHERE session_id = ?")) {
                 ps.setInt(1, sessionId);
                 int del = ps.executeUpdate();
                 out.println("Deleted moderated_answers rows: " + del);
