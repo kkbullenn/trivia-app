@@ -6,11 +6,8 @@ import com.triviaapp.dao.QuestionDAO;
 import com.triviaapp.dao.impl.QuestionDAOImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import com.triviaapp.externalapi.WhisperConnection;
-import jakarta.servlet.http.Part;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -34,6 +31,12 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
      */
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        final HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user_id") == null) {
+            response.sendRedirect("/trivia-app/login");
+            return;
+        }
+
         final ObjectMapper mapper = new ObjectMapper();
         final PrintWriter resWriter = response.getWriter();
 

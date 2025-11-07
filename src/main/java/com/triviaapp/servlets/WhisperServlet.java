@@ -2,12 +2,9 @@ package com.triviaapp.servlets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import com.triviaapp.externalapi.WhisperConnection;
-import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +35,6 @@ public final class WhisperServlet extends HttpServlet {
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-
         // request given does not matter
 
         final HttpRequest httpRequest = HttpRequest.newBuilder().uri(WhisperConnection.WHISPER_GET_URI).build();
@@ -60,7 +56,7 @@ public final class WhisperServlet extends HttpServlet {
     /**
      * Strictly for transcription (speech to text). To check if the audio answer is correct see doPost in
      * WhisperAnswerCheckerServlet.
-     *
+     * <p>
      * Takes an audio file and optionally the source language of the auto and transcribes it into English text.
      * <p>
      * Can accept almost all modern audio file extensions.
@@ -77,7 +73,14 @@ public final class WhisperServlet extends HttpServlet {
      *                 }
      */
     @Override
-    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException,
+            ServletException {
+        final HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user_id") == null) {
+            response.sendRedirect("/trivia-app/login");
+            return;
+        }
+
         final Part filePart = request.getPart("file");
 
         // verifies that we have file audio
