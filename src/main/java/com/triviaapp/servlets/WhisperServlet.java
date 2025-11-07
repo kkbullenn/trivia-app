@@ -1,14 +1,18 @@
 package com.triviaapp.servlets;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.triviaapp.externalapi.WhisperConnection;
+import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -19,6 +23,7 @@ import java.net.http.HttpResponse;
  * <p>
  * Available methods: POST (see doPost).
  */
+@MultipartConfig
 public final class WhisperServlet extends HttpServlet {
     private static final WhisperConnection CONNECTION = new WhisperConnection();
 
@@ -84,18 +89,36 @@ public final class WhisperServlet extends HttpServlet {
      *                 }
      */
     @Override
-    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        // TODO: need to verify request integrity
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+        final Part filePart = request.getPart("file");
+
+        // verifies that we have file audio
+        if (filePart == null) {
+            final PrintWriter resWriter = response.getWriter();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            final String data = "{"
+                    + "\"status\": \"error\","
+                    + "\"message\": \"Expected 'file' in multipart/form-data.\""
+                    + "}";
+            resWriter.write(data);
+            return;
+        }
+
+        final String fileName = filePart.getSubmittedFileName();
+        final byte[] audioBytes = filePart.getInputStream().readAllBytes();
 
         final HttpURLConnection connection = (HttpURLConnection) CONNECTION.getPostURL().openConnection();
-
-        final InputStream whisperInputStream = CONNECTION.getTranscription(request, connection);
+        final InputStream whisperInputStream = WhisperConnection.getTranscription(audioBytes, fileName, connection);
         final OutputStream resOutputStream = response.getOutputStream();
 
         // getting response from whisper service and giving it to FE
         final int responseCode = connection.getResponseCode();
         response.setStatus(responseCode);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
         if (whisperInputStream != null) {
             whisperInputStream.transferTo(resOutputStream);

@@ -35,6 +35,13 @@
             <version>20230227</version>
         </dependency>
 
+        <!--- A better way to manage Json from input streams -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.18.0</version>
+        </dependency>
+
         <dependency>
             <!-- MySQL JDBC driver used by DBConnectionManager and runtime -->
             <groupId>com.mysql</groupId>
@@ -47,6 +54,13 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
+        </dependency>
+
+        <!-- for multipart/form-data -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.3</version>
         </dependency>
     </dependencies>
 

@@ -2,10 +2,14 @@ package com.triviaapp.externalapi;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -20,6 +24,7 @@ public final class WhisperConnection extends ServerConnection {
 
     private static final Dotenv ENV;
     private static final String ENV_MODE;
+    private static final String HF_API_TOKEN;
 
     private static final String DEV_MODE = "dev";
     private static final int WHISPER_LOCAL_PORT = 8888;
@@ -27,6 +32,7 @@ public final class WhisperConnection extends ServerConnection {
     private static final String HOST;
     private static final int PORT;
     private static final URI WHISPER_URI;
+    private static final String HF_API_URL = "https://router.huggingface.co/hf-inference/mistralai/Mistral-7B-Instruct-v0.3";
 
     static {
         ENV = Dotenv.load();
@@ -36,6 +42,7 @@ public final class WhisperConnection extends ServerConnection {
         WHISPER_URI = createURI();
         WHISPER_GET_URI = URI.create(WHISPER_URI + "/whisper");
         WHISPER_POST_URI = URI.create(WHISPER_GET_URI + "/transcribe");
+        HF_API_TOKEN = ENV.get("WHISPER_HF_API_KEY");
     }
 
     @Override
@@ -57,32 +64,98 @@ public final class WhisperConnection extends ServerConnection {
     }
 
     /**
-     * Calls the whisper service api with the given request and returns it's output (via InputStream).
+     * Calls the whisper service api with the given body and returns it's output (via InputStream).
      *
-     * @param request The request to forward
+     * @param body The body of the request to forward (multipart/form-data)
      * @return The output from the server.
      */
-    public InputStream getTranscription(final HttpServletRequest request, final HttpURLConnection connection) throws IOException {
-        final String contentType = request.getContentType();
-        final String contentLength = String.valueOf(request.getContentLength());
+    public static InputStream getTranscription(final byte[] body,
+                                               final String fileName,
+                                               final HttpURLConnection connection) throws IOException {
+        final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addBinaryBody("file", body, ContentType.create("audio/*"), fileName);
+
+        final HttpEntity multipart = builder.build();
+        final String contentType = multipart.getContentType();
+        final long contentLength = multipart.getContentLength();
 
         // For multipart form data
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", contentType);
-        connection.setRequestProperty("Content-Length", contentLength);
+        connection.setRequestProperty("Content-Length", "" + contentLength);
 
-        final InputStream reqInputStream = request.getInputStream();
+        // forward data to whisper by writing body to outputStream
         final OutputStream whisperOutputStream = connection.getOutputStream();
-
-        // forward data to whisper by writing inputStream to outputStream
-        if (reqInputStream != null) {
-            reqInputStream.transferTo(whisperOutputStream);
-            reqInputStream.close();
-        }
+        multipart.writeTo(whisperOutputStream);
         whisperOutputStream.close();
 
         return connection.getInputStream();
+    }
+
+    @NotNull
+    public static String getMatchResult(final String questionText,
+                                        final String translatedText,
+                                        final String answerText) throws IOException {
+        final JSONObject payload = WhisperConnection.getTransformationPayload(questionText, translatedText, answerText);
+        final String payloadStr = payload.toString();
+
+        // Setup HttpURLConnection
+        final URL url = new URL(HF_API_URL);
+        final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Authorization", "Bearer " + HF_API_TOKEN);
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        // Send request
+        try (final OutputStream os = conn.getOutputStream()) {
+            os.write(payloadStr.getBytes());
+            os.flush();
+        }
+
+        final InputStream inputStream;
+        if (conn.getResponseCode() >= 400) {
+            inputStream = conn.getErrorStream();
+        } else {
+            inputStream = conn.getInputStream();
+        }
+
+        // Read response
+        final StringBuilder responseSB = new StringBuilder();
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                responseSB.append(line);
+            }
+        }
+        conn.disconnect();
+
+        // Parse response (Hugging Face returns JSON array)
+        final JSONArray responseArray = new JSONArray(responseSB.toString());
+        final JSONObject responseJson = responseArray.getJSONObject(0);
+        final String generatedText = responseJson.getString("generated_text").trim();
+
+        // Extract YES/NO
+        return generatedText.toUpperCase().contains("YES") ? "YES" : "NO";
+    }
+
+    @NotNull
+    private static JSONObject getTransformationPayload(final String questionText,
+                                                       final String translatedText,
+                                                       final String answerText) {
+        final String prompt = String.format(
+                "Context: See if a transcribed answer is somewhat equivalent to the actual answer. "
+                        + "These answers refer to this question, \"%s\"\n"
+                        + "Transcribed Answer: %s\n"
+                        + "Actual Answer: %s\n\n"
+                        + "Question: Based on the context, is the \"Transcribed Answer\" somewhat equivalent to "
+                        + "\"Actual Answer\"? Answer YES or NO.",
+                questionText, translatedText, answerText);
+
+        final JSONObject payload = new JSONObject();
+        payload.put("inputs", prompt);
+        return payload;
     }
 
     private static String getMode(final String mode) {
