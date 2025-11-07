@@ -20,6 +20,7 @@ import java.net.http.HttpResponse;
 
 /**
  * BE endpoint for transcribing an audio file (of any language supported) to English text.
+ * See WhisperAnswerCheckerServlet for answer checking functionality. This servlet is strictly for transcription.
  * <p>
  * Available methods: POST (see doPost).
  */
@@ -57,6 +58,9 @@ public final class WhisperServlet extends HttpServlet {
     }
 
     /**
+     * Strictly for transcription (speech to text). To check if the audio answer is correct see doPost in
+     * WhisperAnswerCheckerServlet.
+     *
      * Takes an audio file and optionally the source language of the auto and transcribes it into English text.
      * <p>
      * Can accept almost all modern audio file extensions.
@@ -64,22 +68,6 @@ public final class WhisperServlet extends HttpServlet {
      * Please see this <a href="https://github.com/SYSTRAN/faster-whisper">link</a> for supported languages and file extensions
      *
      * @param request  multipart form-data containing the file and optionally the source_lang
-     *                 <p>
-     *                 Sample multipart form-data:
-     *                 <p>
-     *                 POST /whisper/transcribe HTTP/1.1
-     *                 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryXyZ123
-     *                 <p>
-     *                 ------WebKitFormBoundaryXyZ123
-     *                 Content-Disposition: form-data; name="file"; filename="audio.wav"
-     *                 Content-Type: audio/wav
-     *                 <p>
-     *                 <binary audio data here>
-     *                 ------WebKitFormBoundaryXyZ123
-     *                 Content-Disposition: form-data; name="source_lang"
-     *                 <p>
-     *                 auto
-     *                 ------WebKitFormBoundaryXyZ123--
      * @param response Gives the response as a JSON object in the following format:
      *                 <p>
      *                 {

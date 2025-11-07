@@ -22,7 +22,16 @@ import java.util.Map;
 public class WhisperAnswerCheckerServlet extends HttpServlet {
     private static final WhisperConnection CONNECTION = new WhisperConnection();
 
-    // Expects a multipart form data with question_id and file (the audio file)
+    /**
+     * Transcribes and checks if the answer is correct for the given question.
+     *
+     * @param request  multipart form-data containing the file and the question_id of the question to check answers for.
+     * @param response returns a json body with a message of "YES" or "NO" to simply say if the answer was correct or not.
+     *                 {
+     *                 "status": "success",
+     *                 "message": "YES"
+     *                 }
+     */
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         final ObjectMapper mapper = new ObjectMapper();
