@@ -19,6 +19,10 @@ public class MainServlet extends HttpServlet {
         if (session == null || session.getAttribute("user_id") == null) {
             response.sendRedirect("login");
             return;
+        } else if (!"user".equals(session.getAttribute("role_name"))) {
+            // Not an admin, redirect to main page
+            response.sendRedirect("admin");
+            return;
         }
         
         RequestDispatcher dispatcher = request.getRequestDispatcher("/select-quiz.html");
