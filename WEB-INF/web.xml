@@ -104,6 +104,37 @@
         <url-pattern>/join-category</url-pattern>
     </servlet-mapping>
 
+    <!-- Quiz Page Servlets -->
+    <servlet>
+        <servlet-name>JoinQuizServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.JoinQuizServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>JoinQuizServlet</servlet-name>
+        <url-pattern>/join-quiz</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>QuizServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.QuizServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>QuizServlet</servlet-name>
+        <url-pattern>/quiz</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>QuizDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.QuizDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>QuizDataServlet</servlet-name>
+        <url-pattern>/quiz/data</url-pattern>
+    </servlet-mapping>
+
     <!-- M2M100 Translator proxy -->
     <servlet>
         <servlet-name>M2M100Servlet</servlet-name>

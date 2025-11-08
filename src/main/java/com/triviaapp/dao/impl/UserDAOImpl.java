@@ -53,4 +53,19 @@ public class UserDAOImpl implements UserDAO {
         }
         return -1;
     }
+
+    @Override
+    public int findUserRoleIDByID(int userId) throws SQLException {
+        String sql = "SELECT role_id FROM users WHERE user_id = ?";
+        try (Connection conn = DBConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("role_id");
+                }
+            }
+        }
+        return -1;
+    }
 }

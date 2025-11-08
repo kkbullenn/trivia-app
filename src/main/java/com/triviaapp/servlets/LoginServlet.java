@@ -2,14 +2,15 @@ package com.triviaapp.servlets;
 
 import com.triviaapp.dao.UserDAO;
 import com.triviaapp.dao.impl.UserDAOImpl;
-import com.triviaapp.util.DBConnectionManager;
+import com.triviaapp.dao.RoleDAO;
+import com.triviaapp.dao.impl.RoleDAOImpl;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.*;
 import java.sql.*;
-
 
 public class LoginServlet extends HttpServlet {
 
@@ -26,6 +27,7 @@ public class LoginServlet extends HttpServlet {
             throws IOException, ServletException {
 
         final UserDAO userDAO = new UserDAOImpl();
+        final RoleDAO roleDAO = new RoleDAOImpl();
 
         String email = request.getParameter("user_id");
         String password = request.getParameter("password");
@@ -39,10 +41,14 @@ public class LoginServlet extends HttpServlet {
                 // Successful login
                 HttpSession session = request.getSession(true);
                 int user_id = userDAO.findUserIDByEmail(email);
+                int roleId = userDAO.findUserRoleIDByID(user_id);
+                String roleName = roleDAO.findRoleNameById(roleId);
+
                 if (user_id == -1) {
                     throw new SQLException("Database inconsistency: User found but ID not found.");
                 } else {
                     session.setAttribute("user_id", user_id);
+                    session.setAttribute("user_role", roleName);
                     response.sendRedirect("main");
                 }
 
