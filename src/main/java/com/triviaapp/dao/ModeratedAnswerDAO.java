@@ -29,4 +29,9 @@ public interface ModeratedAnswerDAO {
      * Each map contains: participant_id, username, total_score, rank_pos
      */
     List<Map<String, String>> getSessionLeaderboard(int sessionId) throws SQLException;
+
+    /**
+     * Check if the selected answer is correct for the given question.
+     */
+    boolean isAnswerCorrect(int questionId, String selectedAnswer) throws SQLException;
 }

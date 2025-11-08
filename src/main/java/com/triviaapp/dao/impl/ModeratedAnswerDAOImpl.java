@@ -111,4 +111,19 @@ public class ModeratedAnswerDAOImpl implements ModeratedAnswerDAO {
         }
         return out;
     }
+
+    @Override
+    public boolean isAnswerCorrect(int questionId, String selectedAnswer) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT answer_key FROM questions WHERE question_id = ?")) {
+            ps.setInt(1, questionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String correctAnswer = rs.getString("answer_key");
+                    return correctAnswer.equalsIgnoreCase(selectedAnswer.trim());
+                }
+            }
+        }
+        return false;
+    }
 }
