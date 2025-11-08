@@ -135,16 +135,6 @@
         <url-pattern>/quiz/data</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>QuizControlServlet</servlet-name>
-        <servlet-class>com.triviaapp.servlets.QuizControlServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>QuizControlServlet</servlet-name>
-        <url-pattern>/quiz/control</url-pattern>
-    </servlet-mapping>
-
     <!-- M2M100 Translator proxy -->
     <servlet>
         <servlet-name>M2M100Servlet</servlet-name>
