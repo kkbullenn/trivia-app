@@ -52,6 +52,60 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>MainDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.MainDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>MainDataServlet</servlet-name>
+        <url-pattern>/main/data</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Admin Servlets -->
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.AdminServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.AdminDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminDataServlet</servlet-name>
+        <url-pattern>/admin/data</url-pattern>
+    </servlet-mapping>
+
+    <!-- Create Quiz Servlets -->
+    <servlet>
+        <servlet-name>JoinCreateQuizServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.JoinCreateQuizServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>JoinCreateQuizServlet</servlet-name>
+        <url-pattern>/join-create-quiz</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CreateQuizServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.CreateQuizServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>CreateQuizServlet</servlet-name>
+        <url-pattern>/create-quiz</url-pattern>
+    </servlet-mapping>
+
+    <!-- Whisper AI Server Routes End -->
+    <servlet>
         <servlet-name>WhisperAnswerCheckerServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.WhisperAnswerCheckerServlet</servlet-class>
     </servlet>
@@ -60,17 +114,6 @@
     <servlet-mapping>
         <servlet-name>WhisperAnswerCheckerServlet</servlet-name>
         <url-pattern>/whisper/transcribe-answer</url-pattern>
-    </servlet-mapping>
-    <!-- Whisper AI Server Routes End -->
-
-    <servlet>
-        <servlet-name>MainDataServlet</servlet-name>
-        <servlet-class>com.triviaapp.servlets.MainDataServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>MainDataServlet</servlet-name>
-        <url-pattern>/main/data</url-pattern>
     </servlet-mapping>
 
     <!-- Category Lobbies Servlets -->
