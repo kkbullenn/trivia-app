@@ -24,6 +24,7 @@ public class SessionDAOImpl implements SessionDAO {
     // session_questions helper SQL
     private static final String SQL_DELETE_SESSION_QUESTIONS = "DELETE FROM session_questions WHERE session_id = ?";
     private static final String SQL_INSERT_FROM_CATEGORY = "INSERT INTO session_questions (session_id, question_id) SELECT ?, q.question_id FROM questions q WHERE q.category_id = ?";
+    private static final String SQL_INSERT_SESSSION_QUESTIONS = "INSERT INTO session_questions (session_id, question_id) VALUES (?, ?)";
     private static final String SQL_SELECT_SESSION_QUESTION_IDS = "SELECT question_id FROM session_questions WHERE session_id = ? ORDER BY question_id ASC";
 
     // current_index management on sessions table (multiplayer host-driven sync)
@@ -248,6 +249,19 @@ public class SessionDAOImpl implements SessionDAO {
             } finally {
                 conn.setAutoCommit(oldAuto);
             }
+        }
+    }
+
+    @Override
+    public boolean insertQuestionForSession(int sessionId, int questionId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_INSERT_SESSSION_QUESTIONS)) {
+            ps.setInt(1, sessionId);
+            ps.setInt(2, questionId);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            throw ex;
         }
     }
 

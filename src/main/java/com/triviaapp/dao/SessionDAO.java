@@ -87,6 +87,11 @@ public interface SessionDAO {
     boolean insertAllQuestionsForSession(int sessionId, int categoryId) throws SQLException;
 
     /**
+     * Insert a specific question ID into session_questions for the given session.
+     */
+    boolean insertQuestionForSession(int sessionId, int questionId) throws SQLException;
+
+    /**
      * Return the list of question IDs bound to the session (ordered by question_id by default).
      */
     List<Integer> findQuestionIdsForSession(int sessionId) throws SQLException;
