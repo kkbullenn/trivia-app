@@ -23,10 +23,11 @@ public class SignUpServlet extends HttpServlet {
             throws IOException, ServletException {
 
         final UserDAO userDAO = new UserDAOImpl();
-        final int DEFAULT_ROLE_ID = 100;
+
 
         String email = request.getParameter("user_id");
         String password = request.getParameter("password");
+        int roleId = Integer.parseInt(request.getParameter("role_id"));
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -43,7 +44,7 @@ public class SignUpServlet extends HttpServlet {
             //hashing password for secure the user password
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-            boolean success = userDAO.createUser(userName, email, hashedPassword, DEFAULT_ROLE_ID);
+            boolean success = userDAO.createUser(userName, email, hashedPassword, roleId);
 
             if (success) {
                 response.sendRedirect("login");
