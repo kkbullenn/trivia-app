@@ -8,147 +8,59 @@
 </head>
 
 <body class="bg-[#000814] text-white font-sans min-h-screen flex justify-center items-start py-12">
-  <form action="createQuiz" method="post" class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
+
+  <div class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
 
     <!-- Header -->
     <header class="flex justify-between items-center border-b border-[#003566] pb-4">
       <h1 class="text-2xl font-bold text-[#FFD60A] mx-auto">Create a Quiz</h1>
     </header>
 
-    <!-- Basic Info -->
-    <section class="space-y-4">
-      <div>
-        <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Quiz Session Name</label>
-        <input name="session_name" type="text" placeholder="Enter quiz session name..."
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]" required>
-      </div>
-
-      <div>
-        <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
-        <select name="category_id"
-                class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD60A]" required>
-          <option value="">Select a quiz category</option>
-
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Max Participants</label>
-        <input name="max_participants" type="number" min="1" placeholder="Enter max participants..."
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]">
-      </div>
+    <!-- Category -->
+    <section>
+      <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
+      <select class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD60A]">
+        <option>Select a quiz category</option>
+      </select>
     </section>
 
     <!-- Question Container -->
     <div id="questions-container" class="space-y-6">
 
-      <!-- Question 1 -->
-      <section class="bg-[#003566] rounded-xl p-6 space-y-3 question-block">
-        <h3 class="text-xl font-bold text-[#FFD60A]">Question</h3>
-        <input name="question_text_1" type="text" placeholder="Enter a question..."
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+    <!-- Question 1 -->
+    <section class="bg-[#003566] rounded-xl p-6 space-y-3">
+      <h3 class="text-xl font-bold text-[#FFD60A]">Question 1</h3>
+      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      
+      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
+      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
 
-        <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-        <input name="correct_option_1" type="text" placeholder="Enter correct answer..."
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answers</label>
+      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+    </section>
 
-        <label class="block font-semibold text-[#FFD60A] mt-3">Options (A–D)</label>
-        <input name="option_a_1" type="text" placeholder="Option A"
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-        <input name="option_b_1" type="text" placeholder="Option B"
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-        <input name="option_c_1" type="text" placeholder="Option C"
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-        <input name="option_d_1" type="text" placeholder="Option D"
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-      </section>
-    </div>
+    <!-- Question 2 -->
+    <section class="bg-[#003566] rounded-xl p-6 space-y-3">
+      <h3 class="text-xl font-bold text-[#FFD60A]">Question 2</h3>
+      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      
+      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
+      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
 
-    <!-- Buttons -->
-    <div class="flex flex-col items-center space-y-6">
-      <button type="button" id="addQuestion"
-              class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
-        ＋ Add Question
-      </button>
+      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answer</label>
+      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+    </section>
 
-      <button type="submit"
-              class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
+    <!-- Create Button -->
+    <div class="flex justify-center">
+      <button class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
         Create Quiz
       </button>
     </div>
-  </form>
 
-  <script>
-  window.addEventListener("DOMContentLoaded", async () => {
-    const select = document.querySelector("select[name='category_id']");
-    try {
-      const res = await fetch("/trivia-app-prod/admin/data");
-      const data = await res.json();
-      select.innerHTML = "<option value=''>Select a quiz category</option>";
+  </div>
 
-      if (Array.isArray(data) && data.length > 0) {
-        data.forEach(cat => {
-          const opt = document.createElement("option");
-          opt.value = cat["category-id"];
-          opt.textContent = cat["category-name"];
-          select.appendChild(opt);
-        });
-      } else {
-        const opt = document.createElement("option");
-        opt.textContent = "No categories available";
-        opt.disabled = true;
-        select.appendChild(opt);
-      }
-    } catch (err) {
-      console.error("Error loading categories:", err);
-      select.innerHTML = "<option disabled>Error loading categories</option>";
-    }
-  });
-
-  const container = document.getElementById("questions-container");
-
-  document.getElementById("addQuestion").addEventListener("click", () => {
-    const newSection = document.createElement("section");
-    newSection.className = "bg-[#003566] rounded-xl p-6 space-y-3 question-block";
-    newSection.innerHTML = `
-      <h3 class="text-xl font-bold text-[#FFD60A]">Question</h3>
-      <input type="text" placeholder="Enter a question..." class="question-input w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-
-      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-      <input type="text" placeholder="Enter correct answer..." class="correct-input w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-
-      <label class="block font-semibold text-[#FFD60A] mt-3">Options (A–D)</label>
-      <input type="text" placeholder="Option A" class="option-a w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-      <input type="text" placeholder="Option B" class="option-b w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-      <input type="text" placeholder="Option C" class="option-c w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-      <input type="text" placeholder="Option D" class="option-d w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
-
-      <button type="button" class="delete-question text-[#FFC300] hover:text-[#FFD60A] mt-3 text-sm underline">🗑️ Delete Question</button>
-    `;
-    container.appendChild(newSection);
-    updateQuestionNames();
-  });
-
-  container.addEventListener("click", (e) => {
-    if (e.target.classList.contains("delete-question")) {
-      e.target.closest(".question-block").remove();
-      updateQuestionNames();
-    }
-  });
-
-  function updateQuestionNames() {
-    const sections = document.querySelectorAll(".question-block");
-    sections.forEach((sec, i) => {
-      const idx = i + 1;
-      sec.querySelector("h3").textContent = `Question ${idx}`;
-      sec.querySelector(".question-input").name = `question_text_${idx}`;
-      sec.querySelector(".correct-input").name = `correct_option_${idx}`;
-      sec.querySelector(".option-a").name = `option_a_${idx}`;
-      sec.querySelector(".option-b").name = `option_b_${idx}`;
-      sec.querySelector(".option-c").name = `option_c_${idx}`;
-      sec.querySelector(".option-d").name = `option_d_${idx}`;
-    });
-  }
-  </script>
 </body>
 </html>
