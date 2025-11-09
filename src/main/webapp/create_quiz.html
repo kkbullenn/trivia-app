@@ -3,62 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create a Quiz</ti이tle>
+  <title>Create a Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#000814] text-white font-sans min-h-screen flex justify-center items-start py-12">
-
-  <div class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
+  <form action="createQuiz" method="post" class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
 
     <!-- Header -->
     <header class="flex justify-between items-center border-b border-[#003566] pb-4">
-      <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">←</button>
-      <h1 class="text-2xl font-bold text-[#FFD60A]">Create a Quiz</h1>
-      <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">→</button>
+      <h1 class="text-2xl font-bold text-[#FFD60A] mx-auto">Create a Quiz</h1>
     </header>
 
-    <!-- Category -->
-    <section>
-      <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
-      <select class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD60A]">
-        <option>Select a quiz category</option>
-      </select>
+    <!-- Basic Info -->
+    <section class="space-y-4">
+      <div>
+        <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Quiz Session Name</label>
+        <input name="session_name" type="text" placeholder="Enter quiz session name..."
+               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]" required>
+      </div>
+
+      <div>
+        <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
+        <select name="category_id"
+                class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD60A]" required>
+          <option value="">Select a quiz category</option>
+          <!-- 추후 BE에서 category 목록 fetch 후 JS로 append -->
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Max Participants</label>
+        <input name="max_participants" type="number" min="1" placeholder="Enter max participants..."
+               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]">
+      </div>
     </section>
 
     <!-- Question 1 -->
     <section class="bg-[#003566] rounded-xl p-6 space-y-3">
       <h3 class="text-xl font-bold text-[#FFD60A]">Question 1</h3>
-      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      
-      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      <input name="question_text_1" type="text" placeholder="Enter a question..."
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
 
-      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answers</label>
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
+      <input name="correct_option_1" type="text" placeholder="Enter correct answer..."
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+
+      <label class="block font-semibold text-[#FFD60A] mt-3">Options (A–D)</label>
+      <input name="option_a_1" type="text" placeholder="Option A"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
+      <input name="option_b_1" type="text" placeholder="Option B"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
+      <input name="option_c_1" type="text" placeholder="Option C"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
+      <input name="option_d_1" type="text" placeholder="Option D"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
     </section>
 
     <!-- Question 2 -->
     <section class="bg-[#003566] rounded-xl p-6 space-y-3">
       <h3 class="text-xl font-bold text-[#FFD60A]">Question 2</h3>
-      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      
-      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      <input name="question_text_2" type="text" placeholder="Enter a question..."
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
 
-      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answer</label>
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
+      <input name="correct_option_2" type="text" placeholder="Enter correct answer..."
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
+
+      <label class="block font-semibold text-[#FFD60A] mt-3">Options (A–D)</label>
+      <input name="option_a_2" type="text" placeholder="Option A"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
+      <input name="option_b_2" type="text" placeholder="Option B"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
+      <input name="option_c_2" type="text" placeholder="Option C"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
+      <input name="option_d_2" type="text" placeholder="Option D"
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white" />
     </section>
 
-    <!-- Create Button -->
+    <!-- Submit Button -->
     <div class="flex justify-center">
-      <button class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
+      <button type="submit"
+              class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
         Create Quiz
       </button>
     </div>
 
-  </div>
-
+  </form>
 </body>
 </html>
