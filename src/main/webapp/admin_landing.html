@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Categories (Admin)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#000814] text-white font-sans min-h-screen flex justify-center items-start py-12">
+
+  <div class="w-full max-w-4xl bg-[#001D3D] rounded-2xl shadow-xl p-10">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center border-b border-[#003566] pb-4 mb-6">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl">👤</span>
+        <p class="text-lg">Welcome, <b>admin</b></p>
+      </div>
+      <a href="#" class="flex items-center gap-2 border border-[#FFC300] px-4 py-2 rounded-md text-[#FFC300] font-semibold hover:bg-[#FFC300] hover:text-black transition">
+      <span class="text-xl">←</span>
+      <span>Back</span>
+      </a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="space-y-10">
+
+      <!-- Categories Section -->
+      <section>
+        <h2 class="text-2xl font-bold text-[#FFD60A] mb-6">Select a Quiz Category</h2>
+        <div class="grid grid-cols-3 md:grid-cols-4 gap-6">
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+          <button class="bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition">Category</button>
+        </div>
+      </section>
+
+      <!-- My Quizzes Section -->
+      <section>
+        <h3 class="text-xl font-semibold text-[#FFD60A] mb-4">My Quizzes</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center bg-[#003566] p-4 rounded-lg hover:bg-[#001D3D] transition">
+            <p><b>My Quiz 1</b><br><span class="text-gray-300 text-sm">Category: 90’s</span></p>
+            <button class="inline-flex h-12 items-center justify-center rounded-md px-6 font-medium text-[#FFC300] shadow-lg shadow-[#FFC300]/20 border border-[#FFC300] transition active:scale-95 hover:text-[#FFD60A] hover:border-[#FFD60A]">Delete</button>
+          </div>
+
+          <div class="flex justify-between items-center bg-[#003566] p-4 rounded-lg hover:bg-[#001D3D] transition">
+            <p><b>My Quiz 2</b><br><span class="text-gray-300 text-sm">Category: Action</span></p>
+            <button class="inline-flex h-12 items-center justify-center rounded-md px-6 font-medium text-[#FFC300] shadow-lg shadow-[#FFC300]/20 border border-[#FFC300] transition active:scale-95 hover:text-[#FFD60A] hover:border-[#FFD60A]">Delete</button>
+          </div>
+
+          <div class="flex justify-between items-center bg-[#003566] p-4 rounded-lg hover:bg-[#001D3D] transition">
+            <p><b>My Quiz 3</b><br><span class="text-gray-300 text-sm">Category: Science Fiction</span></p>
+            <button class="inline-flex h-12 items-center justify-center rounded-md px-6 font-medium text-[#FFC300] shadow-lg shadow-[#FFC300]/20 border border-[#FFC300] transition active:scale-95 hover:text-[#FFD60A] hover:border-[#FFD60A]">Delete</button>
+          </div>
+        </div>
+
+        <!-- Add Quiz Button -->
+        <div class="flex justify-center mt-8">
+          <button class="bg-[#FFC300] text-black text-4xl w-14 h-14 rounded-full flex items-center justify-center hover:bg-[#FFD60A] transition">＋</button>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+</body>
+</html>
