@@ -35,9 +35,10 @@ public class SignUpServlet extends HttpServlet {
         try{
 
             if (userDAO.findPasswordByEmail(email) != null) {
-                out.println("<h3>Email already registered!</h3>");
-                out.println("<a href='signup'>Try again</a>");
-                response.sendRedirect("signup");
+                request.setAttribute("errorMessage", "Email already registered!");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/signUp.html");
+                dispatcher.forward(request, response);
+                return;
             }
             // generate username based on the email input
             String userName = email.substring(0, email.indexOf('@'));
@@ -48,6 +49,7 @@ public class SignUpServlet extends HttpServlet {
 
             if (success) {
                 response.sendRedirect("login");
+                return;
             } else {
                 out.println("<h3>Sign up failed unexpectedly.</h3>");
             }

@@ -48,18 +48,18 @@ public class LoginServlet extends HttpServlet {
                     throw new SQLException("Database inconsistency: User found but ID not found.");
                 } else {
                     session.setAttribute("user_id", user_id);
-                    session.setAttribute("user_role", roleName);
+                    session.setAttribute("role_name", roleName);
                     response.sendRedirect("main");
+                    return;
                 }
 
 
             } else {
-                // Invalid login
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<h3>Invalid email or password.</h3>");
-                out.println("<a href='login'>Try again</a>");
-                response.sendRedirect("login");
+
+                request.setAttribute("loginError", "Invalid email or password.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/login.html");
+                dispatcher.forward(request, response);
+
             }
 
 
