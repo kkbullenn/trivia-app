@@ -47,7 +47,6 @@
         </button>
       </div>
     </section>
-
   </div>
 
   <script>
@@ -64,29 +63,21 @@
         if (!res.ok) throw new Error("HTTP " + res.status);
 
         const data = await res.json();
-
-
-        const categories = [
-          { id: 1, name: "Science" },
-          { id: 2, name: "Movies" },
-          { id: 3, name: "History" },
-          { id: 4, name: "Geography" },
-          { id: 5, name: "Sports" },
-          { id: 6, name: "Music" },
-          { id: 7, name: "Food" },
-          { id: 8, name: "General Knowledge" }
-        ];
-
+        const categories = data.categories;
         categoryGrid.innerHTML = "";
-        categories.forEach(cat => {
-          const btn = document.createElement("button");
-          btn.className =
-            "bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition";
-          btn.textContent = cat.name;
-          btn.onclick = () => alert(`Selected category: ${cat.name}`);
-          categoryGrid.appendChild(btn);
-        });
 
+        if (categories && categories.length > 0) {
+          categories.forEach(cat => {
+            const btn = document.createElement("button");
+            btn.className =
+              "bg-[#000814] border border-[#FFC300] rounded-xl text-base font-medium py-6 hover:bg-[#FFC300] hover:text-black transition";
+            btn.textContent = cat["category-name"];
+            btn.onclick = () => alert(`Selected category: ${cat["category-name"]}`);
+            categoryGrid.appendChild(btn);
+          });
+        } else {
+          categoryGrid.innerHTML = `<p class="col-span-full text-center text-gray-400">No categories found.</p>`;
+        }
 
         quizList.innerHTML = "";
         if (data.quizzes && data.quizzes.length > 0) {
@@ -118,7 +109,6 @@
       }
     }
 
-
     function deleteQuizClient(button) {
       if (!confirm("Do you want to remove this quiz from the list?")) return;
       const card = button.closest(".quiz-card");
@@ -131,6 +121,5 @@
 
     loadAdminData();
   </script>
-
 </body>
 </html>

@@ -28,18 +28,11 @@
     <!-- Category -->
     <section>
       <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
-      <select name="category_id" required 
+      <select id="categorySelect" name="category_id" required 
               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]">
         <option value="">Select a quiz category</option>
-        <option value="1">Science</option>
-        <option value="2">Movies</option>
-        <option value="3">History</option>
-        <option value="4">Geography</option>
-        <option value="5">Sports</option>
-        <option value="6">Music</option>
-        <option value="7">Food</option>
-        <option value="8">General Knowledge</option>
       </select>
+
     </section>
 
     <!-- Questions Container -->
@@ -106,34 +99,65 @@
   <script>
     let questionCount = 1;
 
+    async function loadCategories() {
+      try {
+        const res = await fetch("/trivia-app-prod/admin/data", {
+          method: "GET",
+          credentials: "same-origin",
+          headers: { "Accept": "application/json" }
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const data = await res.json();
+        const categories = data.categories;
+        const select = document.getElementById("categorySelect");
+        select.innerHTML = '<option value="">Select a quiz category</option>';
+
+        categories.forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat["category-id"];
+          opt.textContent = cat["category-name"];
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    }
+
     function addQuestion() {
       questionCount++;
       const container = document.getElementById("questionsContainer");
+
+      const optionHTML = ["A","B","C","D"]
+        .map(letter => `
+          <div class="flex items-center gap-2">
+            <input name="option_${letter.toLowerCase()}_${questionCount}" type="text" placeholder="Option ${letter}" required
+                  class="flex-1 bg-[#000814] border border-[#FFC300] rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+            <label class="flex items-center gap-1 text-sm">
+              <input type="radio" name="correct_option_${questionCount}" value="${letter}" ${letter === "A" ? "required" : ""}/>
+              Correct
+            </label>
+          </div>
+        `)
+        .join("");
+
       const newSection = document.createElement("section");
       newSection.className = "question bg-[#003566] rounded-xl p-6 space-y-4";
       newSection.innerHTML = `
         <h3 class="text-xl font-bold text-[#FFD60A]">Question ${questionCount}</h3>
         <input name="question_text_${questionCount}" type="text" placeholder="Enter question text..." required
-               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+              class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
         <div class="space-y-2 mt-3">
           <label class="block font-semibold text-[#FFD60A]">Options</label>
-          <div class="grid grid-cols-1 gap-2">
-            ${["A","B","C","D"].map(letter => `
-              <div class="flex items-center gap-2">
-                <input name="option_${letter.toLowerCase()}_${questionCount}" type="text" placeholder="Option ${letter}" required
-                       class="flex-1 bg-[#000814] border border-[#FFC300] rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-                <label class="flex items-center gap-1 text-sm">
-                  <input type="radio" name="correct_option_${questionCount}" value="${letter}" ${letter === "A" ? "required" : ""}/>
-                  Correct
-                </label>
-              </div>
-            `).join("")}
-          </div>
+          <div class="grid grid-cols-1 gap-2">${optionHTML}</div>
         </div>
       `;
       container.appendChild(newSection);
     }
-  </script>
+
+    window.addEventListener("DOMContentLoaded", loadCategories);
+</script>
+
 
 </body>
 </html>
