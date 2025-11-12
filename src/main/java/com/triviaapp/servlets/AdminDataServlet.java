@@ -66,7 +66,7 @@ public class AdminDataServlet extends HttpServlet {
         for (Map<String, String> quiz : sessions) {
             JSONObject obj = new JSONObject();
             obj.put("quiz-id", Integer.parseInt(quiz.get("session_id")));
-            obj.put("quiz-name", quiz.get("quiz_name"));
+            obj.put("quiz-name", quiz.get("session_name"));
             obj.put("quiz-status", quiz.get("status")); // Temporary since category not stored in session table, and MVP prototype doesn't need it
             quizzesArray.put(obj);
         }

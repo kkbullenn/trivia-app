@@ -75,8 +75,8 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 
             boolean created = questionDAO.createQuestion(
                     categoryId,
-                    null, // xml_question
-                    null, // youtube_url
+                    "", // xml_question
+                    "", // youtube_url
                     questionText,
                     answersOptionJson,
                     correctAnswer,
