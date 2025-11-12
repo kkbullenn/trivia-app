@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Login</title>
+  </head>
+  <body class="flex items-center justify-center min-h-screen">
+    <div class="flex flex-col items-center mb-[50%]">
+      <h1 class="text-center text-6xl font-bold mb-4">Quiz App</h1>
+      <div class="mb-[5%]">
+        <h1 class="text-center text-3xl">Login</h1>
+        <h2 class="text-center text-xs">Login to continue</h2>
+      </div>
+
+      <form class="flex flex-col w-64" action="login" method="POST">
+        <div class="flex flex-col">
+          <label>Username:</label>
+          <input class="border-1" type="text" name="user_id" />
+        </div>
+
+        <div class="flex flex-col">
+          <label>Password:</label>
+          <input class="border-1" type="password" name="password" id="pswd" />
+        </div>
+
+        <input
+          class="border rounded p-1 mt-4 cursor-pointer bg-[grey] text-white hover:bg-gray-600 w-64"
+          id="submitButton"
+          type="submit"
+          value="login"
+        />
+      </form>
+      <input
+        class="border rounded p-1 mt-4 cursor-pointer hover:bg-gray-300 w-full"
+        id="submitButton"
+        type="submit"
+        value="Sign Up"
+        onclick="window.location.href='signUp'"
+      />
+    </div>
+  </body>
+</html>
