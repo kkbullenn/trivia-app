@@ -3,62 +3,132 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create a Quiz</ti이tle>
+  <title>Create a Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-[#000814] text-white font-sans min-h-screen flex justify-center items-start py-12">
 
-  <div class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
+  <form action="create-quiz" method="POST" class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
 
     <!-- Header -->
     <header class="flex justify-between items-center border-b border-[#003566] pb-4">
-      <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">←</button>
+      <button type="button" onclick="window.location.href='admin-landing'" class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">←</button>
       <h1 class="text-2xl font-bold text-[#FFD60A]">Create a Quiz</h1>
-      <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">→</button>
+      <button type="button" onclick="addQuestion()" class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">＋</button>
     </header>
+
+    <!-- Quiz Name -->
+    <section>
+      <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Quiz Name</label>
+      <input name="session_name" type="text" required placeholder="Enter quiz title..." 
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+    </section>
 
     <!-- Category -->
     <section>
       <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
-      <select class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD60A]">
-        <option>Select a quiz category</option>
+      <select name="category_id" required 
+              class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]">
+        <option value="">Select a quiz category</option>
+        <option value="1">Science</option>
+        <option value="2">Movies</option>
+        <option value="3">History</option>
       </select>
     </section>
 
-    <!-- Question 1 -->
-    <section class="bg-[#003566] rounded-xl p-6 space-y-3">
-      <h3 class="text-xl font-bold text-[#FFD60A]">Question 1</h3>
-      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      
-      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+    <!-- Questions Container -->
+    <div id="questionsContainer">
 
-      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answers</label>
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-    </section>
+      <!-- Question 1 -->
+      <section class="question bg-[#003566] rounded-xl p-6 space-y-4">
+        <h3 class="text-xl font-bold text-[#FFD60A]">Question 1</h3>
 
-    <!-- Question 2 -->
-    <section class="bg-[#003566] rounded-xl p-6 space-y-3">
-      <h3 class="text-xl font-bold text-[#FFD60A]">Question 2</h3>
-      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      
-      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+        <!-- Question Text -->
+        <input name="question_text_1" type="text" placeholder="Enter question text..." required
+               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
 
-      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answer</label>
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-    </section>
+        <!-- Options -->
+        <div class="space-y-2 mt-3">
+          <label class="block font-semibold text-[#FFD60A]">Options</label>
+
+          <div class="grid grid-cols-1 gap-2">
+            <div class="flex items-center gap-2">
+              <input name="option_a_1" type="text" placeholder="Option A" required
+                     class="flex-1 bg-[#000814] border border-[#FFC300] rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+              <label class="flex items-center gap-1 text-sm">
+                <input type="radio" name="correct_option_1" value="A" required />
+                Correct
+              </label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input name="option_b_1" type="text" placeholder="Option B" required
+                     class="flex-1 bg-[#000814] border border-[#FFC300] rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+              <label class="flex items-center gap-1 text-sm">
+                <input type="radio" name="correct_option_1" value="B" />
+                Correct
+              </label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input name="option_c_1" type="text" placeholder="Option C" required
+                     class="flex-1 bg-[#000814] border border-[#FFC300] rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+              <label class="flex items-center gap-1 text-sm">
+                <input type="radio" name="correct_option_1" value="C" />
+                Correct
+              </label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input name="option_d_1" type="text" placeholder="Option D" required
+                     class="flex-1 bg-[#000814] border border-[#FFC300] rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+              <label class="flex items-center gap-1 text-sm">
+                <input type="radio" name="correct_option_1" value="D" />
+                Correct
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <!-- Create Button -->
     <div class="flex justify-center">
-      <button class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
+      <button type="submit" class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
         Create Quiz
       </button>
     </div>
+  </form>
 
-  </div>
+  <script>
+    let questionCount = 1;
+
+    function addQuestion() {
+      questionCount++;
+      const container = document.getElementById("questionsContainer");
+      const newSection = document.createElement("section");
+      newSection.className = "question bg-[#003566] rounded-xl p-6 space-y-4";
+      newSection.innerHTML = `
+        <h3 class="text-xl font-bold text-[#FFD60A]">Question ${questionCount}</h3>
+        <input name="question_text_${questionCount}" type="text" placeholder="Enter question text..." required
+               class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+        <div class="space-y-2 mt-3">
+          <label class="block font-semibold text-[#FFD60A]">Options</label>
+          <div class="grid grid-cols-1 gap-2">
+            ${["A","B","C","D"].map(letter => `
+              <div class="flex items-center gap-2">
+                <input name="option_${letter.toLowerCase()}_${questionCount}" type="text" placeholder="Option ${letter}" required
+                       class="flex-1 bg-[#000814] border border-[#FFC300] rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+                <label class="flex items-center gap-1 text-sm">
+                  <input type="radio" name="correct_option_${questionCount}" value="${letter}" ${letter === "A" ? "required" : ""}/>
+                  Correct
+                </label>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+      container.appendChild(newSection);
+    }
+  </script>
 
 </body>
 </html>
