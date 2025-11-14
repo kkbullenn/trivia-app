@@ -1,54 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <title>Playing Quiz</title>
-  </head>
-  <body class="flex flex-col items-center p-5 min-h-screen">
-    
-    <div class="flex w-full justify-between"><i class="fa-solid fa-arrow-left"></i><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
-    <div class="flex flex-col w-full">
-        <div class="flex flex-col mt-4 gap-2">
-          <h1 class="text-xl">Question:</h1>
-          <div class="border-1 bg-gray-300 h-[50px] p-2">question here...</div>
-        </div>
-        <div class="flex flex-col p-4 mt-4 border-1">
-          <h1 class="text-xl">Category1</h1>
-          <iframe
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <title>Playing Quiz</title>
+</head>
+<body class="flex flex-col items-center p-5 min-h-screen">
+
+<div class="flex w-full justify-between"><i class="fa-solid fa-arrow-left"></i><i
+        class="fa-solid fa-arrow-right-from-bracket"></i></div>
+<div class="flex flex-col w-full">
+  <div class="flex flex-col mt-4 gap-2">
+    <h1 class="text-xl">Question:</h1>
+    <div class="border-1 bg-gray-300 h-[50px] p-2">question here...</div>
+  </div>
+  <div class="flex flex-col p-4 mt-4 border-1">
+    <h1 class="text-xl">Category1</h1>
+    <iframe
             src="https://www.youtube.com/embed/Ye8mB6VsUHw?si=qMdza5DcWLhs-pmv"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen
-          ></iframe>
-        </div>
-        <div class="flex justify-center space-x-4 my-4 mx-[25%]">
-            <button class="border cursor-pointer bg-gray-300 w-full">Prev</button>
-            <button class="border cursor-pointer bg-gray-300 w-full">Next</button>
-        </div>
-        <div class="flex flex-col gap-2">
-            <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">A
-                <div class="ml-2">answer here</div>
-            </button>
-            <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">B
-                <div class="ml-2">answer here</div>
-            </button>
-            <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">C
-                <div class="ml-2">answer here</div>
-            </button>
-            <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">D
-                <div class="ml-2">answer here</div>
-            </button>
-        <div class="flex w-full justify-between mt-[5%] p-2">
-            <button><i class="fa-solid fa-microphone"></i></button>
-            <button><i class="fa-solid fa-star"></i></button>
-            <button><i class="fa-solid fa-language"></i></button>
-        </div>
-    </div>
-    </div>
-  </body>
+    ></iframe>
+  </div>
+  <div class="flex justify-center space-x-4 my-4 mx-[25%]">
+    <button class="border cursor-pointer bg-gray-300 w-full">Prev</button>
+    <button class="border cursor-pointer bg-gray-300 w-full">Next</button>
+  </div>
+  <div class="flex flex-col gap-2">
+    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">A
+      <span class="ml-2">answer here</span>
+    </button>
+    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">B
+      <span class="ml-2">answer here</span>
+    </button>
+    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">C
+      <span class="ml-2">answer here</span>
+    </button>
+    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">D
+      <span class="ml-2">answer here</span>
+    </button>
+  </div>
+  <div class="flex w-full justify-between mt-[5%] p-2">
+    <button><i class="fa-solid fa-microphone"></i></button>
+    <button><i class="fa-solid fa-star"></i></button>
+    <button><i class="fa-solid fa-language"></i></button>
+  </div>
+</div>
+</body>
 </html>

@@ -1,64 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create a Quiz</ti이tle>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create a Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#000814] text-white font-sans min-h-screen flex justify-center items-start py-12">
 
-  <div class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
+<div class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
 
-    <!-- Header -->
-    <header class="flex justify-between items-center border-b border-[#003566] pb-4">
-      <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">←</button>
-      <h1 class="text-2xl font-bold text-[#FFD60A]">Create a Quiz</h1>
-      <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">→</button>
-    </header>
+  <!-- Header -->
+  <header class="flex justify-between items-center border-b border-[#003566] pb-4">
+    <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">←</button>
+    <h1 class="text-2xl font-bold text-[#FFD60A]">Create a Quiz</h1>
+    <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">→</button>
+  </header>
 
-    <!-- Category -->
-    <section>
-      <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
-      <select class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD60A]">
-        <option>Select a quiz category</option>
-      </select>
-    </section>
+  <!-- Category -->
+  <section>
+    <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Category</label>
+    <select class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD60A]">
+      <option>Select a quiz category</option>
+    </select>
+  </section>
 
-    <!-- Question 1 -->
-    <section class="bg-[#003566] rounded-xl p-6 space-y-3">
-      <h3 class="text-xl font-bold text-[#FFD60A]">Question 1</h3>
-      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      
-      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+  <!-- Question 1 -->
+  <section class="bg-[#003566] rounded-xl p-6 space-y-3">
+    <h3 class="text-xl font-bold text-[#FFD60A]">Question 1</h3>
+    <input type="text" placeholder="Enter a question..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
 
-      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answers</label>
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-    </section>
+    <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
+    <input type="text" placeholder="Enter correct answer..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
 
-    <!-- Question 2 -->
-    <section class="bg-[#003566] rounded-xl p-6 space-y-3">
-      <h3 class="text-xl font-bold text-[#FFD60A]">Question 2</h3>
-      <input type="text" placeholder="Enter a question..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-      
-      <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
-      <input type="text" placeholder="Enter correct answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+    <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answers</label>
+    <input type="text" placeholder="Enter incorrect answer..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
+    <input type="text" placeholder="Enter incorrect answer..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
+    <input type="text" placeholder="Enter incorrect answer..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
+  </section>
 
-      <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answer</label>
-      <input type="text" placeholder="Enter incorrect answer..." class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]" />
-    </section>
+  <!-- Question 2 -->
+  <section class="bg-[#003566] rounded-xl p-6 space-y-3">
+    <h3 class="text-xl font-bold text-[#FFD60A]">Question 2</h3>
+    <input type="text" placeholder="Enter a question..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
 
-    <!-- Create Button -->
-    <div class="flex justify-center">
-      <button class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
-        Create Quiz
-      </button>
-    </div>
+    <label class="block font-semibold text-[#FFD60A] mt-3">Correct Answer</label>
+    <input type="text" placeholder="Enter correct answer..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
 
+    <label class="block font-semibold text-[#FFD60A] mt-3">Incorrect Answer</label>
+    <input type="text" placeholder="Enter incorrect answer..."
+           class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#FFD60A]"/>
+  </section>
+
+  <!-- Create Button -->
+  <div class="flex justify-center">
+    <button class="bg-[#FFC300] text-black font-semibold text-lg px-8 py-3 rounded-full hover:bg-[#FFD60A] active:scale-95 transition">
+      Create Quiz
+    </button>
   </div>
+
+</div>
 
 </body>
 </html>

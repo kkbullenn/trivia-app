@@ -25,7 +25,7 @@ public class JoinQuizServlet extends HttpServlet {
             return;
         }
 
-        int user_id = (Integer) session.getAttribute("user_id");
+        int userId = (Integer) session.getAttribute("user_id");
         String lobbyIdParam = request.getParameter("lobby_id");
         if (lobbyIdParam == null || lobbyIdParam.isBlank()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing lobby_id");
@@ -43,7 +43,7 @@ public class JoinQuizServlet extends HttpServlet {
         // Add user to the selected lobby (session) in the database
         SessionDAO sessionDAO = new SessionDAOImpl();
         try {
-            sessionDAO.joinSession(lobbyId, user_id);
+            sessionDAO.joinSession(lobbyId, userId);
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");

@@ -23,8 +23,8 @@
           </path>
         </g>
       </svg>
-      <div class="text-white">Welcome,</div>
-      <div class="font-bold text-yellow-400" id="username">User</div>
+      <span class="text-white">Welcome,</span>
+      <span class="font-bold text-yellow-400" id="username">User</span>
     </button>
   </form>
   <form action="EXIT" method="POST">
@@ -49,29 +49,6 @@
   <form action="category-lobbies" method="GET">
     <div class="py-1 flex flex-col items-center">
       <div id="category" class="grid grid-cols-3 gap-5">
-        <button
-                class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                type="button">
-          Category
-        </button>
-        <button
-                class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                type="button">
-          Category
-        </button>
-        <button
-                class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                type="button">
-          Category
-        </button>
-        <template id="category">
-          <button name="category" value="Category"
-                  class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                  type="submit">
-            Category
-          </button>
-        </template>
-
       </div>
     </div>
   </form>
@@ -113,15 +90,15 @@
         <input type="hidden" name="lobby_id" class="lobby-id" value="">
         <button type="submit"
                 class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 focus:outline-none">
-          <div class="flex flex-col text-left">
-            <div class="font-bold text-yellow-400 quiz-name">My Quiz</div>
-            <div class="flex flex-row text-yellow-300">
+          <span class="flex flex-col text-left">
+            <span class="font-bold text-yellow-400 quiz-name">My Quiz</span>
+            <span class="flex flex-row text-yellow-300">
               Category:
-              <div class="ml-1 quiz-category">Action</div>
-            </div>
-          </div>
+              <span class="ml-1 quiz-category">Action</span>
+            </span>
+          </span>
 
-          <div class="flex-shrink-0">
+          <span class="flex-shrink-0">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                  xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
               <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -143,26 +120,23 @@
                       stroke-linejoin="round"></path>
               </g>
             </svg>
-          </div>
+          </span>
         </button>
       </form>
     </template>
     <a href="/CreateQuiz">
       <div class="flex items-center justify-center w-full px-4 py-4 text-lg rounded-lg bg-blue-950">
-        <svg class="w-6 h-6" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
-             xmlns:xlink="http://www.w3.org/1999/xlink"
-             xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000">
+        <svg class="w-6 h-6" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
           <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
           <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
           <g id="SVGRepo_iconCarrier">
             <defs></defs>
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
-               sketch:type="MSPage">
-              <g id="Icon-Set" sketch:type="MSLayerGroup"
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g id="Icon-Set"
                  transform="translate(-464.000000, -1087.000000)" fill="#000000">
                 <path
                         d="M480,1117 C472.268,1117 466,1110.73 466,1103 C466,1095.27 472.268,1089 480,1089 C487.732,1089 494,1095.27 494,1103 C494,1110.73 487.732,1117 480,1117 L480,1117 Z M480,1087 C471.163,1087 464,1094.16 464,1103 C464,1111.84 471.163,1119 480,1119 C488.837,1119 496,1111.84 496,1103 C496,1094.16 488.837,1087 480,1087 L480,1087 Z M486,1102 L481,1102 L481,1097 C481,1096.45 480.553,1096 480,1096 C479.447,1096 479,1096.45 479,1097 L479,1102 L474,1102 C473.447,1102 473,1102.45 473,1103 C473,1103.55 473.447,1104 474,1104 L479,1104 L479,1109 C479,1109.55 479.447,1110 480,1110 C480.553,1110 481,1109.55 481,1109 L481,1104 L486,1104 C486.553,1104 487,1103.55 487,1103 C487,1102.45 486.553,1102 486,1102 L486,1102 Z"
-                        id="plus-circle" sketch:type="MSShapeGroup"></path>
+                        id="plus-circle"></path>
               </g>
             </g>
           </g>
@@ -186,79 +160,79 @@
       <input type="hidden" name="lobby_id" class="lobby-id" value="">
       <button type="submit"
               class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 text-left">
-        <div>
-          <div class="quiz-name font-bold text-yellow-400"></div>
-          <div class="quiz-category text-yellow-300 text-sm"></div>
-        </div>
-        <div class="quiz-meta text-sm"></div>
+        <span class="flex flex-col">
+          <span class="quiz-name font-bold text-yellow-400"></span>
+          <span class="quiz-category text-yellow-300 text-sm"></span>
+        </span>
+        <span class="quiz-meta text-sm"></span>
       </button>
     </form>
   </template>
+</div>
 
-  <script>
-    (async function () {
-      try {
-        const pathParts = window.location.pathname.split('/');
-        pathParts.pop();
-        const contextPath = pathParts.join('/') || '';
-        const res = await fetch(`${contextPath}/main/data`, {
-          method: 'GET',
-          headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
-          credentials: 'same-origin'
+<script>
+  (async function () {
+    try {
+      const pathParts = window.location.pathname.split('/');
+      pathParts.pop();
+      const contextPath = pathParts.join('/') || '';
+      const res = await fetch(`${contextPath}/main/data`, {
+        method: 'GET',
+        headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
+        credentials: 'same-origin'
+      });
+      if (!res.ok) throw new Error('Network error: ' + res.status);
+      const data = await res.json();
+
+      // Categories
+      const catContainer = document.getElementById('category');
+      const catTpl = document.getElementById('categoryTpl');
+      if (catContainer && catTpl && Array.isArray(data.categories)) {
+        catContainer.innerHTML = '';
+        data.categories.forEach(cat => {
+          const node = catTpl.content.cloneNode(true);
+          const catIdInput = node.querySelector('.category-id');
+          if (catIdInput) catIdInput.value = String(cat.id ?? '');
+          const nameEl = node.querySelector('.category-name');
+          if (nameEl) nameEl.textContent = cat.name ?? String(cat);
+          const formEl = node.querySelector('form');
+          if (formEl) formEl.action = `${contextPath}/join-category`;
+          catContainer.appendChild(node);
         });
-        if (!res.ok) throw new Error('Network error: ' + res.status);
-        const data = await res.json();
-
-        // Categories
-        const catContainer = document.getElementById('category');
-        const catTpl = document.getElementById('categoryTpl');
-        if (catContainer && catTpl && Array.isArray(data.categories)) {
-          catContainer.innerHTML = '';
-          data.categories.forEach(cat => {
-            const node = catTpl.content.cloneNode(true);
-            const catIdInput = node.querySelector('.category-id');
-            if (catIdInput) catIdInput.value = String(cat.id ?? '');
-            const nameEl = node.querySelector('.category-name');
-            if (nameEl) nameEl.textContent = cat.name ?? String(cat);
-            const formEl = node.querySelector('form');
-            if (formEl) formEl.action = `${contextPath}/join-category`;
-            catContainer.appendChild(node);
-          });
-        }
-
-        // Quizzes — use keys returned by MainDataServlet
-        const quizContainer = document.getElementById('MyQuizzes');
-        const quizTpl = document.getElementById('quizTpl');
-        if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
-          quizContainer.innerHTML = '';
-          data.quizzes.forEach(q => {
-            const node = quizTpl.content.cloneNode(true);
-            const lobbyInput = node.querySelector('.lobby-id');
-            if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
-            const quizNameEl = node.querySelector('.quiz-name');
-            if (quizNameEl) quizNameEl.textContent = q.quiz_name ?? 'Untitled';
-            const statusEl = node.querySelector('.quiz-category');
-            const statusText = q.status && q.status !== 'null' ? q.status : '';
-            if (statusEl) statusEl.textContent = statusText ? `Status: ${statusText}` : '';
-            const metaEl = node.querySelector('.quiz-meta');
-            if (metaEl) {
-              const maxParticipants = q.max_participants && q.max_participants !== 'null' ? `Max: ${q.max_participants}` : '';
-              const startAt = q.start_at && q.start_at !== 'null' ? `Start: ${q.start_at}` : '';
-              const endAt = q.end_at && q.end_at !== 'null' ? `End: ${q.end_at}` : '';
-              const metaParts = [maxParticipants, startAt, endAt].filter(Boolean);
-              metaEl.textContent = metaParts.join(' · ');
-            }
-            const formEl = node.querySelector('form');
-            if (formEl) formEl.action = `${contextPath}/join-quiz`;
-            quizContainer.appendChild(node);
-          });
-        }
-      } catch (err) {
-        console.error('Failed to load data', err);
       }
-    })();
-  </script>
 
+      // Quizzes — use keys returned by MainDataServlet
+      const quizContainer = document.getElementById('MyQuizzes');
+      const quizTpl = document.getElementById('quizTpl');
+      if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
+        quizContainer.innerHTML = '';
+        data.quizzes.forEach(q => {
+          const node = quizTpl.content.cloneNode(true);
+          const lobbyInput = node.querySelector('.lobby-id');
+          if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
+          const quizNameEl = node.querySelector('.quiz-name');
+          if (quizNameEl) quizNameEl.textContent = q.quiz_name ?? 'Untitled';
+          const statusEl = node.querySelector('.quiz-category');
+          const statusText = q.status && q.status !== 'null' ? q.status : '';
+          if (statusEl) statusEl.textContent = statusText ? `Status: ${statusText}` : '';
+          const metaEl = node.querySelector('.quiz-meta');
+          if (metaEl) {
+            const maxParticipants = q.max_participants && q.max_participants !== 'null' ? `Max: ${q.max_participants}` : '';
+            const startAt = q.start_at && q.start_at !== 'null' ? `Start: ${q.start_at}` : '';
+            const endAt = q.end_at && q.end_at !== 'null' ? `End: ${q.end_at}` : '';
+            const metaParts = [maxParticipants, startAt, endAt].filter(Boolean);
+            metaEl.textContent = metaParts.join(' · ');
+          }
+          const formEl = node.querySelector('form');
+          if (formEl) formEl.action = `${contextPath}/join-quiz`;
+          quizContainer.appendChild(node);
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load data', err);
+    }
+  })();
+</script>
 </body>
 
 </html>

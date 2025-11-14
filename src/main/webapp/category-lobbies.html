@@ -11,7 +11,7 @@
 
 <body class="font-mono bg-blue-900">
 <div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
-  <form action="USER" , method="GET">
+  <form action="USER" method="GET">
     <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
       <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#ffffff" class="icon" version="1.1"
            xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +25,7 @@
       </svg>
     </button>
   </form>
-  <form action="EXIT" , method="POST">
+  <form action="EXIT" method="POST">
     <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -53,10 +53,10 @@
       <input type="hidden" name="lobby_id" class="lobby-id" value="">
       <button type="submit"
               class="w-full bg-blue-950 text-yellow-300 rounded-lg px-4 py-6 shadow hover:bg-blue-900 focus:outline-none flex items-center justify-between">
-        <div class="text-left">
-          <div class="username font-semibold">Username's room</div>
-        </div>
-        <div class="room text-sm">1/9</div>
+        <span class="text-left flex flex-col">
+          <span class="username font-semibold">Username's room</span>
+        </span>
+        <span class="room text-sm">1/9</span>
       </button>
     </form>
   </template>

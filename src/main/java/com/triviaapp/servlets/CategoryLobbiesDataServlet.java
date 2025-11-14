@@ -32,7 +32,7 @@ public class CategoryLobbiesDataServlet extends HttpServlet {
             // Not logged in -> redirect to login page
             response.sendRedirect("login");
             return;
-        } else if (ajaxHeader == null || !ajaxHeader.equals("fetch")) {
+        } else if (!"fetch".equals(ajaxHeader)) {
             // Not an AJAX fetch request → redirect to main page
             response.sendRedirect("main");
             return;
@@ -65,7 +65,7 @@ public class CategoryLobbiesDataServlet extends HttpServlet {
         // Send JSON response
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        out.print(sessionsArray.toString());
+        out.print(sessionsArray);
         out.flush();
     }
 }
