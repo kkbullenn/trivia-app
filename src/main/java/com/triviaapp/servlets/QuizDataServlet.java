@@ -12,7 +12,11 @@ import com.triviaapp.dao.SessionDAO;
 import com.triviaapp.dao.impl.QuestionDAOImpl;
 import com.triviaapp.dao.impl.SessionDAOImpl;
 import com.triviaapp.dao.impl.CategoryDAOImpl;
+import com.triviaapp.dao.impl.UserDAOImpl;
+import com.triviaapp.dao.impl.ModeratedAnswerDAOImpl;
 import com.triviaapp.dao.CategoryDAO;   
+import com.triviaapp.dao.UserDAO;
+import com.triviaapp.dao.ModeratedAnswerDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -24,6 +28,8 @@ public class QuizDataServlet extends HttpServlet {
     private final SessionDAO sessionDAO = new SessionDAOImpl();
     private final QuestionDAO questionDAO = new QuestionDAOImpl();
     private final CategoryDAO categoryDAO = new CategoryDAOImpl();
+    private final UserDAO userDAO = new UserDAOImpl();
+    private final ModeratedAnswerDAO moderatedAnswerDAO = new ModeratedAnswerDAOImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,13 +48,40 @@ public class QuizDataServlet extends HttpServlet {
         }
 
         try {
-            // Get current index from sessionDAO
-            int currentIndex = sessionDAO.getCurrentIndex(lobbyId);
             List<Integer> questionIds = sessionDAO.findQuestionIdsForSession(lobbyId);
+            if (questionIds == null || questionIds.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No questions configured for this lobby");
+                return;
+            }
+
+            // Get current index from sessionDAO, initialize to zero when absent
+            Integer currentIndexObj = sessionDAO.getCurrentIndex(lobbyId);
+            int currentIndex;
+            if (currentIndexObj == null) {
+                currentIndex = 0;
+                boolean updated = sessionDAO.updateCurrentIndex(lobbyId, currentIndex);
+                if (!updated) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to initialize current question index");
+                    return;
+                }
+            } else {
+                currentIndex = currentIndexObj;
+            }
 
             if (currentIndex < 0 || currentIndex >= questionIds.size()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid question index");
-                return;
+                int clampedIndex = currentIndex;
+                if (clampedIndex < 0) {
+                    clampedIndex = 0;
+                } else {
+                    clampedIndex = Math.min(clampedIndex, questionIds.size() - 1);
+                }
+
+                if (!sessionDAO.updateCurrentIndex(lobbyId, clampedIndex)) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to reconcile question index");
+                    return;
+                }
+
+                currentIndex = clampedIndex;
             }
 
             int questionId = questionIds.get(currentIndex);
@@ -61,13 +94,29 @@ public class QuizDataServlet extends HttpServlet {
 
             JSONObject question = new JSONObject();
             question.put("question_number", currentIndex);
+            question.put("total_questions", questionIds.size());
             question.put("category_name", categoryDAO.findCategoryNameById(
                 Integer.parseInt(questionData.get("category_id"))));
             question.put("question_text", questionData.get("question_text"));
-            question.put("answer_option", questionData.get("answer_option"));
-            question.put("answer_key", questionData.get("answer_key"));
+            question.put("answers_option", questionData.get("answers_option"));
+            question.put("answers_key", questionData.get("answers_key"));
             question.put("points", questionData.get("points"));
             question.put("youtube_url", questionData.get("youtube_url"));
+
+            Integer userId = (Integer) session.getAttribute("user_id");
+            question.put("user_id", userId);
+            question.put("username", userId != null ? userDAO.findUsernameById(userId) : null);
+            question.put("lobby_id", lobbyId);
+            if (userId != null) {
+                Map<String, String> existingAnswer = moderatedAnswerDAO.findAnswerForParticipantAndQuestion(lobbyId, questionId, userId);
+                if (existingAnswer != null) {
+                    question.put("selected_answer", existingAnswer.get("selected_answer"));
+                    question.put("is_correct", existingAnswer.get("is_correct"));
+                    question.put("score_awarded", existingAnswer.get("score"));
+                }
+                int answeredCount = moderatedAnswerDAO.countAnswersForParticipantInSession(lobbyId, userId);
+                question.put("answered_count", answeredCount);
+            }
 
             response.setContentType("application/json");
             response.getWriter().write(question.toString());

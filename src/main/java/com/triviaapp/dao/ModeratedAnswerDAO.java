@@ -34,4 +34,14 @@ public interface ModeratedAnswerDAO {
      * Check if the selected answer is correct for the given question.
      */
     boolean isAnswerCorrect(int questionId, String selectedAnswer) throws SQLException;
+
+    /**
+     * Retrieve an answer the participant already submitted for the given question within the session.
+     */
+    Map<String, String> findAnswerForParticipantAndQuestion(int sessionId, int questionId, int participantId) throws SQLException;
+
+    /**
+     * Count how many answers the participant has submitted within the session.
+     */
+    int countAnswersForParticipantInSession(int sessionId, int participantId) throws SQLException;
 }

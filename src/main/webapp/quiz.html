@@ -9,47 +9,519 @@
 </head>
 <body class="flex flex-col items-center p-5 min-h-screen">
 
-<div class="flex w-full justify-between"><i class="fa-solid fa-arrow-left"></i><i
-        class="fa-solid fa-arrow-right-from-bracket"></i></div>
+<div class="flex w-full justify-between text-xl">
+  <i id="backIcon" class="fa-solid fa-arrow-left cursor-pointer" aria-label="Return to lobby"></i>
+  <i id="exitIcon" class="fa-solid fa-arrow-right-from-bracket cursor-pointer" aria-label="Quit"></i>
+</div>
+
 <div class="flex flex-col w-full">
   <div class="flex flex-col mt-4 gap-2">
-    <h1 class="text-xl">Question:</h1>
-    <div class="border-1 bg-gray-300 h-[50px] p-2">question here...</div>
+    <h1 id="questionTitle" class="text-xl">Question:</h1>
+    <div id="questionText" class="border bg-gray-100 h-[70px] p-3 overflow-y-auto">Loading question...</div>
+    <span id="questionMeta" class="text-sm text-gray-600"></span>
   </div>
-  <div class="flex flex-col p-4 mt-4 border-1">
-    <h1 class="text-xl">Category1</h1>
+
+  <div class="flex flex-col p-4 mt-4 border" id="videoWrapper">
+    <h1 id="categoryTitle" class="text-xl">Category</h1>
     <iframe
-            src="https://www.youtube.com/embed/Ye8mB6VsUHw?si=qMdza5DcWLhs-pmv"
-            title="YouTube video player"
+            id="questionVideo"
+            class="mt-2"
+            src=""
+            title="Question Video"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen
     ></iframe>
   </div>
+
   <div class="flex justify-center space-x-4 my-4 mx-[25%]">
-    <button class="border cursor-pointer bg-gray-300 w-full">Prev</button>
-    <button class="border cursor-pointer bg-gray-300 w-full">Next</button>
+    <button id="prevButton" class="border cursor-pointer bg-gray-300 w-full">Prev</button>
+    <button id="nextButton" class="border cursor-pointer bg-gray-300 w-full">Next</button>
   </div>
-  <div class="flex flex-col gap-2">
-    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">A
-      <span class="ml-2">answer here</span>
-    </button>
-    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">B
-      <span class="ml-2">answer here</span>
-    </button>
-    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">C
-      <span class="ml-2">answer here</span>
-    </button>
-    <button class="flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5">D
-      <span class="ml-2">answer here</span>
-    </button>
+
+  <div id="answersContainer" class="flex flex-col gap-2"></div>
+  <div id="completionActions" class="hidden mt-4 flex justify-center">
+    <a id="completionLink" class="border bg-gray-300 px-4 py-2" href="#">View Quiz Summary</a>
   </div>
-  <div class="flex w-full justify-between mt-[5%] p-2">
-    <button><i class="fa-solid fa-microphone"></i></button>
-    <button><i class="fa-solid fa-star"></i></button>
-    <button><i class="fa-solid fa-language"></i></button>
+
+  <div class="flex w-full justify-between mt-[5%] p-2 text-2xl">
+    <button id="voiceButton" type="button" aria-label="Voice Answer"><i class="fa-solid fa-microphone"></i></button>
+    <button id="favoriteButton" type="button" aria-label="Save Question"><i class="fa-solid fa-star"></i></button>
+    <button id="languageButton" type="button" aria-label="Switch Language"><i class="fa-solid fa-language"></i></button>
   </div>
 </div>
+
+<div id="statusBanner" class="hidden mt-4 w-full border p-2 text-sm text-center"></div>
+
+<script>
+  (function () {
+    const statusBanner = document.getElementById('statusBanner');
+    const questionTitle = document.getElementById('questionTitle');
+    const questionMeta = document.getElementById('questionMeta');
+    const questionText = document.getElementById('questionText');
+    const answersContainer = document.getElementById('answersContainer');
+    const videoWrapper = document.getElementById('videoWrapper');
+    const questionVideo = document.getElementById('questionVideo');
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
+    const backIcon = document.getElementById('backIcon');
+    const exitIcon = document.getElementById('exitIcon');
+    const completionActions = document.getElementById('completionActions');
+    const completionLink = document.getElementById('completionLink');
+
+    let socket = null;
+    let lobbyId = null;
+    let userId = null;
+    let username = null;
+    let reconnectTimeout = null;
+    let selectedAnswerKey = null;
+    let currentQuestionIndex = 0;
+    let totalQuestionCount = null;
+
+    const questionState = new Map();
+    const COMPLETION_STORAGE_KEY = 'quizCompletionData';
+    const ANSWER_BUTTON_BASE_CLASS = 'flex border items-center cursor-pointer hover:bg-gray-300 w-full h-[50px] pl-5';
+    const DISABLED_BUTTON_CLASS = 'opacity-60 pointer-events-none';
+    const CORRECT_SELECTED_CLASS = 'bg-green-500 border-green-600 text-white';
+    const CORRECT_REVEAL_CLASS = 'bg-green-100 border-green-300 text-green-900';
+    const INCORRECT_SELECTED_CLASS = 'bg-red-500 border-red-600 text-white';
+    const INCORRECT_REVEAL_CLASS = 'bg-red-100 border-red-300 text-red-800';
+    const NEUTRAL_LOCKED_CLASS = 'bg-gray-200 text-gray-700';
+
+    const toTokens = (classString = '') => classString.trim().split(/\s+/).filter(Boolean);
+    const ANSWER_BUTTON_BASE_TOKENS = toTokens(ANSWER_BUTTON_BASE_CLASS);
+    const DISABLED_BUTTON_TOKENS = toTokens(DISABLED_BUTTON_CLASS);
+    const CORRECT_SELECTED_TOKENS = toTokens(CORRECT_SELECTED_CLASS);
+    const CORRECT_REVEAL_TOKENS = toTokens(CORRECT_REVEAL_CLASS);
+    const INCORRECT_SELECTED_TOKENS = toTokens(INCORRECT_SELECTED_CLASS);
+    const INCORRECT_REVEAL_TOKENS = toTokens(INCORRECT_REVEAL_CLASS);
+    const NEUTRAL_LOCKED_TOKENS = toTokens(NEUTRAL_LOCKED_CLASS);
+
+    const toIndex = (value, fallback = 0) => {
+      const parsed = Number(value);
+      return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
+    };
+
+    const toNumber = (value, fallback = 0) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    };
+
+    try {
+      sessionStorage.removeItem(COMPLETION_STORAGE_KEY);
+    } catch (err) {
+      console.warn('Failed to clear cached completion payload', err);
+    }
+
+    const contextPath = (() => {
+      const parts = window.location.pathname.split('/');
+      parts.pop();
+      const joined = parts.join('/');
+      return joined.length ? joined : '';
+    })();
+
+    const disableNav = (disabled) => {
+      if (prevButton) prevButton.disabled = disabled;
+      if (nextButton) nextButton.disabled = disabled;
+    };
+
+    const showStatus = (message, tone = 'error') => {
+      if (!statusBanner) return;
+      if (!message) {
+        statusBanner.classList.add('hidden');
+        statusBanner.textContent = '';
+        return;
+      }
+      statusBanner.textContent = message;
+      statusBanner.classList.remove('hidden');
+      const toneClass = tone === 'info' ? 'bg-blue-200 text-blue-800' : tone === 'success' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
+      statusBanner.className = `mt-4 w-full border p-2 text-sm text-center ${toneClass}`;
+    };
+
+    const toEmbedUrl = (url) => {
+      if (!url) return null;
+      if (/\/embed\//.test(url)) return url;
+      const matcher = url.match(/(?:v=|youtu.be\/|embed\/)([A-Za-z0-9_-]{6,})/);
+      if (matcher && matcher[1]) {
+        return `https://www.youtube.com/embed/${matcher[1]}`;
+      }
+      return url;
+    };
+
+    const normalizeAnswers = (raw) => {
+      if (!raw) return [];
+      let parsed = raw;
+      if (typeof raw === 'string') {
+        try {
+          parsed = JSON.parse(raw);
+        } catch (err) {
+          console.error('Failed to parse answers_option', err);
+          return [];
+        }
+      }
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => ({
+          key: item.key ?? item.option ?? '',
+          text: item.text ?? item.value ?? ''
+        })).filter((item) => item.key && item.text);
+      }
+      if (typeof parsed === 'object' && parsed !== null) {
+        return Object.entries(parsed).map(([key, text]) => ({ key, text })).filter((item) => item.key && item.text);
+      }
+      return [];
+    };
+
+    const getQuestionState = (index) => questionState.get(index);
+    const setQuestionState = (index, state) => {
+      if (state) {
+        questionState.set(index, state);
+      }
+    };
+
+    const resetAnswerButtons = () => {
+      const buttons = answersContainer.querySelectorAll('button[data-key]');
+      buttons.forEach((btn) => {
+        btn.className = ANSWER_BUTTON_BASE_TOKENS.join(' ');
+        btn.disabled = false;
+        btn.dataset.locked = '';
+      });
+    };
+
+    const applyAnswerState = (state) => {
+      if (!state) return;
+      const buttons = answersContainer.querySelectorAll('button[data-key]');
+      buttons.forEach((btn) => {
+        const key = btn.dataset.key;
+        let tokens = [...ANSWER_BUTTON_BASE_TOKENS, ...DISABLED_BUTTON_TOKENS];
+        btn.disabled = true;
+        btn.dataset.locked = 'true';
+
+        const isSelected = key === state.selectedAnswer;
+        const isCorrectAnswer = key === state.correctAnswer;
+
+        if (isSelected && state.isCorrect) {
+          tokens = tokens.concat(CORRECT_SELECTED_TOKENS);
+        } else if (isSelected && !state.isCorrect) {
+          tokens = tokens.concat(INCORRECT_SELECTED_TOKENS);
+        } else if (isCorrectAnswer) {
+          tokens = tokens.concat(CORRECT_REVEAL_TOKENS);
+        } else {
+          tokens = tokens.concat(INCORRECT_REVEAL_TOKENS);
+        }
+        btn.className = tokens.join(' ');
+      });
+
+      selectedAnswerKey = state.selectedAnswer;
+    };
+
+    const renderQuestion = (payload) => {
+      const receivedIndex = toIndex(payload.question_number, currentQuestionIndex);
+      currentQuestionIndex = receivedIndex;
+      totalQuestionCount = toNumber(payload.total_questions, totalQuestionCount);
+      const questionNumber = currentQuestionIndex + 1;
+      const categoryName = payload.category_name ?? '';
+      const points = payload.points ? `${payload.points} pts` : '';
+
+      questionTitle.textContent = `Question ${questionNumber}`;
+      const metaParts = [categoryName, points].filter(Boolean);
+      questionMeta.textContent = metaParts.join(' · ');
+      questionText.textContent = payload.question_text || 'Question content unavailable.';
+
+      const answers = normalizeAnswers(payload.answers_option);
+      answersContainer.innerHTML = '';
+      selectedAnswerKey = null;
+      if (!answers.length) {
+        const empty = document.createElement('div');
+        empty.className = 'rounded border border-slate-700 bg-slate-800/60 p-3 text-sm text-slate-300';
+        empty.textContent = 'No answer options available for this question.';
+        answersContainer.appendChild(empty);
+      } else {
+        answers.forEach((answer) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.key = String(answer.key);
+          button.className = ANSWER_BUTTON_BASE_TOKENS.join(' ');
+          const keySpan = document.createElement('span');
+          keySpan.className = 'font-semibold mr-2';
+          keySpan.textContent = answer.key;
+          const textSpan = document.createElement('span');
+          textSpan.textContent = answer.text;
+          button.appendChild(keySpan);
+          button.appendChild(textSpan);
+          answersContainer.appendChild(button);
+        });
+      }
+
+      const embedUrl = toEmbedUrl(payload.youtube_url);
+      if (embedUrl) {
+        questionVideo.src = embedUrl;
+        videoWrapper.classList.remove('hidden');
+      } else {
+        questionVideo.src = '';
+        videoWrapper.classList.add('hidden');
+      }
+
+      disableNav(false);
+      resetAnswerButtons();
+
+      // Apply historical state when revisiting
+      let state = getQuestionState(currentQuestionIndex);
+      if (!state && payload.selected_answer) {
+        state = {
+          selectedAnswer: payload.selected_answer,
+          correctAnswer: payload.answers_key,
+          isCorrect: payload.is_correct === 'true' || payload.is_correct === true,
+          alreadyAnswered: true,
+          scoreAwarded: toNumber(payload.score_awarded, 0),
+          answeredCount: toNumber(payload.answered_count, 0),
+          totalQuestions: toNumber(payload.total_questions, totalQuestionCount),
+        };
+        setQuestionState(currentQuestionIndex, state);
+      }
+
+      showStatus('', 'info');
+
+      if (state && state.alreadyAnswered) {
+        applyAnswerState(state);
+      }
+    };
+
+    const showCompletionActions = (href) => {
+      if (!completionActions || !completionLink) return;
+      completionLink.href = href;
+      completionActions.classList.remove('hidden');
+    };
+
+    const sendMessage = (payload) => {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        showStatus('Live connection is not ready; action queued.', 'info');
+        disableNav(true);
+        return;
+      }
+      socket.send(JSON.stringify(payload));
+    };
+
+    const highlightSelectedAnswer = (key) => {
+      const buttons = answersContainer.querySelectorAll('button[data-key]');
+      buttons.forEach((btn) => {
+        if (btn.dataset.key === key) {
+          btn.classList.add('bg-yellow-100');
+        } else {
+          btn.classList.remove('bg-yellow-100');
+        }
+      });
+    };
+
+    const lockAnswerButtons = () => {
+      const buttons = answersContainer.querySelectorAll('button[data-key]');
+      buttons.forEach((btn) => {
+        btn.disabled = true;
+        if (!btn.dataset.locked) {
+          btn.classList.add(...DISABLED_BUTTON_TOKENS, ...NEUTRAL_LOCKED_TOKENS);
+        }
+      });
+    };
+
+    const handleAnswerResult = (payload) => {
+      if (typeof payload.question_index !== 'number') return;
+
+      const state = {
+        selectedAnswer: payload.selected_answer,
+        correctAnswer: payload.correct_answer,
+        isCorrect: Boolean(payload.is_correct),
+        alreadyAnswered: true,
+        scoreAwarded: toNumber(payload.score_awarded, 0),
+        answeredCount: toNumber(payload.answered_count, 0),
+        totalQuestions: toNumber(payload.total_questions, totalQuestionCount),
+      };
+
+      setQuestionState(toIndex(payload.question_index, payload.question_index), state);
+
+      if (toIndex(payload.question_index, payload.question_index) === currentQuestionIndex) {
+        applyAnswerState(state);
+      }
+
+      showStatus('', 'info');
+    };
+
+    const handleQuizComplete = (payload) => {
+      const summary = {
+        lobbyId,
+        totalQuestions: Number(payload.total_questions) || totalQuestionCount || 0,
+        answeredCount: Number(payload.answered_count) || 0,
+        totalScore: Number(payload.total_score) || 0,
+        leaderboard: Array.isArray(payload.leaderboard) ? payload.leaderboard : [],
+        completedAt: Date.now(),
+        username,
+      };
+
+      try {
+        sessionStorage.setItem(COMPLETION_STORAGE_KEY, JSON.stringify(summary));
+      } catch (err) {
+        console.warn('Failed to persist completion summary', err);
+      }
+
+      const target = `${contextPath}/quiz-complete.html`;
+      showCompletionActions(target);
+      window.location.href = target;
+    };
+
+    const tryReconnect = () => {
+      if (reconnectTimeout || !lobbyId) return;
+      reconnectTimeout = setTimeout(() => {
+        reconnectTimeout = null;
+        initWebSocket();
+      }, 2000);
+    };
+
+    const initWebSocket = () => {
+      if (!lobbyId) return;
+      if (socket) {
+        socket.close();
+      }
+      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const wsUrl = `${protocol}://${window.location.host}${contextPath}/quiz/webSocket`;
+      socket = new WebSocket(wsUrl);
+
+      socket.addEventListener('open', () => {
+        disableNav(false);
+        showStatus('', 'success');
+        if (reconnectTimeout) {
+          clearTimeout(reconnectTimeout);
+          reconnectTimeout = null;
+        }
+        socket.send(JSON.stringify({
+          type: 'join',
+          lobbyId,
+          user_id: userId ?? -1,
+          username: username ?? 'Player'
+        }));
+      });
+
+      socket.addEventListener('message', (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          switch (data.type) {
+            case 'question':
+              renderQuestion({
+                question_number: data.index,
+                category_name: data.category_name,
+                question_text: data.question_text,
+                answers_option: data.answers_option,
+                answers_key: data.answers_key,
+                points: data.points,
+                youtube_url: data.youtube_url,
+                total_questions: data.total_questions
+              });
+              break;
+            case 'answerResult':
+              handleAnswerResult(data);
+              break;
+            case 'quizComplete':
+              handleQuizComplete(data);
+              break;
+            default:
+              console.debug('Unhandled message type', data);
+          }
+        } catch (err) {
+          console.error('Failed to process WebSocket message', err);
+        }
+      });
+
+      socket.addEventListener('close', () => {
+        disableNav(true);
+        showStatus('Live connection lost. Reconnecting...', 'info');
+        tryReconnect();
+      });
+
+      socket.addEventListener('error', (err) => {
+        console.error('WebSocket error', err);
+        showStatus('Live connection encountered an issue.', 'error');
+      });
+    };
+
+    const loadInitialQuestion = async () => {
+      try {
+        disableNav(true);
+        showStatus('Loading question…', 'info');
+        const res = await fetch(`${contextPath}/quiz/data`, {
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: {
+            'Accept': 'application/json',
+            'AJAX-Requested-With': 'fetch'
+          }
+        });
+        if (!res.ok) {
+          throw new Error(`Server responded with status ${res.status}`);
+        }
+        const data = await res.json();
+        lobbyId = data.lobby_id ?? lobbyId;
+        userId = data.user_id ?? userId;
+        username = data.username ?? username ?? 'Player';
+
+        totalQuestionCount = typeof data.total_questions === 'number' ? data.total_questions : totalQuestionCount;
+        renderQuestion(data);
+        showStatus('', 'success');
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+          initWebSocket();
+        }
+      } catch (err) {
+        console.error('Failed to load quiz data', err);
+        showStatus('Failed to load question. Please try again later.', 'error');
+      }
+    };
+
+    backIcon?.addEventListener('click', () => {
+      window.location.href = `${contextPath}/category-lobbies`;
+    });
+
+    exitIcon?.addEventListener('click', async () => {
+      try {
+        await fetch(`${contextPath}/EXIT`, { method: 'POST', credentials: 'same-origin' });
+      } catch (err) {
+        console.error('Failed to exit session', err);
+      } finally {
+        window.location.href = `${contextPath}/login`;
+      }
+    });
+
+    prevButton?.addEventListener('click', () => {
+      if (!lobbyId) return;
+      sendMessage({ type: 'prev', lobbyId });
+    });
+
+    nextButton?.addEventListener('click', () => {
+      if (!lobbyId) return;
+      sendMessage({ type: 'next', lobbyId });
+    });
+
+    answersContainer?.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-key]');
+      if (!button || !lobbyId) return;
+      const existing = getQuestionState(currentQuestionIndex);
+      if (existing && existing.alreadyAnswered) {
+        showStatus('You already answered this question.', 'info');
+        return;
+      }
+      const answerKey = button.dataset.key;
+      sendMessage({ type: 'answer', lobbyId, answer: answerKey });
+      selectedAnswerKey = answerKey;
+      highlightSelectedAnswer(answerKey);
+      lockAnswerButtons();
+      showStatus('Waiting for answer result…', 'info');
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (socket) {
+        socket.close();
+      }
+    });
+
+    loadInitialQuestion();
+  })();
+</script>
 </body>
 </html>

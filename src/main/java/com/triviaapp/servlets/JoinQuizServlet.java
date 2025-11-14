@@ -44,6 +44,7 @@ public class JoinQuizServlet extends HttpServlet {
         SessionDAO sessionDAO = new SessionDAOImpl();
         try {
             sessionDAO.joinSession(lobbyId, userId);
+            sessionDAO.updateCurrentIndex(lobbyId, 0);
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");

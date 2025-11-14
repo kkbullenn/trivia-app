@@ -31,6 +31,7 @@ public class SessionDAOImpl implements SessionDAO {
     private static final String SQL_GET_CURRENT_INDEX = "SELECT current_index FROM sessions WHERE session_id = ?";
     private static final String SQL_INCREMENT_CURRENT_INDEX = "UPDATE sessions SET current_index = current_index + 1 WHERE session_id = ?";
     private static final String SQL_DECREMENT_CURRENT_INDEX = "UPDATE sessions SET current_index = current_index - 1 WHERE session_id = ? AND current_index > 0";
+    private static final String SQL_SET_CURRENT_INDEX = "UPDATE sessions SET current_index = ? WHERE session_id = ?";
     
     private static final String SQL_LIST_ACTIVE_SUMMARY = String.join("\n",
             "SELECT s.session_id, s.session_name, s.host_user_id, s.max_participants, s.status, COALESCE(sp.cnt,0) AS current_participants",
@@ -381,6 +382,17 @@ public class SessionDAOImpl implements SessionDAO {
             } finally {
                 conn.setAutoCommit(oldAuto);
             }
+        }
+    }
+
+    @Override
+    public boolean updateCurrentIndex(int sessionId, int index) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_SET_CURRENT_INDEX)) {
+            ps.setInt(1, index);
+            ps.setInt(2, sessionId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
         }
     }
 }
