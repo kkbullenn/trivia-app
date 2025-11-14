@@ -2,242 +2,262 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Select Quiz</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Select Quiz</title>
 </head>
 
 <body class="font-mono bg-blue-900">
-    <div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
-        <form action="USER" method="GET">
-            <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
-                <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                    <g id="SVGRepo_iconCarrier">
-                        <path
-                            d="M8 7C9.65685 7 11 5.65685 11 4C11 2.34315 9.65685 1 8 1C6.34315 1 5 2.34315 5 4C5 5.65685 6.34315 7 8 7Z"
-                            fill="#000000"></path>
-                        <path d="M14 12C14 10.3431 12.6569 9 11 9H5C3.34315 9 2 10.3431 2 12V15H14V12Z" fill="#000000">
-                        </path>
-                    </g>
-                </svg>
-                <div class="text-white">Welcome, </div>
-                <div class="font-bold text-yellow-400" id="username">User</div>
-            </button>
-        </form>
-        <form action="EXIT" method="POST">
-            <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                    <g id="SVGRepo_iconCarrier">
-                        <path
-                            d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        </path>
-                        <path d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"></path>
-                    </g>
-                </svg>
-            </button>
-        </form>
+<div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
+  <form action="USER" method="GET">
+    <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
+      <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+                  d="M8 7C9.65685 7 11 5.65685 11 4C11 2.34315 9.65685 1 8 1C6.34315 1 5 2.34315 5 4C5 5.65685 6.34315 7 8 7Z"
+                  fill="#000000"></path>
+          <path d="M14 12C14 10.3431 12.6569 9 11 9H5C3.34315 9 2 10.3431 2 12V15H14V12Z" fill="#000000">
+          </path>
+        </g>
+      </svg>
+      <div class="text-white">Welcome,</div>
+      <div class="font-bold text-yellow-400" id="username">User</div>
+    </button>
+  </form>
+  <form action="EXIT" method="POST">
+    <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+                  d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          </path>
+          <path d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+      </svg>
+    </button>
+  </form>
+</div>
+<div class="px-4">
+  <div class="py-5 font-bold text-2xl text-yellow-400 text-center">Categories</div>
+  <form action="category-lobbies" method="GET">
+    <div class="py-1 flex flex-col items-center">
+      <div id="category" class="grid grid-cols-3 gap-5">
+        <button
+                class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
+                type="button">
+          Category
+        </button>
+        <button
+                class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
+                type="button">
+          Category
+        </button>
+        <button
+                class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
+                type="button">
+          Category
+        </button>
+        <template id="category">
+          <button name="category" value="Category"
+                  class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
+                  type="submit">
+            Category
+          </button>
+        </template>
+
+      </div>
     </div>
-    <div class="px-4">
-        <div class="py-5 font-bold text-2xl text-yellow-400 text-center">Categories</div>
-        <form action="category-lobbies" method="GET">
-            <div class="py-1 flex flex-col items-center">
-                <div id="category" class="grid grid-cols-3 gap-5">
-                    <button
-                        class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                        type="button">
-                        Category
-                    </button>
-                    <button
-                        class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                        type="button">
-                        Category
-                    </button>
-                    <button
-                        class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                        type="button">
-                        Category
-                    </button>
-                    <template id="category">
-                        <button name="category" value="Category"
-                            class="bg-blue-950 text-yellow-300 rounded-lg p-10 shadow hover:bg-gray-100 focus:outline-none flex items-center justify-center text-center"
-                            type="submit">
-                            Category
-                        </button>
-                    </template>
-
-                </div>
-            </div>
-        </form>
-        <div class="py-5 font-bold text-2xl text-yellow-400 text-center">My Quizzes</div>
-        <div id="MyQuizzes" class="flex flex-col w-full space-y-4">
-            <div class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950">
-                <div class="flex flex-col">
-                    <div class="font-bold text-yellow-400" id="QuizName">My Quiz 1</div>
-                    <div class="flex flex-row text-yellow-300">
-                        Category:
-                        <div class="ml-1" id="CategoryName">Action</div>
-                    </div>
-                </div>
-                <div class="flex-shrink-0">
-                    <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        stroke="#ffffff">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <path
-                                d="M4 6H20L18.4199 20.2209C18.3074 21.2337 17.4512 22 16.4321 22H7.56786C6.54876 22 5.69264 21.2337 5.5801 20.2209L4 6Z"
-                                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path
-                                d="M7.34491 3.14716C7.67506 2.44685 8.37973 2 9.15396 2H14.846C15.6203 2 16.3249 2.44685 16.6551 3.14716L18 6H6L7.34491 3.14716Z"
-                                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M2 6H22" stroke="#000000" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                            <path d="M10 11V16" stroke="#000000" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                            <path d="M14 11V16" stroke="#000000" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-
-            <template id="QuizTemplate">
-                <form action="/quiz" method="POST" class="w-full">
-                    <input type="hidden" name="quizId" class="quiz-id" value="">
-                    <button type="submit"
-                        class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 focus:outline-none">
-                        <div class="flex flex-col text-left">
-                            <div class="font-bold text-yellow-400 quiz-name">My Quiz</div>
-                            <div class="flex flex-row text-yellow-300">
-                                Category:
-                                <div class="ml-1 quiz-category">Action</div>
-                            </div>
-                        </div>
-
-                        <div class="flex-shrink-0">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
-                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    <path
-                                        d="M4 6H20L18.4199 20.2209C18.3074 21.2337 17.4512 22 16.4321 22H7.56786C6.54876 22 5.69264 21.2337 5.5801 20.2209L4 6Z"
-                                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                    <path
-                                        d="M7.34491 3.14716C7.67506 2.44685 8.37973 2 9.15396 2H14.846C15.6203 2 16.3249 2.44685 16.6551 3.14716L18 6H6L7.34491 3.14716Z"
-                                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                    <path d="M2 6H22" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                    <path d="M10 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                    <path d="M14 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                </g>
-                            </svg>
-                        </div>
-                    </button>
-                </form>
-            </template>
-            <a href="/CreateQuiz">
-                <div class="flex items-center justify-center w-full px-4 py-4 text-lg rounded-lg bg-blue-950">
-                    <svg class="w-6 h-6" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <defs> </defs>
-                            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
-                                sketch:type="MSPage">
-                                <g id="Icon-Set" sketch:type="MSLayerGroup"
-                                    transform="translate(-464.000000, -1087.000000)" fill="#000000">
-                                    <path
-                                        d="M480,1117 C472.268,1117 466,1110.73 466,1103 C466,1095.27 472.268,1089 480,1089 C487.732,1089 494,1095.27 494,1103 C494,1110.73 487.732,1117 480,1117 L480,1117 Z M480,1087 C471.163,1087 464,1094.16 464,1103 C464,1111.84 471.163,1119 480,1119 C488.837,1119 496,1111.84 496,1103 C496,1094.16 488.837,1087 480,1087 L480,1087 Z M486,1102 L481,1102 L481,1097 C481,1096.45 480.553,1096 480,1096 C479.447,1096 479,1096.45 479,1097 L479,1102 L474,1102 C473.447,1102 473,1102.45 473,1103 C473,1103.55 473.447,1104 474,1104 L479,1104 L479,1109 C479,1109.55 479.447,1110 480,1110 C480.553,1110 481,1109.55 481,1109 L481,1104 L486,1104 C486.553,1104 487,1103.55 487,1103 C487,1102.45 486.553,1102 486,1102 L486,1102 Z"
-                                        id="plus-circle" sketch:type="MSShapeGroup"> </path>
-                                </g>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-            </a>
-
+  </form>
+  <div class="py-5 font-bold text-2xl text-yellow-400 text-center">My Quizzes</div>
+  <div id="MyQuizzes" class="flex flex-col w-full space-y-4">
+    <div class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950">
+      <div class="flex flex-col">
+        <div class="font-bold text-yellow-400" id="QuizName">My Quiz 1</div>
+        <div class="flex flex-row text-yellow-300">
+          Category:
+          <div class="ml-1" id="CategoryName">Action</div>
         </div>
+      </div>
+      <div class="flex-shrink-0">
+        <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+             stroke="#ffffff">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+                    d="M4 6H20L18.4199 20.2209C18.3074 21.2337 17.4512 22 16.4321 22H7.56786C6.54876 22 5.69264 21.2337 5.5801 20.2209L4 6Z"
+                    stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path
+                    d="M7.34491 3.14716C7.67506 2.44685 8.37973 2 9.15396 2H14.846C15.6203 2 16.3249 2.44685 16.6551 3.14716L18 6H6L7.34491 3.14716Z"
+                    stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2 6H22" stroke="#000000" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+            <path d="M10 11V16" stroke="#000000" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+            <path d="M14 11V16" stroke="#000000" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+          </g>
+        </svg>
+      </div>
     </div>
-    <template id="categoryTpl">
-        <form action="/join-category" method="POST" class="w-full">
-            <input type="hidden" name="categoryId" class="category-id" value="">
-            <button type="submit"
-                class="w-full bg-blue-950 text-yellow-300 rounded-lg p-6 shadow hover:bg-blue-900 focus:outline-none">
-                <span class="category-name"></span>
-            </button>
-        </form>
+
+    <template id="QuizTemplate">
+      <form action="join-quiz" method="POST" class="w-full">
+        <input type="hidden" name="lobby_id" class="lobby-id" value="">
+        <button type="submit"
+                class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 focus:outline-none">
+          <div class="flex flex-col text-left">
+            <div class="font-bold text-yellow-400 quiz-name">My Quiz</div>
+            <div class="flex flex-row text-yellow-300">
+              Category:
+              <div class="ml-1 quiz-category">Action</div>
+            </div>
+          </div>
+
+          <div class="flex-shrink-0">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                        d="M4 6H20L18.4199 20.2209C18.3074 21.2337 17.4512 22 16.4321 22H7.56786C6.54876 22 5.69264 21.2337 5.5801 20.2209L4 6Z"
+                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                <path
+                        d="M7.34491 3.14716C7.67506 2.44685 8.37973 2 9.15396 2H14.846C15.6203 2 16.3249 2.44685 16.6551 3.14716L18 6H6L7.34491 3.14716Z"
+                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                <path d="M2 6H22" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round"></path>
+                <path d="M10 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round"></path>
+                <path d="M14 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round"></path>
+              </g>
+            </svg>
+          </div>
+        </button>
+      </form>
     </template>
+    <a href="/CreateQuiz">
+      <div class="flex items-center justify-center w-full px-4 py-4 text-lg rounded-lg bg-blue-950">
+        <svg class="w-6 h-6" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink"
+             xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            <defs></defs>
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
+               sketch:type="MSPage">
+              <g id="Icon-Set" sketch:type="MSLayerGroup"
+                 transform="translate(-464.000000, -1087.000000)" fill="#000000">
+                <path
+                        d="M480,1117 C472.268,1117 466,1110.73 466,1103 C466,1095.27 472.268,1089 480,1089 C487.732,1089 494,1095.27 494,1103 C494,1110.73 487.732,1117 480,1117 L480,1117 Z M480,1087 C471.163,1087 464,1094.16 464,1103 C464,1111.84 471.163,1119 480,1119 C488.837,1119 496,1111.84 496,1103 C496,1094.16 488.837,1087 480,1087 L480,1087 Z M486,1102 L481,1102 L481,1097 C481,1096.45 480.553,1096 480,1096 C479.447,1096 479,1096.45 479,1097 L479,1102 L474,1102 C473.447,1102 473,1102.45 473,1103 C473,1103.55 473.447,1104 474,1104 L479,1104 L479,1109 C479,1109.55 479.447,1110 480,1110 C480.553,1110 481,1109.55 481,1109 L481,1104 L486,1104 C486.553,1104 487,1103.55 487,1103 C487,1102.45 486.553,1102 486,1102 L486,1102 Z"
+                        id="plus-circle" sketch:type="MSShapeGroup"></path>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </a>
 
-    <template id="quizTpl">
-        <form action="/quiz" method="POST" class="w-full">
-            <input type="hidden" name="quizId" class="quiz-id" value="">
-            <button type="submit"
-                class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 text-left">
-                <div>
-                    <div class="quiz-name font-bold text-yellow-400"></div>
-                    <div class="quiz-category text-yellow-300 text-sm"></div>
-                </div>
-                <div class="quiz-meta text-sm"></div>
-            </button>
-        </form>
-    </template>
+  </div>
+  <template id="categoryTpl">
+    <form action="join-category" method="POST" class="w-full">
+      <input type="hidden" name="category_id" class="category-id" value="">
+      <button type="submit"
+              class="w-full bg-blue-950 text-yellow-300 rounded-lg p-6 shadow hover:bg-blue-900 focus:outline-none">
+        <span class="category-name"></span>
+      </button>
+    </form>
+  </template>
 
-<script>
-(async function () {
-  try {
-    const res = await fetch('/main/data', {
-      method: 'GET',
-      headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
-      credentials: 'same-origin'
-    });
-    if (!res.ok) throw new Error('Network error: ' + res.status);
-    const data = await res.json();
+  <template id="quizTpl">
+    <form action="join-quiz" method="POST" class="w-full">
+      <input type="hidden" name="lobby_id" class="lobby-id" value="">
+      <button type="submit"
+              class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 text-left">
+        <div>
+          <div class="quiz-name font-bold text-yellow-400"></div>
+          <div class="quiz-category text-yellow-300 text-sm"></div>
+        </div>
+        <div class="quiz-meta text-sm"></div>
+      </button>
+    </form>
+  </template>
 
-    // Categories
-    const catContainer = document.getElementById('category');
-    const catTpl = document.getElementById('categoryTpl');
-    if (catContainer && catTpl && Array.isArray(data.categories)) {
-      catContainer.innerHTML = '';
-      data.categories.forEach(cat => {
-        const node = catTpl.content.cloneNode(true);
-        node.querySelector('.category-id').value = cat.id ?? (cat.name || '');
-        node.querySelector('.category-name').textContent = cat.name ?? String(cat);
-        catContainer.appendChild(node);
-      });
-    }
+  <script>
+    (async function () {
+      try {
+        const pathParts = window.location.pathname.split('/');
+        pathParts.pop();
+        const contextPath = pathParts.join('/') || '';
+        const res = await fetch(`${contextPath}/main/data`, {
+          method: 'GET',
+          headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
+          credentials: 'same-origin'
+        });
+        if (!res.ok) throw new Error('Network error: ' + res.status);
+        const data = await res.json();
 
-    // Quizzes — use keys returned by MainDataServlet
-    const quizContainer = document.getElementById('MyQuizzes');
-    const quizTpl = document.getElementById('quizTpl');
-    if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
-      quizContainer.innerHTML = '';
-      data.quizzes.forEach(q => {
-        const node = quizTpl.content.cloneNode(true);
-        node.querySelector('.quiz-id').value = q.session_id ?? '';
-        node.querySelector('.quiz-name').textContent = q.quiz_name ?? 'Untitled';
-        node.querySelector('.quiz-category').textContent = q.status ?? '';
-        quizContainer.appendChild(node);
-      });
-    }
-  } catch (err) {
-    console.error('Failed to load data', err);
-  }
-})();
-</script>
+        // Categories
+        const catContainer = document.getElementById('category');
+        const catTpl = document.getElementById('categoryTpl');
+        if (catContainer && catTpl && Array.isArray(data.categories)) {
+          catContainer.innerHTML = '';
+          data.categories.forEach(cat => {
+            const node = catTpl.content.cloneNode(true);
+            const catIdInput = node.querySelector('.category-id');
+            if (catIdInput) catIdInput.value = String(cat.id ?? '');
+            const nameEl = node.querySelector('.category-name');
+            if (nameEl) nameEl.textContent = cat.name ?? String(cat);
+            const formEl = node.querySelector('form');
+            if (formEl) formEl.action = `${contextPath}/join-category`;
+            catContainer.appendChild(node);
+          });
+        }
+
+        // Quizzes — use keys returned by MainDataServlet
+        const quizContainer = document.getElementById('MyQuizzes');
+        const quizTpl = document.getElementById('quizTpl');
+        if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
+          quizContainer.innerHTML = '';
+          data.quizzes.forEach(q => {
+            const node = quizTpl.content.cloneNode(true);
+            const lobbyInput = node.querySelector('.lobby-id');
+            if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
+            const quizNameEl = node.querySelector('.quiz-name');
+            if (quizNameEl) quizNameEl.textContent = q.quiz_name ?? 'Untitled';
+            const statusEl = node.querySelector('.quiz-category');
+            const statusText = q.status && q.status !== 'null' ? q.status : '';
+            if (statusEl) statusEl.textContent = statusText ? `Status: ${statusText}` : '';
+            const metaEl = node.querySelector('.quiz-meta');
+            if (metaEl) {
+              const maxParticipants = q.max_participants && q.max_participants !== 'null' ? `Max: ${q.max_participants}` : '';
+              const startAt = q.start_at && q.start_at !== 'null' ? `Start: ${q.start_at}` : '';
+              const endAt = q.end_at && q.end_at !== 'null' ? `End: ${q.end_at}` : '';
+              const metaParts = [maxParticipants, startAt, endAt].filter(Boolean);
+              metaEl.textContent = metaParts.join(' · ');
+            }
+            const formEl = node.querySelector('form');
+            if (formEl) formEl.action = `${contextPath}/join-quiz`;
+            quizContainer.appendChild(node);
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load data', err);
+      }
+    })();
+  </script>
 
 </body>
 

@@ -53,10 +53,12 @@ public class CategoryLobbiesDataServlet extends HttpServlet {
         JSONArray sessionsArray = new JSONArray();
         for (Map<String, String> sessionData : sessions) {
             JSONObject sessionJson = new JSONObject();
-            sessionJson.put("lobby_id", Integer.parseInt(sessionData.get("session_id")));
+            sessionJson.put("lobby_id", sessionData.get("session_id"));
             sessionJson.put("lobby_name", sessionData.get("session_name"));
-            sessionJson.put("host_username", sessionData.get("host_username"));
-            sessionJson.put("num_players", Integer.parseInt(sessionData.get("num_players")));
+            sessionJson.put("host_user_id", sessionData.get("host_user_id"));
+            sessionJson.put("status", sessionData.get("status"));
+            sessionJson.put("current_participants", sessionData.getOrDefault("current_participants", "0"));
+            sessionJson.put("max_participants", sessionData.getOrDefault("max_participants", ""));
             sessionsArray.put(sessionJson);
         }
 

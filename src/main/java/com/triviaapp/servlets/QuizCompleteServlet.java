@@ -12,7 +12,10 @@ public class QuizCompleteServlet extends HttpServlet
     {
         resp.setContentType("text/html;charset=UTF-8");
         String score = req.getParameter("scorePct");
-        if (score == null) score = "0";
+        if (score == null)
+        {
+            score = "0";
+        }
 
         try (PrintWriter w = resp.getWriter())
         {

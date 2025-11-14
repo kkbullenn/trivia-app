@@ -2,47 +2,47 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-    <title>Document</title>
+  <title>Document</title>
 </head>
 
 <body class="font-mono bg-blue-900">
-    <div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
-        <form action="USER" , method="GET">
-            <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
-                <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#ffffff" class="icon" version="1.1"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                    <g id="SVGRepo_iconCarrier">
-                        <path
-                            d="M669.6 849.6c8.8 8 22.4 7.2 30.4-1.6s7.2-22.4-1.6-30.4l-309.6-280c-8-7.2-8-17.6 0-24.8l309.6-270.4c8.8-8 9.6-21.6 2.4-30.4-8-8.8-21.6-9.6-30.4-2.4L360.8 480.8c-27.2 24-28 64-0.8 88.8l309.6 280z"
-                            fill=""></path>
-                    </g>
-                </svg>
-            </button>
-        </form>
-        <form action="EXIT" , method="POST">
-            <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                    <g id="SVGRepo_iconCarrier">
-                        <path
-                            d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        </path>
-                        <path d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"></path>
-                    </g>
-                </svg>
-            </button>
-        </form>
-    </div>
-    <div class="px-4 pt-4 text-xl font-bold text-yellow-400">Category (Available Lobbies)</div>
+<div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
+  <form action="USER" , method="GET">
+    <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
+      <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#ffffff" class="icon" version="1.1"
+           xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+                  d="M669.6 849.6c8.8 8 22.4 7.2 30.4-1.6s7.2-22.4-1.6-30.4l-309.6-280c-8-7.2-8-17.6 0-24.8l309.6-270.4c8.8-8 9.6-21.6 2.4-30.4-8-8.8-21.6-9.6-30.4-2.4L360.8 480.8c-27.2 24-28 64-0.8 88.8l309.6 280z"
+                  fill=""></path>
+        </g>
+      </svg>
+    </button>
+  </form>
+  <form action="EXIT" , method="POST">
+    <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+                  d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          </path>
+          <path d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+      </svg>
+    </button>
+  </form>
+</div>
+<div class="px-4 pt-4 text-xl font-bold text-yellow-400">Category (Available Lobbies)</div>
 <div class="py-8">
   <div id="category" class="flex flex-col w-full space-y-4">
     <!-- lobbies here -->
@@ -50,9 +50,9 @@
 
   <template id="lobbyTpl">
     <form class="w-full" action="/join-quiz" method="POST">
-      <input type="hidden" name="lobbyId" class="lobby-id" value="">
+      <input type="hidden" name="lobby_id" class="lobby-id" value="">
       <button type="submit"
-        class="w-full bg-blue-950 text-yellow-300 rounded-lg px-4 py-6 shadow hover:bg-blue-900 focus:outline-none flex items-center justify-between">
+              class="w-full bg-blue-950 text-yellow-300 rounded-lg px-4 py-6 shadow hover:bg-blue-900 focus:outline-none flex items-center justify-between">
         <div class="text-left">
           <div class="username font-semibold">Username's room</div>
         </div>
@@ -65,52 +65,62 @@
 
 </html>
 <script>
-(async function () {
-  try {
-    const res = await fetch('/your-sessions-endpoint', {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: { 'Accept': 'application/json' }
-    });
-    if (!res.ok) throw new Error('Network error: ' + res.status);
+  (async function () {
+    try {
+      const pathParts = window.location.pathname.split('/');
+      pathParts.pop();
+      const contextPath = pathParts.join('/') || '';
+      const res = await fetch(`${contextPath}/category-lobbies/data`, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'AJAX-Requested-With': 'fetch'
+        }
+      });
+      if (!res.ok) throw new Error('Network error: ' + res.status);
 
-    const sessions = await res.json();
+      const sessions = await res.json();
 
-    const container = document.getElementById('category');
-    const tpl = document.getElementById('lobbyTpl');
-    if (!container || !tpl) return;
+      const container = document.getElementById('category');
+      const tpl = document.getElementById('lobbyTpl');
+      if (!container || !tpl) return;
 
-    container.innerHTML = '';
+      container.innerHTML = '';
 
-    if (!Array.isArray(sessions) || sessions.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'text-yellow-300 text-center py-4';
-      empty.textContent = 'No lobbies available';
-      container.appendChild(empty);
-      return;
+      if (!Array.isArray(sessions) || sessions.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'text-yellow-300 text-center py-4';
+        empty.textContent = 'No lobbies available';
+        container.appendChild(empty);
+        return;
+      }
+
+      sessions.forEach(s => {
+        const node = tpl.content.cloneNode(true);
+        const form = node.querySelector('form');
+        const idInput = node.querySelector('.lobby-id');
+        const nameEl = node.querySelector('.username');
+        const roomEl = node.querySelector('.room');
+
+        if (idInput) idInput.value = s.lobby_id ?? '';
+        if (nameEl) nameEl.textContent = s.lobby_name ?? (s.host_username ?? 'Lobby');
+        if (roomEl) {
+          const participants = s.current_participants ?? s.num_players ?? '';
+          const limit = s.max_participants ?? s.max_players ?? '';
+          roomEl.textContent = limit ? `${participants}/${limit}` : String(participants);
+        }
+
+        if (form) form.action = `${contextPath}/join-quiz`;
+
+        container.appendChild(node);
+      });
+    } catch (err) {
+      console.error('Failed to load lobbies', err);
+      const container = document.getElementById('category');
+      if (container) {
+        container.innerHTML = '<div class="text-red-400">Failed to load lobbies</div>';
+      }
     }
-
-    sessions.forEach(s => {
-      const node = tpl.content.cloneNode(true);
-      const form = node.querySelector('form');
-      const idInput = node.querySelector('.lobby-id');
-      const nameEl = node.querySelector('.username');
-      const roomEl = node.querySelector('.room');
-
-      if (idInput) idInput.value = s.lobby_id ?? '';
-      if (nameEl) nameEl.textContent = s.lobby_name ?? (s.host_username ?? 'Lobby');
-      if (roomEl) roomEl.textContent = (s.num_players ?? '') + (s.max_players ? ('/' + s.max_players) : '');
-
-      if (form) form.action = form.action || '/join'; 
-
-      container.appendChild(node);
-    });
-  } catch (err) {
-    console.error('Failed to load lobbies', err);
-    const container = document.getElementById('category');
-    if (container) {
-      container.innerHTML = '<div class="text-red-400">Failed to load lobbies</div>';
-    }
-  }
-})();
+  })();
 </script>
