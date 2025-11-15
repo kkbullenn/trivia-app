@@ -446,6 +446,16 @@
           throw new Error(`Server responded with status ${res.status}`);
         }
         const data = await res.json();
+
+        if (data && data.type === 'quizComplete') {
+          lobbyId = data.lobby_id ?? lobbyId;
+          userId = data.user_id ?? userId;
+          username = data.username ?? username ?? 'Player';
+          totalQuestionCount = Number(data.total_questions) || totalQuestionCount;
+          handleQuizComplete(data);
+          return;
+        }
+
         lobbyId = data.lobby_id ?? lobbyId;
         userId = data.user_id ?? userId;
         username = data.username ?? username ?? 'Player';

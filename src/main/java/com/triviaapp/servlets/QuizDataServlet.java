@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.triviaapp.dao.QuestionDAO;
@@ -92,11 +93,14 @@ public class QuizDataServlet extends HttpServlet {
                 return;
             }
 
+            int totalQuestions = questionIds.size();
+            String categoryName = categoryDAO.findCategoryNameById(
+                Integer.parseInt(questionData.get("category_id")));
+
             JSONObject question = new JSONObject();
             question.put("question_number", currentIndex);
-            question.put("total_questions", questionIds.size());
-            question.put("category_name", categoryDAO.findCategoryNameById(
-                Integer.parseInt(questionData.get("category_id"))));
+            question.put("total_questions", totalQuestions);
+            question.put("category_name", categoryName);
             question.put("question_text", questionData.get("question_text"));
             question.put("answers_option", questionData.get("answers_option"));
             question.put("answers_key", questionData.get("answers_key"));
@@ -116,6 +120,65 @@ public class QuizDataServlet extends HttpServlet {
                 }
                 int answeredCount = moderatedAnswerDAO.countAnswersForParticipantInSession(lobbyId, userId);
                 question.put("answered_count", answeredCount);
+
+                if (answeredCount >= totalQuestions) {
+                    List<Map<String, String>> leaderboard = moderatedAnswerDAO.getSessionLeaderboard(lobbyId);
+                    int totalScore = 0;
+                    if (leaderboard != null) {
+                        for (Map<String, String> entry : leaderboard) {
+                            if (entry == null) {
+                                continue;
+                            }
+                            String participantIdStr = entry.get("participant_id");
+                            if (participantIdStr == null) {
+                                continue;
+                            }
+                            try {
+                                if (Integer.parseInt(participantIdStr) == userId) {
+                                    String scoreStr = entry.get("total_score");
+                                    if (scoreStr != null) {
+                                        try {
+                                            totalScore = Integer.parseInt(scoreStr.trim());
+                                        } catch (NumberFormatException ignored) {
+                                            totalScore = 0;
+                                        }
+                                    }
+                                    break;
+                                }
+                            } catch (NumberFormatException ignored) {
+                                // skip malformed rows
+                            }
+                        }
+                    }
+
+                    JSONObject completion = new JSONObject();
+                    completion.put("type", "quizComplete");
+                    completion.put("lobby_id", lobbyId);
+                    completion.put("total_questions", totalQuestions);
+                    completion.put("answered_count", answeredCount);
+                    completion.put("total_score", totalScore);
+                    completion.put("category_name", categoryName);
+                    completion.put("username", question.get("username"));
+
+                    if (leaderboard != null) {
+                        JSONArray leaderboardArray = new JSONArray();
+                        for (Map<String, String> entry : leaderboard) {
+                            if (entry == null) {
+                                continue;
+                            }
+                            JSONObject entryJson = new JSONObject();
+                            for (Map.Entry<String, String> kv : entry.entrySet()) {
+                                entryJson.put(kv.getKey(), kv.getValue() == null ? JSONObject.NULL : kv.getValue());
+                            }
+                            leaderboardArray.put(entryJson);
+                        }
+                        completion.put("leaderboard", leaderboardArray);
+                    }
+
+                    response.setContentType("application/json");
+                    response.getWriter().write(completion.toString());
+                    return;
+                }
             }
 
             response.setContentType("application/json");
