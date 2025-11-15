@@ -61,6 +61,15 @@
         <url-pattern>/main/data</url-pattern>
     </servlet-mapping>
 
+   <servlet>
+        <servlet-name>ExitServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.ExitServlet</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+        <servlet-name>ExitServlet</servlet-name>
+        <url-pattern>/EXIT</url-pattern>
+   </servlet-mapping>
 
     <!-- Admin Servlets -->
     <servlet>
