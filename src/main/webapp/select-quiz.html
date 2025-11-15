@@ -96,7 +96,7 @@
     </template>
 
     <template id="createQuizTpl">
-      <a href="/CreateQuiz">
+      <a href="create-quiz" onclick="return checkAdminAccess(event)">
         <div class="flex items-center justify-center w-full px-4 py-4 text-lg rounded-lg bg-blue-950">
           <svg class="w-6 h-6" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -130,11 +130,56 @@
 </div>
 
 <script>
+  // Store admin status for reuse
+  let isAdmin = false;
+
+  // Helper function to get context path
+  function getContextPath() {
+    const pathParts = window.location.pathname.split('/');
+    pathParts.pop();
+    return pathParts.join('/') || '';
+  }
+
+  // Helper function to show error messages
+  function showUnauthorizedError(message) {
+    const existingError = document.querySelector('.unauthorized-error');
+    if (existingError) existingError.remove();
+    
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'unauthorized-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center';
+    errorMsg.textContent = message || 'You do not have permission to access this feature.';
+    
+    const container = document.querySelector('.px-4');
+    if (container) {
+      container.insertBefore(errorMsg, container.firstChild);
+      setTimeout(() => errorMsg.remove(), 5000);
+    }
+  }
+
   (async function () {
+    const contextPath = getContextPath();
+
+    // Check for error messages in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error') || urlParams.get('unauthorized');
+    if (error) {
+      showUnauthorizedError(error);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Check user role
     try {
-      const pathParts = window.location.pathname.split('/');
-      pathParts.pop();
-      const contextPath = pathParts.join('/') || '';
+      const adminCheck = await fetch(`${contextPath}/admin/data`, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' }
+      });
+      isAdmin = adminCheck.ok;
+    } catch (err) {
+      isAdmin = false;
+    }
+
+    try {
       const res = await fetch(`${contextPath}/main/data`, {
         method: 'GET',
         headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
@@ -196,7 +241,8 @@
           quizContainer.appendChild(node);
         });
 
-        if (createTpl) {
+        // Only show "Create Quiz" button to admins
+        if (createTpl && isAdmin) {
           quizContainer.appendChild(createTpl.content.cloneNode(true));
         }
       }
@@ -204,6 +250,16 @@
       console.error('Failed to load data', err);
     }
   })();
+
+  // Check admin access before navigating
+  function checkAdminAccess(event) {
+    if (!isAdmin) {
+      event.preventDefault();
+      showUnauthorizedError('Only administrators can create quizzes.');
+      return false;
+    }
+    return true;
+  }
 </script>
 </body>
 
