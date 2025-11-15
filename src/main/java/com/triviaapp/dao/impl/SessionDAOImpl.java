@@ -8,10 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SessionDAOImpl implements SessionDAO {
 
@@ -32,7 +29,7 @@ public class SessionDAOImpl implements SessionDAO {
     private static final String SQL_INCREMENT_CURRENT_INDEX = "UPDATE sessions SET current_index = current_index + 1 WHERE session_id = ?";
     private static final String SQL_DECREMENT_CURRENT_INDEX = "UPDATE sessions SET current_index = current_index - 1 WHERE session_id = ? AND current_index > 0";
     private static final String SQL_SET_CURRENT_INDEX = "UPDATE sessions SET current_index = ? WHERE session_id = ?";
-    
+
     private static final String SQL_LIST_ACTIVE_SUMMARY = String.join("\n",
             "SELECT s.session_id, s.session_name, s.host_user_id, s.max_participants, s.status, COALESCE(sp.cnt,0) AS current_participants",
             "FROM sessions s",
@@ -124,17 +121,32 @@ public class SessionDAOImpl implements SessionDAO {
              PreparedStatement ps = conn.prepareStatement(SQL_INSERT)) {
             ps.setInt(1, hostUserId);
             ps.setString(2, sessionName);
-            if (categoryId != null) ps.setInt(3, categoryId); else ps.setNull(3, java.sql.Types.INTEGER);
-            if (maxParticipants != null) ps.setInt(4, maxParticipants); else ps.setNull(4, java.sql.Types.INTEGER);
+            if (categoryId != null)
+            {
+                ps.setInt(3, categoryId);
+            } else
+            {
+                ps.setNull(3, java.sql.Types.INTEGER);
+            }
+            if (maxParticipants != null)
+            {
+                ps.setInt(4, maxParticipants);
+            } else
+            {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
             ps.setString(5, status);
             // start_at column is NOT NULL with DEFAULT CURRENT_TIMESTAMP in schema.
             // If caller provides null, insert current time instead of explicit NULL to avoid constraint violation.
-            if (startAt != null) {
-                ps.setTimestamp(6, startAt);
-            } else {
-                ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+            ps.setTimestamp(6, Objects.requireNonNullElseGet(startAt,
+                    () -> new Timestamp(System.currentTimeMillis())));
+            if (endAt != null)
+            {
+                ps.setTimestamp(7, endAt);
+            } else
+            {
+                ps.setNull(7, java.sql.Types.TIMESTAMP);
             }
-            if (endAt != null) ps.setTimestamp(7, endAt); else ps.setNull(7, java.sql.Types.TIMESTAMP);
             int rows = ps.executeUpdate();
             return rows > 0;
         }
@@ -145,8 +157,10 @@ public class SessionDAOImpl implements SessionDAO {
         try (Connection conn = DBConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_STATUS)) {
             // status param is bound twice: once for status column, once for CASE check
-            ps.setString(1, status); // bind value for `status` column
-            ps.setString(2, status); // bind value for CASE WHEN ? = 'completed' check
+            // bind value for `status` column
+            ps.setString(1, status);
+            // bind value for CASE WHEN ? = 'completed' check
+            ps.setString(2, status);
             ps.setInt(3, sessionId);
             int rows = ps.executeUpdate();
             return rows > 0;
@@ -279,8 +293,6 @@ public class SessionDAOImpl implements SessionDAO {
             ps.setInt(2, questionId);
             ps.executeUpdate();
             return true;
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -307,7 +319,10 @@ public class SessionDAOImpl implements SessionDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int v = rs.getInt("current_index");
-                    if (rs.wasNull()) return null;
+                    if (rs.wasNull())
+                    {
+                        return null;
+                    }
                     return v;
                 }
             }

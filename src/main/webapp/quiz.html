@@ -41,10 +41,6 @@
   </div>
 
   <div id="answersContainer" class="flex flex-col gap-2"></div>
-  <div id="completionActions" class="hidden mt-4 flex justify-center">
-    <a id="completionLink" class="border bg-gray-300 px-4 py-2" href="#">View Quiz Summary</a>
-  </div>
-
   <div class="flex w-full justify-between mt-[5%] p-2 text-2xl">
     <button id="voiceButton" type="button" aria-label="Voice Answer"><i class="fa-solid fa-microphone"></i></button>
     <button id="favoriteButton" type="button" aria-label="Save Question"><i class="fa-solid fa-star"></i></button>
@@ -67,8 +63,6 @@
     const nextButton = document.getElementById('nextButton');
     const backIcon = document.getElementById('backIcon');
     const exitIcon = document.getElementById('exitIcon');
-    const completionActions = document.getElementById('completionActions');
-    const completionLink = document.getElementById('completionLink');
 
     let socket = null;
     let lobbyId = null;
@@ -287,12 +281,6 @@
       }
     };
 
-    const showCompletionActions = (href) => {
-      if (!completionActions || !completionLink) return;
-      completionLink.href = href;
-      completionActions.classList.remove('hidden');
-    };
-
     const sendMessage = (payload) => {
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         showStatus('Live connection is not ready; action queued.', 'info');
@@ -346,14 +334,16 @@
     };
 
     const handleQuizComplete = (payload) => {
+      const leaderboard = Array.isArray(payload.leaderboard) ? payload.leaderboard : [];
       const summary = {
         lobbyId,
         totalQuestions: Number(payload.total_questions) || totalQuestionCount || 0,
         answeredCount: Number(payload.answered_count) || 0,
         totalScore: Number(payload.total_score) || 0,
-        leaderboard: Array.isArray(payload.leaderboard) ? payload.leaderboard : [],
-        completedAt: Date.now(),
+        leaderboard,
         username,
+        categoryName: payload.category_name || '',
+        completedAt: Date.now()
       };
 
       try {
@@ -362,8 +352,7 @@
         console.warn('Failed to persist completion summary', err);
       }
 
-      const target = `${contextPath}/quiz-complete.html`;
-      showCompletionActions(target);
+      const target = `${contextPath}/complete.html`;
       window.location.href = target;
     };
 

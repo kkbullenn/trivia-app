@@ -217,6 +217,15 @@ public class QuizWebSocket {
             }
 
             String correctAnswerKey = questionData.get("answers_key");
+            String categoryName = null;
+            try
+            {
+                categoryName = CATEGORY_DAO.findCategoryNameById(
+                        Integer.parseInt(questionData.get("category_id")));
+            }
+            catch(NumberFormatException ignored)
+            {
+            }
 
             Map<String, String> existingAnswer =
                     MODERATED_ANSWER_DAO.findAnswerForParticipantAndQuestion(lobbyId,
@@ -258,7 +267,7 @@ public class QuizWebSocket {
             {
                 int totalScore = findParticipantScore(leaderboard, participantId);
                 sendCompletion(session, lobbyId, totalQuestions, answeredCountAfter,
-                        totalScore, leaderboard);
+                        totalScore, leaderboard, categoryName);
             }
 
         } catch(Exception e)
@@ -390,7 +399,8 @@ public class QuizWebSocket {
 
     private void sendCompletion(Session session, Integer lobbyId, int totalQuestions,
                                 int answeredCount, int totalScore,
-                                List<Map<String, String>> leaderboard) throws IOException
+                                List<Map<String, String>> leaderboard,
+                                String categoryName) throws IOException
     {
         JSONObject payload = new JSONObject();
         payload.put("type", "quizComplete");
@@ -399,6 +409,10 @@ public class QuizWebSocket {
         payload.put("answered_count", answeredCount);
         payload.put("total_score", totalScore);
         payload.put("leaderboard", toLeaderboardJson(leaderboard));
+        if(categoryName != null)
+        {
+            payload.put("category_name", categoryName);
+        }
         sendToSession(session, payload);
     }
 
