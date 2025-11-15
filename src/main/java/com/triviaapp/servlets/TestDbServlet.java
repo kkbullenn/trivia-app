@@ -326,7 +326,7 @@ public class TestDbServlet extends HttpServlet {
             }
 
             // list active sessions summary
-            java.util.List<Map<String, String>> summary = sDao.listActiveSessionsSummary();
+            java.util.List<Map<String, String>> summary = sDao.listActiveSessionsSummary(null);
             out.println("listActiveSessionsSummary count: " + summary.size());
 
             if (foundId == null) {

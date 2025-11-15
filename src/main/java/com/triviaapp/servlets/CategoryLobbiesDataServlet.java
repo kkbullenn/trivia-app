@@ -38,11 +38,17 @@ public class CategoryLobbiesDataServlet extends HttpServlet {
             return;
         }
 
-        // Create Session DAO object to grab all available sessions from database
+        Integer categoryId = (Integer) session.getAttribute("category_id");
+        if (categoryId == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No category selected");
+            return;
+        }
+
+        // Create Session DAO object to grab available sessions from database for this category
         SessionDAO sessionDAO = new SessionDAOImpl();
         List<Map<String, String>> sessions;
         try {
-            sessions = sessionDAO.listActiveSessionsSummary();
+            sessions = sessionDAO.listActiveSessionsSummary(categoryId);
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");

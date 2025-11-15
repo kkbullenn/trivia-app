@@ -44,6 +44,18 @@ public class SessionDAOImpl implements SessionDAO {
             "WHERE s.status = 'active'",
             "ORDER BY current_participants DESC, s.start_at DESC");
 
+    private static final String SQL_LIST_ACTIVE_SUMMARY_BY_CATEGORY = String.join("\n",
+            "SELECT s.session_id, s.session_name, s.host_user_id, s.max_participants, s.status, COALESCE(sp.cnt,0) AS current_participants",
+            "FROM sessions s",
+            "LEFT JOIN (",
+            "  SELECT session_id, COUNT(*) AS cnt",
+            "  FROM session_participants",
+            "  WHERE status = 'joined'",
+            "  GROUP BY session_id",
+            ") sp ON s.session_id = sp.session_id",
+            "WHERE s.status = 'active' AND s.category_id = ?",
+            "ORDER BY current_participants DESC, s.start_at DESC");
+
     private static final String SQL_LIST_PARTICIPANTS_BY_SESSION = String.join("\n",
             "SELECT sp.participant_id, u.username, sp.joined_at, sp.left_at, sp.status",
             "FROM session_participants sp",
@@ -161,20 +173,26 @@ public class SessionDAOImpl implements SessionDAO {
     }
 
     @Override
-    public List<Map<String, String>> listActiveSessionsSummary() throws SQLException {
+    public List<Map<String, String>> listActiveSessionsSummary(Integer categoryId) throws SQLException {
         List<Map<String, String>> out = new ArrayList<>();
+        boolean filterByCategory = categoryId != null;
+        String sql = filterByCategory ? SQL_LIST_ACTIVE_SUMMARY_BY_CATEGORY : SQL_LIST_ACTIVE_SUMMARY;
         try (Connection conn = DBConnectionManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_LIST_ACTIVE_SUMMARY);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Map<String, String> row = new LinkedHashMap<>();
-                row.put("session_id", String.valueOf(rs.getInt("session_id")));
-                row.put("session_name", rs.getString("session_name"));
-                row.put("host_user_id", String.valueOf(rs.getInt("host_user_id")));
-                row.put("max_participants", String.valueOf(rs.getObject("max_participants")));
-                row.put("status", rs.getString("status"));
-                row.put("current_participants", String.valueOf(rs.getInt("current_participants")));
-                out.add(row);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (filterByCategory) {
+                ps.setInt(1, categoryId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, String> row = new LinkedHashMap<>();
+                    row.put("session_id", String.valueOf(rs.getInt("session_id")));
+                    row.put("session_name", rs.getString("session_name"));
+                    row.put("host_user_id", String.valueOf(rs.getInt("host_user_id")));
+                    row.put("max_participants", String.valueOf(rs.getObject("max_participants")));
+                    row.put("status", rs.getString("status"));
+                    row.put("current_participants", String.valueOf(rs.getInt("current_participants")));
+                    out.add(row);
+                }
             }
         }
         return out;

@@ -58,9 +58,10 @@ public interface SessionDAO {
 
     /**
      * Return a summary list for active sessions. Each map contains:
-     * session_id, session_name, host_user_id, max_participants, status, current_participants
+     * session_id, session_name, host_user_id, max_participants, status, current_participants.
+     * When {@code categoryId} is non-null, only sessions from that category are returned.
      */
-    List<Map<String, String>> listActiveSessionsSummary() throws SQLException;
+    List<Map<String, String>> listActiveSessionsSummary(Integer categoryId) throws SQLException;
 
     /**
      * Return participants for a session. Each map contains:
