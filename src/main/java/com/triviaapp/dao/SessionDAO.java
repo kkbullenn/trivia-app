@@ -112,4 +112,9 @@ public interface SessionDAO {
      * or cannot be decremented (e.g. already at 0).
      */
     Integer decrementAndGetCurrentIndex(int sessionId) throws SQLException;
+
+    /**
+     * Overwrite the current_index value for the session.
+     */
+    boolean updateCurrentIndex(int sessionId, int index) throws SQLException;
 }

@@ -13,6 +13,7 @@ public class UserDAOImpl implements UserDAO {
     private static final String SQL_FIND_PASSWORD_BY_EMAIL = "SELECT password_hash FROM users WHERE email = ?";
     private static final String SQL_INSERT = "INSERT INTO users (username, email, password_hash, role_id) VALUES (?, ?, ?, ?)";
     private static final String SQL_FIND_USERID_BY_EMAIL = "SELECT user_id FROM users WHERE email = ?";
+    private static final String SQL_FIND_USERNAME_BY_ID = "SELECT username FROM users WHERE user_id = ?";
 
     @Override
     public String findPasswordByEmail(String email) throws SQLException {
@@ -21,8 +22,7 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    String pw = rs.getString("password_hash");
-                    return pw;
+                    return rs.getString("password_hash");
                 }
             }
         }
@@ -67,5 +67,19 @@ public class UserDAOImpl implements UserDAO {
             }
         }
         return -1;
+    }
+
+    @Override
+    public String findUsernameById(int userId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_FIND_USERNAME_BY_ID)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("username");
+                }
+            }
+        }
+        return null;
     }
 }

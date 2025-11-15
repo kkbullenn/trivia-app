@@ -26,4 +26,9 @@ public interface UserDAO {
      * Return user role ID for the given user ID
      */
     int findUserRoleIDByID(int userId) throws SQLException;
+
+    /**
+     * Return the username for the given user ID.
+     */
+    String findUsernameById(int userId) throws SQLException;
 }

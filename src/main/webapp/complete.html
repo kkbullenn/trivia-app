@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <title>Quiz Complete</title>
+</head>
+<body class="font-mono bg-blue-900 text-yellow-300 min-h-screen">
+<div class="flex flex-col min-h-screen">
+  <header class="px-4 py-2 flex items-center justify-between bg-blue-950">
+    <button id="backButton" aria-label="Back" class="flex items-center text-yellow-300 hover:text-yellow-200">
+      <svg width="24" height="24" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M669.6 849.6c8.8 8 22.4 7.2 30.4-1.6s7.2-22.4-1.6-30.4l-309.6-280c-8-7.2-8-17.6 0-24.8l309.6-270.4c8.8-8 9.6-21.6 2.4-30.4-8-8.8-21.6-9.6-30.4-2.4L360.8 480.8c-27.2 24-28 64-0.8 88.8l309.6 280z"/>
+      </svg>
+    </button>
+    <h1 class="text-xl font-bold uppercase tracking-wider">Quiz Complete</h1>
+    <button id="logoutButton" aria-label="Exit" class="flex items-center text-yellow-300 hover:text-yellow-200">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 7.636L14 4.5C14 4.224 13.776 4 13.5 4L4.5 4C4.224 4 4 4.224 4 4.5L4 19.5C4 19.776 4.224 20 4.5 20L13.5 20C13.776 20 14 19.776 14 19.5L14 16.364"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 12L21 12M21 12L18 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 px-4 py-8">
+    <section class="bg-blue-950/70 rounded-lg border border-yellow-300/40 px-4 py-6 shadow">
+      <header class="text-center mb-6">
+        <h2 id="categoryTitle" class="text-2xl font-semibold">Category Winners</h2>
+        <p id="subtitle" class="text-yellow-200 text-sm"></p>
+      </header>
+
+      <section id="leaderboardSection" class="flex flex-col space-y-4 hidden">
+        <ul id="leaderboardList" class="flex flex-col space-y-3"></ul>
+      </section>
+
+      <p id="emptyState" class="hidden text-center text-yellow-200/80">
+        No completion summary found. Please finish a quiz first.
+      </p>
+    </section>
+
+    <div class="mt-8 flex flex-col gap-3">
+      <button id="completeButton"
+              class="w-full bg-yellow-400 text-blue-950 font-semibold py-3 rounded-lg shadow hover:bg-yellow-300">
+        Back to Main Lobby
+      </button>
+    </div>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const backButton = document.getElementById('backButton');
+    const logoutButton = document.getElementById('logoutButton');
+    const completeButton = document.getElementById('completeButton');
+    const categoryTitle = document.getElementById('categoryTitle');
+    const subtitle = document.getElementById('subtitle');
+    const leaderboardSection = document.getElementById('leaderboardSection');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const emptyState = document.getElementById('emptyState');
+
+    const contextPath = (() => {
+      const parts = window.location.pathname.split('/');
+      parts.pop();
+      const joined = parts.join('/');
+      return joined.length ? joined : '';
+    })();
+
+    const goTo = (path) => {
+      window.location.href = `${contextPath}${path}`;
+    };
+
+    backButton.addEventListener('click', () => goTo('/category-lobbies'));
+
+    logoutButton.addEventListener('click', async () => {
+      try {
+        await fetch(`${contextPath}/EXIT`, { method: 'POST', credentials: 'same-origin' });
+      } catch (err) {
+        console.error('Failed to exit session', err);
+      } finally {
+        goTo('/login');
+      }
+    });
+
+    completeButton.addEventListener('click', () => goTo('/main'));
+
+    let summary = null;
+    try {
+      const raw = sessionStorage.getItem('quizCompletionData');
+      if (raw) {
+        summary = JSON.parse(raw);
+      }
+    } catch (err) {
+      console.warn('Failed to parse completion summary', err);
+    }
+
+    if (!summary) {
+      emptyState.classList.remove('hidden');
+      leaderboardSection.classList.add('hidden');
+      return;
+    }
+
+    const categoryName = summary.categoryName || 'Category Winners';
+    categoryTitle.textContent = categoryName ? `${categoryName}` : 'Category';
+    subtitle.textContent = `Winners`;
+
+    const totalQuestions = Number(summary.totalQuestions) || 0;
+    const totalMaxScore = Number(summary.totalMaxScore) || 0;
+    const leaderboard = Array.isArray(summary.leaderboard) ? summary.leaderboard : [];
+
+    if (!leaderboard.length) {
+      leaderboardSection.classList.add('hidden');
+      emptyState.textContent = 'No leaderboard data available yet.';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    leaderboardSection.classList.remove('hidden');
+    leaderboardList.innerHTML = '';
+
+    leaderboard.forEach((entry, index) => {
+      const li = document.createElement('li');
+      li.className = 'flex items-center justify-between rounded border border-gray-200 px-3 py-2 text-sm shadow-sm';
+
+      const rank = entry.rank_pos ?? index + 1;
+      const name = entry.username ?? `Player ${rank}`;
+      const score = Number(entry.total_score) || 0;
+      const percent = totalMaxScore > 0 ? Math.round((score / totalMaxScore) * 100) : 0;
+
+      li.innerHTML = `
+        <span class="font-semibold">${name}</span>
+        <span class="text-gray-600">Score: ${score}${totalMaxScore ? ` / ${totalMaxScore}` : ''} (${percent}%)</span>
+      `;
+
+      leaderboardList.appendChild(li);
+    });
+  })();
+</script>
+</body>
+</html>

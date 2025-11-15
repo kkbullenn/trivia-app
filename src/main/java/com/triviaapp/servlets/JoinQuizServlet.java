@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.triviaapp.dao.SessionDAO;
+import com.triviaapp.dao.ModeratedAnswerDAO;
 import com.triviaapp.dao.impl.SessionDAOImpl;
+import com.triviaapp.dao.impl.ModeratedAnswerDAOImpl;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -42,8 +44,12 @@ public class JoinQuizServlet extends HttpServlet {
 
         // Add user to the selected lobby (session) in the database
         SessionDAO sessionDAO = new SessionDAOImpl();
+        ModeratedAnswerDAO moderatedAnswerDAO = new ModeratedAnswerDAOImpl();
         try {
             sessionDAO.joinSession(lobbyId, userId);
+            if (moderatedAnswerDAO.findAnswersBySession(lobbyId).isEmpty()) {
+                sessionDAO.updateCurrentIndex(lobbyId, 0);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
