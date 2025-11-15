@@ -266,8 +266,9 @@ public class QuizWebSocket {
             if(answeredCountAfter >= totalQuestions)
             {
                 int totalScore = findParticipantScore(leaderboard, participantId);
+                int totalPossibleScore = computeTotalPossibleScore(questionIds);
                 sendCompletion(session, lobbyId, totalQuestions, answeredCountAfter,
-                        totalScore, leaderboard, categoryName);
+                        totalScore, totalPossibleScore, leaderboard, categoryName);
             }
 
         } catch(Exception e)
@@ -398,7 +399,7 @@ public class QuizWebSocket {
     }
 
     private void sendCompletion(Session session, Integer lobbyId, int totalQuestions,
-                                int answeredCount, int totalScore,
+                                int answeredCount, int totalScore, int totalPossibleScore,
                                 List<Map<String, String>> leaderboard,
                                 String categoryName) throws IOException
     {
@@ -408,6 +409,7 @@ public class QuizWebSocket {
         payload.put("total_questions", totalQuestions);
         payload.put("answered_count", answeredCount);
         payload.put("total_score", totalScore);
+        payload.put("total_max_score", totalPossibleScore);
         payload.put("leaderboard", toLeaderboardJson(leaderboard));
         if(categoryName != null)
         {
@@ -465,6 +467,36 @@ public class QuizWebSocket {
             }
         }
         return 0;
+    }
+
+    private int computeTotalPossibleScore(List<Integer> questionIds)
+    {
+        if(questionIds == null)
+        {
+            return 0;
+        }
+        int total = 0;
+        for(Integer qId : questionIds)
+        {
+            if(qId == null)
+            {
+                continue;
+            }
+            try
+            {
+                Map<String, String> qData = QUESTION_DAO.findQuestionById(qId);
+                if(qData == null)
+                {
+                    continue;
+                }
+                total += parseScore(qData.get("points"));
+            }
+            catch(SQLException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return total;
     }
 
     private int parseScore(String value)

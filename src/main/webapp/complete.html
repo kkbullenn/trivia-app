@@ -108,6 +108,7 @@
     subtitle.textContent = `Winners`;
 
     const totalQuestions = Number(summary.totalQuestions) || 0;
+    const totalMaxScore = Number(summary.totalMaxScore) || 0;
     const leaderboard = Array.isArray(summary.leaderboard) ? summary.leaderboard : [];
 
     if (!leaderboard.length) {
@@ -127,11 +128,11 @@
       const rank = entry.rank_pos ?? index + 1;
       const name = entry.username ?? `Player ${rank}`;
       const score = Number(entry.total_score) || 0;
-      const percent = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+      const percent = totalMaxScore > 0 ? Math.round((score / totalMaxScore) * 100) : 0;
 
       li.innerHTML = `
         <span class="font-semibold">${name}</span>
-        <span class="text-gray-600">Score: ${score} (${percent}%)</span>
+        <span class="text-gray-600">Score: ${score}${totalMaxScore ? ` / ${totalMaxScore}` : ''} (${percent}%)</span>
       `;
 
       leaderboardList.appendChild(li);

@@ -32,6 +32,17 @@ public class QuizDataServlet extends HttpServlet {
     private final UserDAO userDAO = new UserDAOImpl();
     private final ModeratedAnswerDAO moderatedAnswerDAO = new ModeratedAnswerDAOImpl();
 
+    private int parseScore(String value) {
+        if (value == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -151,12 +162,25 @@ public class QuizDataServlet extends HttpServlet {
                         }
                     }
 
+                    int totalPossibleScore = 0;
+                    for (Integer id : questionIds) {
+                        if (id == null) {
+                            continue;
+                        }
+                        Map<String, String> qRow = questionDAO.findQuestionById(id);
+                        if (qRow == null) {
+                            continue;
+                        }
+                        totalPossibleScore += parseScore(qRow.get("points"));
+                    }
+
                     JSONObject completion = new JSONObject();
                     completion.put("type", "quizComplete");
                     completion.put("lobby_id", lobbyId);
                     completion.put("total_questions", totalQuestions);
                     completion.put("answered_count", answeredCount);
                     completion.put("total_score", totalScore);
+                    completion.put("total_max_score", totalPossibleScore);
                     completion.put("category_name", categoryName);
                     completion.put("username", question.get("username"));
 
