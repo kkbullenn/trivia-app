@@ -7,50 +7,57 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <title>Playing Quiz</title>
 </head>
-<body class="flex flex-col items-center p-5 min-h-screen">
+<body class="font-mono bg-blue-900 text-yellow-300 min-h-screen">
 
-<div class="flex w-full justify-between text-xl">
-  <i id="backIcon" class="fa-solid fa-arrow-left cursor-pointer" aria-label="Return to lobby"></i>
-  <i id="exitIcon" class="fa-solid fa-arrow-right-from-bracket cursor-pointer" aria-label="Quit"></i>
+<div class="flex min-h-screen flex-col">
+  <header class="flex items-center justify-between bg-blue-950 px-4 py-3 text-2xl">
+    <i id="backIcon" class="fa-solid fa-arrow-left cursor-pointer text-yellow-300 hover:text-yellow-100" aria-label="Return to lobby"></i>
+    <i id="exitIcon" class="fa-solid fa-arrow-right-from-bracket cursor-pointer text-yellow-300 hover:text-yellow-100" aria-label="Quit"></i>
+  </header>
+
+  <main class="flex-1 px-4 py-6">
+    <div class="mx-auto flex w-full max-w-4xl flex-col gap-6">
+      <section class="rounded-lg border border-yellow-300/40 bg-blue-950/70 p-5 shadow">
+        <div class="flex flex-col gap-3">
+          <h1 id="questionTitle" class="text-2xl font-semibold text-yellow-100">Question:</h1>
+          <div id="questionText" class="rounded-lg border border-yellow-300/30 bg-blue-900/70 p-4 text-yellow-100 min-h-[84px] overflow-y-auto">Loading question...</div>
+          <span id="questionMeta" class="text-sm text-yellow-200 hidden"></span>
+        </div>
+      </section>
+
+      <section id="videoWrapper" class="rounded-lg border border-yellow-300/40 bg-blue-950/70 p-5 shadow">
+        <h2 id="categoryTitle" class="text-xl font-semibold text-yellow-100">Category</h2>
+        <iframe
+                id="questionVideo"
+                class="mt-4 w-full rounded-lg"
+                src=""
+                title="Question Video"
+                frameborder="0"
+                width="100%"
+                height="360"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+        ></iframe>
+      </section>
+
+      <div class="flex gap-4">
+        <button id="prevButton" class="w-full rounded-lg border border-yellow-300/40 bg-blue-950/70 py-3 text-lg font-semibold text-yellow-200 transition hover:bg-blue-800">Prev</button>
+        <button id="nextButton" class="w-full rounded-lg border border-yellow-300/40 bg-blue-950/70 py-3 text-lg font-semibold text-yellow-200 transition hover:bg-blue-800">Next</button>
+      </div>
+
+      <div id="answersContainer" class="flex flex-col gap-3"></div>
+
+      <div class="flex w-full justify-between pt-6 text-2xl text-yellow-200">
+        <button id="voiceButton" type="button" aria-label="Voice Answer" class="hover:text-yellow-100"><i class="fa-solid fa-microphone"></i></button>
+        <button id="favoriteButton" type="button" aria-label="Save Question" class="hover:text-yellow-100"><i class="fa-solid fa-star"></i></button>
+        <button id="languageButton" type="button" aria-label="Switch Language" class="hover:text-yellow-100"><i class="fa-solid fa-language"></i></button>
+      </div>
+
+      <div id="statusBanner" class="hidden rounded-lg border border-yellow-300/40 bg-blue-950/80 p-3 text-center text-sm"></div>
+    </div>
+  </main>
 </div>
-
-<div class="flex flex-col w-full">
-  <div class="flex flex-col mt-4 gap-2">
-    <h1 id="questionTitle" class="text-xl">Question:</h1>
-    <div id="questionText" class="border bg-gray-100 h-[70px] p-3 overflow-y-auto">Loading question...</div>
-    <span id="questionMeta" class="text-sm text-gray-600 hidden"></span>
-  </div>
-
-  <div class="flex flex-col p-4 mt-4 border" id="videoWrapper">
-    <h1 id="categoryTitle" class="text-xl">Category</h1>
-    <iframe
-            id="questionVideo"
-            class="mt-3 w-full rounded"
-            src=""
-            title="Question Video"
-            frameborder="0"
-            width="100%"
-            height="315"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-    ></iframe>
-  </div>
-
-  <div class="flex justify-center space-x-4 my-4 mx-[25%]">
-    <button id="prevButton" class="border cursor-pointer bg-gray-300 w-full">Prev</button>
-    <button id="nextButton" class="border cursor-pointer bg-gray-300 w-full">Next</button>
-  </div>
-
-  <div id="answersContainer" class="flex flex-col gap-2"></div>
-  <div class="flex w-full justify-between mt-[5%] p-2 text-2xl">
-    <button id="voiceButton" type="button" aria-label="Voice Answer"><i class="fa-solid fa-microphone"></i></button>
-    <button id="favoriteButton" type="button" aria-label="Save Question"><i class="fa-solid fa-star"></i></button>
-    <button id="languageButton" type="button" aria-label="Switch Language"><i class="fa-solid fa-language"></i></button>
-  </div>
-</div>
-
-<div id="statusBanner" class="hidden mt-4 w-full border p-2 text-sm text-center"></div>
 
 <script>
   (function () {
