@@ -3,13 +3,16 @@ package com.triviaapp.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.triviaapp.dao.CategoryDAO;
+import com.triviaapp.dao.SessionDAO;
 import com.triviaapp.dao.impl.CategoryDAOImpl;
+import com.triviaapp.dao.impl.SessionDAOImpl;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -31,11 +34,16 @@ public class MainDataServlet extends HttpServlet {
             return;
         }
 
-        // Create DAO object to grab available categories from database
+        int userId = (Integer) session.getAttribute("user_id");
+
+        // DAO objects for categories and quizzes
         CategoryDAO categoryDAO = new CategoryDAOImpl();
+        SessionDAO sessionDAO = new SessionDAOImpl();
         Map<Integer, String> categories;
+        List<Map<String, String>> quizzes;
         try {
             categories = categoryDAO.findAllCategories();
+            quizzes = sessionDAO.findSessionsByHost(userId);
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
@@ -44,18 +52,34 @@ public class MainDataServlet extends HttpServlet {
 
         // Build JSON array for categories using org.json
         JSONArray categoriesArray = new JSONArray();
-        for (Map.Entry<Integer, String> entry : categories.entrySet()) {
+        categories.forEach((id, name) -> {
             JSONObject obj = new JSONObject();
-            obj.put("category-id", entry.getKey());
-            obj.put("category-name", entry.getValue());
+            obj.put("id", id);
+            obj.put("name", name);
             categoriesArray.put(obj);
+        });
+
+        // Build JSON array for quizzes created by this host
+        JSONArray quizzesArray = new JSONArray();
+        for (Map<String, String> quiz : quizzes) {
+            JSONObject obj = new JSONObject();
+            obj.put("session_id", quiz.get("session_id"));
+            obj.put("quiz_name", quiz.get("session_name"));
+            obj.put("status", quiz.get("status"));
+            obj.put("max_participants", quiz.get("max_participants"));
+            obj.put("start_at", quiz.get("start_at"));
+            obj.put("end_at", quiz.get("end_at"));
+            quizzesArray.put(obj);
         }
-        
+
         // Return JSON response
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
-        out.write(categoriesArray.toString());
+        JSONObject payload = new JSONObject();
+        payload.put("categories", categoriesArray);
+        payload.put("quizzes", quizzesArray);
+        out.write(payload.toString());
         out.flush();
     }
 }

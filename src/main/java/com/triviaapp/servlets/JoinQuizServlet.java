@@ -25,13 +25,25 @@ public class JoinQuizServlet extends HttpServlet {
             return;
         }
 
-        int user_id = (Integer) session.getAttribute("user_id");
-        int lobbyId = Integer.parseInt(request.getParameter("lobby_id"));
+        int userId = (Integer) session.getAttribute("user_id");
+        String lobbyIdParam = request.getParameter("lobby_id");
+        if (lobbyIdParam == null || lobbyIdParam.isBlank()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing lobby_id");
+            return;
+        }
+
+        int lobbyId;
+        try {
+            lobbyId = Integer.parseInt(lobbyIdParam);
+        } catch (NumberFormatException ex) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid lobby_id");
+            return;
+        }
 
         // Add user to the selected lobby (session) in the database
         SessionDAO sessionDAO = new SessionDAOImpl();
         try {
-            sessionDAO.joinSession(lobbyId, user_id);
+            sessionDAO.joinSession(lobbyId, userId);
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
@@ -39,6 +51,6 @@ public class JoinQuizServlet extends HttpServlet {
         }
 
         session.setAttribute("lobby_id", lobbyId);
-        response.sendRedirect("/quiz");
+        response.sendRedirect(request.getContextPath() + "/quiz");
     }
 }

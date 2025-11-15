@@ -61,6 +61,15 @@
         <url-pattern>/main/data</url-pattern>
     </servlet-mapping>
 
+   <servlet>
+        <servlet-name>ExitServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.ExitServlet</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+        <servlet-name>ExitServlet</servlet-name>
+        <url-pattern>/EXIT</url-pattern>
+   </servlet-mapping>
 
     <!-- Admin Servlets -->
     <servlet>
@@ -176,6 +185,16 @@
     <servlet-mapping>
         <servlet-name>QuizDataServlet</servlet-name>
         <url-pattern>/quiz/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>QuizCompleteServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.QuizCompleteServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>QuizCompleteServlet</servlet-name>
+        <url-pattern>/quiz/complete</url-pattern>
     </servlet-mapping>
 
     <!-- M2M100 Translator proxy -->
