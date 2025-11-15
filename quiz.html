@@ -18,17 +18,19 @@
   <div class="flex flex-col mt-4 gap-2">
     <h1 id="questionTitle" class="text-xl">Question:</h1>
     <div id="questionText" class="border bg-gray-100 h-[70px] p-3 overflow-y-auto">Loading question...</div>
-    <span id="questionMeta" class="text-sm text-gray-600"></span>
+    <span id="questionMeta" class="text-sm text-gray-600 hidden"></span>
   </div>
 
   <div class="flex flex-col p-4 mt-4 border" id="videoWrapper">
     <h1 id="categoryTitle" class="text-xl">Category</h1>
     <iframe
             id="questionVideo"
-            class="mt-2"
+            class="mt-3 w-full rounded"
             src=""
             title="Question Video"
             frameborder="0"
+            width="100%"
+            height="315"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen
@@ -55,6 +57,7 @@
     const statusBanner = document.getElementById('statusBanner');
     const questionTitle = document.getElementById('questionTitle');
     const questionMeta = document.getElementById('questionMeta');
+    const categoryTitle = document.getElementById('categoryTitle');
     const questionText = document.getElementById('questionText');
     const answersContainer = document.getElementById('answersContainer');
     const videoWrapper = document.getElementById('videoWrapper');
@@ -219,7 +222,11 @@
 
       questionTitle.textContent = `Question ${questionNumber}`;
       const metaParts = [categoryName, points].filter(Boolean);
-      questionMeta.textContent = metaParts.join(' · ');
+      const metaText = metaParts.join(' · ');
+      questionMeta.textContent = metaText;
+      if (categoryTitle) {
+        categoryTitle.textContent = metaText || 'Category';
+      }
       questionText.textContent = payload.question_text || 'Question content unavailable.';
 
       const answers = normalizeAnswers(payload.answers_option);
@@ -251,9 +258,11 @@
       if (embedUrl) {
         questionVideo.src = embedUrl;
         videoWrapper.classList.remove('hidden');
+        questionMeta.classList.add('hidden');
       } else {
         questionVideo.src = '';
         videoWrapper.classList.add('hidden');
+        questionMeta.classList.toggle('hidden', !metaText);
       }
 
       disableNav(false);
