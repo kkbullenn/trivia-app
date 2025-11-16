@@ -18,22 +18,14 @@
 </head>
 
 <body class="font-mono bg-blue-900">
-<div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
+<div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between items-center">
   <form action="USER" method="GET">
-    <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
-      <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g id="SVGRepo_iconCarrier">
-          <path
-                  d="M8 7C9.65685 7 11 5.65685 11 4C11 2.34315 9.65685 1 8 1C6.34315 1 5 2.34315 5 4C5 5.65685 6.34315 7 8 7Z"
-                  fill="#000000"></path>
-          <path d="M14 12C14 10.3431 12.6569 9 11 9H5C3.34315 9 2 10.3431 2 12V15H14V12Z" fill="#000000">
-          </path>
-        </g>
-      </svg>
-      <span id="welcomeLabel" class="text-white">Welcome,</span>
-      <span class="font-bold text-yellow-400" id="username">User</span>
+    <button id="UserButton" type="submit" class="flex items-center space-x-3 text-left">
+      <img id="userAvatar" src="" alt="User avatar" class="h-10 w-10 rounded-full border-2 border-yellow-300 bg-blue-800 object-cover"/>
+      <div class="flex flex-col leading-tight">
+        <span id="welcomeLabel" class="text-sm text-yellow-200">Welcome,</span>
+        <span class="font-bold text-yellow-400" id="username">User</span>
+      </div>
     </button>
   </form>
   <form action="EXIT" method="POST">
@@ -169,6 +161,7 @@
     const contextPath = getContextPath();
     const welcomeLabel = document.getElementById('welcomeLabel');
     const usernameDisplay = document.getElementById('username');
+    const avatarEl = document.getElementById('userAvatar');
 
     // Check for error messages in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -199,6 +192,9 @@
         }
         if (usernameDisplay) {
           usernameDisplay.textContent = username;
+        }
+        if (avatarEl && data.avatar_url) {
+          avatarEl.src = data.avatar_url;
         }
       } catch (err) {
         console.error('Failed to load user profile', err);
