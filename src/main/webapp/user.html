@@ -50,6 +50,12 @@
       <p id="bestCategory" class="text-2xl font-bold text-yellow-100">No category yet</p>
     </div>
   </div>
+
+  <div class="w-full flex justify-center">
+    <button id="editProfile" class="mt-2 rounded-lg border border-yellow-400 bg-blue-950/80 px-6 py-3 text-lg font-semibold text-yellow-200 transition hover:bg-blue-800">
+      Edit Profile
+    </button>
+  </div>
   </main>
 </div>
 
@@ -61,6 +67,7 @@
     const bestCategoryEl = document.getElementById('bestCategory');
     const backBtn = document.getElementById('backButton');
     const logoutBtn = document.getElementById('logoutButton');
+    const editProfileBtn = document.getElementById('editProfile');
 
     const getContextPath = () => {
       const path = window.location.pathname;
@@ -76,6 +83,7 @@
     };
 
     backBtn.addEventListener('click', () => goTo('/main'));
+    editProfileBtn.addEventListener('click', () => goTo('/profile_edit.html'));
 
     logoutBtn.addEventListener('click', async () => {
       try {

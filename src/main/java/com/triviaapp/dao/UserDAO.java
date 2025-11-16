@@ -1,6 +1,7 @@
 package com.triviaapp.dao;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * DAO for user authentication.
@@ -36,4 +37,14 @@ public interface UserDAO {
      * Return the username for the given user ID.
      */
     String findUsernameById(int userId) throws SQLException;
+
+    /**
+     * Returns profile details (username, avatar_url, etc.) for the given user ID.
+     */
+    Map<String, String> findUserProfileById(int userId) throws SQLException;
+
+    /**
+     * Update the user's profile information.
+     */
+    boolean updateUserProfile(int userId, String username, String avatarUrl) throws SQLException;
 }

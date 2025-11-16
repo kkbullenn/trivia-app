@@ -7,6 +7,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handles JDBC operations for user authentication, profiles, and role lookups.
@@ -22,6 +25,8 @@ public class UserDAOImpl implements UserDAO {
     private static final String SQL_INSERT = "INSERT INTO users (username, email, password_hash, role_id) VALUES (?, ?, ?, ?)";
     private static final String SQL_FIND_USERID_BY_EMAIL = "SELECT user_id FROM users WHERE email = ?";
     private static final String SQL_FIND_USERNAME_BY_ID = "SELECT username FROM users WHERE user_id = ?";
+    private static final String SQL_FIND_PROFILE_BY_ID = "SELECT username, avatar_url FROM users WHERE user_id = ?";
+    private static final String SQL_UPDATE_PROFILE = "UPDATE users SET username = ?, avatar_url = ? WHERE user_id = ?";
 
     @Override
     public String findPasswordByEmail(String email) throws SQLException {
@@ -89,5 +94,37 @@ public class UserDAOImpl implements UserDAO {
             }
         }
         return null;
+    }
+
+    @Override
+    public Map<String, String> findUserProfileById(int userId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_FIND_PROFILE_BY_ID)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Map<String, String> profile = new HashMap<>();
+                    profile.put("username", rs.getString("username"));
+                    profile.put("avatar_url", rs.getString("avatar_url"));
+                    return profile;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean updateUserProfile(int userId, String username, String avatarUrl) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_PROFILE)) {
+            ps.setString(1, username);
+            if (avatarUrl == null || avatarUrl.isBlank()) {
+                ps.setNull(2, Types.VARCHAR);
+            } else {
+                ps.setString(2, avatarUrl);
+            }
+            ps.setInt(3, userId);
+            return ps.executeUpdate() > 0;
+        }
     }
 }
