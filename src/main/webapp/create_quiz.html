@@ -10,12 +10,19 @@
 
 <div class="w-full max-w-3xl bg-[#001D3D] rounded-2xl p-10 space-y-10">
 
-  <!-- Header -->
-  <header class="flex justify-between items-center border-b border-[#003566] pb-4">
-    <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">←</button>
-    <h1 class="text-2xl font-bold text-[#FFD60A]">Create a Quiz</h1>
-    <button class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">→</button>
-  </header>
+    <!-- Header -->
+    <header class="flex justify-between items-center border-b border-[#003566] pb-4">
+      <button type="button" onclick="window.history.back()" class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">←</button>
+      <h1 class="text-2xl font-bold text-[#FFD60A]">Create a Quiz</h1>
+      <button type="button" onclick="addQuestion()" class="text-[#FFC300] text-3xl hover:text-[#FFD60A] transition">＋</button>
+    </header>
+
+    <!-- Quiz Name -->
+    <section>
+      <label class="block text-lg font-semibold text-[#FFD60A] mb-2">Quiz Name</label>
+      <input name="session_name" type="text" required placeholder="Enter quiz title..." 
+             class="w-full bg-[#000814] border border-[#FFC300] rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#FFD60A]" />
+    </section>
 
   <!-- Category -->
   <section>
