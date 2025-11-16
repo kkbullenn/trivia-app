@@ -82,6 +82,10 @@
     const avatarFileInput = document.getElementById('avatarFileInput');
     let tempObjectUrl = null;
     let uploadedAvatarUrl = '';
+    let validatedRemoteUrl = '';
+    let isUrlValid = true;
+    let urlValidationToken = 0;
+    let urlValidationInProgress = false;
 
     const getContextPath = () => {
       const path = window.location.pathname;
@@ -157,14 +161,64 @@
       const name = usernameInput.value.trim() || 'Player';
       const avatarUrl = avatarInput.value.trim();
       previewName.textContent = name.toUpperCase();
-      const source = avatarUrl || uploadedAvatarUrl || toIdenticon(name);
+      const source = avatarUrl
+        ? (isUrlValid ? avatarUrl : toIdenticon(name))
+        : (uploadedAvatarUrl || toIdenticon(name));
       setPreviewSrc(source);
+    };
+
+    const validateRemoteAvatar = (url) => {
+      const trimmed = url.trim();
+      if (!trimmed) {
+        isUrlValid = true;
+        validatedRemoteUrl = '';
+        urlValidationInProgress = false;
+        showStatus('', 'info');
+        updatePreview();
+        return;
+      }
+
+      urlValidationInProgress = true;
+      const currentToken = ++urlValidationToken;
+      showStatus('Checking avatar URL...', 'info');
+      const tester = new Image();
+      tester.onload = () => {
+        if (currentToken !== urlValidationToken) return;
+        isUrlValid = true;
+        validatedRemoteUrl = trimmed;
+        urlValidationInProgress = false;
+        showStatus('', 'info');
+        setPreviewSrc(trimmed);
+      };
+      tester.onerror = () => {
+        if (currentToken !== urlValidationToken) return;
+        isUrlValid = false;
+        validatedRemoteUrl = '';
+        urlValidationInProgress = false;
+        showStatus('Avatar URL could not be loaded. Please choose another image or upload a file.', 'error');
+        updatePreview();
+      };
+      try {
+        tester.src = trimmed;
+      } catch (err) {
+        tester.onerror();
+      }
     };
 
     usernameInput.addEventListener('input', updatePreview);
     avatarInput.addEventListener('input', () => {
       uploadedAvatarUrl = '';
+      isUrlValid = false;
+      validatedRemoteUrl = '';
       updatePreview();
+      const currentValue = avatarInput.value.trim();
+      if (!currentValue) {
+        isUrlValid = true;
+        showStatus('', 'info');
+        updatePreview();
+      } else {
+        validateRemoteAvatar(currentValue);
+      }
     });
 
     backButton.addEventListener('click', () => goTo('/USER'));
@@ -202,12 +256,19 @@
         if (!avatarUrl || data.using_default) {
           uploadedAvatarUrl = '';
           avatarInput.value = '';
+          isUrlValid = true;
+          validatedRemoteUrl = '';
         } else if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
           uploadedAvatarUrl = '';
           avatarInput.value = avatarUrl;
+          isUrlValid = true;
+          validatedRemoteUrl = avatarUrl;
+          validateRemoteAvatar(avatarUrl);
         } else {
           uploadedAvatarUrl = avatarUrl;
           avatarInput.value = '';
+          isUrlValid = true;
+          validatedRemoteUrl = '';
         }
 
         updatePreview();
@@ -268,6 +329,8 @@
         const data = await res.json();
         uploadedAvatarUrl = data.avatar_url || '';
         avatarInput.value = '';
+        isUrlValid = true;
+        validatedRemoteUrl = '';
         if (tempObjectUrl) {
           URL.revokeObjectURL(tempObjectUrl);
           tempObjectUrl = null;
@@ -289,6 +352,14 @@
 
     async function saveProfile() {
       const urlValue = avatarInput.value.trim();
+      if (urlValidationInProgress) {
+        showStatus('Please wait for the avatar URL check to finish.', 'info');
+        return;
+      }
+      if (urlValue && !isUrlValid) {
+        showStatus('Avatar URL is invalid. Please provide a working image link.', 'error');
+        return;
+      }
       const payload = {
         username: usernameInput.value.trim(),
         avatar_url: urlValue || uploadedAvatarUrl || ''
