@@ -1,7 +1,9 @@
 package com.triviaapp.servlets;
 
+import com.triviaapp.dao.RoleDAO;
 import com.triviaapp.dao.UserDAO;
 import com.triviaapp.dao.UserStatsDAO;
+import com.triviaapp.dao.impl.RoleDAOImpl;
 import com.triviaapp.dao.impl.UserDAOImpl;
 import com.triviaapp.dao.impl.UserStatsDAOImpl;
 import jakarta.servlet.ServletException;
@@ -45,6 +47,18 @@ public class UserDataServlet extends HttpServlet {
                 username = "Player" + userId;
             }
 
+            String roleName = (String) session.getAttribute("role_name");
+            if (roleName == null || roleName.isBlank()) {
+                int roleId = userDAO.findUserRoleIdById(userId);
+                if (roleId > 0) {
+                    RoleDAO roleDAO = new RoleDAOImpl();
+                    roleName = roleDAO.findRoleNameById(roleId);
+                }
+            }
+            if (roleName == null || roleName.isBlank()) {
+                roleName = "User";
+            }
+
             int participations = statsDAO.countSessionsParticipated(userId);
             int wins = statsDAO.countWins(userId);
             double winRate = participations > 0 ? (double) wins / participations : 0.0d;
@@ -54,9 +68,10 @@ public class UserDataServlet extends HttpServlet {
             JSONObject payload = new JSONObject();
             payload.put("username", username);
             payload.put("initial", username.substring(0, 1).toUpperCase());
+            payload.put("role_name", roleName);
             payload.put("participations", participations);
             payload.put("wins", wins);
-            payload.put("win_rate", Math.round(winRate * 1000d) / 10d); // one decimal place (percentage)
+            payload.put("win_rate", Math.round(winRate * 1000d) / 10d);
             payload.put("avatar_url", buildAvatarUrl(username));
 
             if (topCategory != null) {

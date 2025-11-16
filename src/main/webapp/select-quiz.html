@@ -32,7 +32,7 @@
           </path>
         </g>
       </svg>
-      <span class="text-white">Welcome,</span>
+      <span id="welcomeLabel" class="text-white">Welcome,</span>
       <span class="font-bold text-yellow-400" id="username">User</span>
     </button>
   </form>
@@ -126,7 +126,7 @@
       </a>
     </template>
   </div>
-  
+
   <template id="categoryTpl">
     <form action="join-category" method="POST" class="w-full">
       <input type="hidden" name="category_id" class="category-id" value="">
@@ -167,6 +167,8 @@
 
   (async function () {
     const contextPath = getContextPath();
+    const welcomeLabel = document.getElementById('welcomeLabel');
+    const usernameDisplay = document.getElementById('username');
 
     // Check for error messages in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -175,6 +177,35 @@
       showUnauthorizedError(error);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
+
+    const loadUserGreeting = async () => {
+      try {
+        const res = await fetch(`${contextPath}/user/data`, {
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.status === 401) {
+          window.location.href = `${contextPath}/login`;
+          return;
+        }
+        if (!res.ok) throw new Error(`Failed to load user data: ${res.status}`);
+        const data = await res.json();
+        const username = data.username || 'Player';
+        const rawRole = data.role_name || 'User';
+        const roleLabel = `${rawRole.charAt(0).toUpperCase()}${rawRole.slice(1).toLowerCase()}`;
+        if (welcomeLabel) {
+          welcomeLabel.textContent = `Welcome, ${roleLabel}:`;
+        }
+        if (usernameDisplay) {
+          usernameDisplay.textContent = username;
+        }
+      } catch (err) {
+        console.error('Failed to load user profile', err);
+      }
+    };
+
+    await loadUserGreeting();
 
     // Check user role
     try {
