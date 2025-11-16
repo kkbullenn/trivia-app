@@ -5,18 +5,25 @@ import com.triviaapp.dao.impl.UserDAOImpl;
 import com.triviaapp.dao.RoleDAO;
 import com.triviaapp.dao.impl.RoleDAOImpl;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.*;
-import java.sql.*;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 
 /**
  * Processes login requests, verifies credentials, and initializes user sessions.
  *
  * @author Timothy Kim
  * @author Brownie Tran
+ * @author Jerry Xing
  */
 public class LoginServlet extends HttpServlet {
 
@@ -55,15 +62,21 @@ public class LoginServlet extends HttpServlet {
                 } else {
                     session.setAttribute("user_id", userId);
                     session.setAttribute("role_name", roleName);
-                    response.sendRedirect("main");
+                    response.sendRedirect(request.getContextPath() + "/main");
                 }
 
 
             } else {
 
-                request.setAttribute("loginError", "Invalid email or password.");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("/login.html");
-                dispatcher.forward(request, response);
+                String error = URLEncoder.encode("Invalid email or password.", StandardCharsets.UTF_8);
+                String remembered = email != null ? URLEncoder.encode(email, StandardCharsets.UTF_8) : "";
+                String redirectUrl = request.getContextPath() + "/login?error=" + error;
+                if (!remembered.isEmpty()) {
+                    redirectUrl += "&user=" + remembered;
+                }
+                response.sendRedirect(redirectUrl);
+                return;
+
 
             }
 
