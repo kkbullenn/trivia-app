@@ -171,6 +171,23 @@
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
+    const buildIdenticon = (seed) => {
+      const value = seed && seed.trim() ? seed.trim() : 'player';
+      return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
+    };
+
+    const applyAvatar = (img, url, seed) => {
+      if (!img) return;
+      const fallback = buildIdenticon(seed);
+      img.dataset.fallbackApplied = 'false';
+      img.onerror = () => {
+        if (img.dataset.fallbackApplied === 'true') return;
+        img.dataset.fallbackApplied = 'true';
+        img.src = fallback;
+      };
+      img.src = url && url.trim() ? url : fallback;
+    };
+
     const loadUserGreeting = async () => {
       try {
         const res = await fetch(`${contextPath}/user/data`, {
@@ -193,8 +210,8 @@
         if (usernameDisplay) {
           usernameDisplay.textContent = username;
         }
-        if (avatarEl && data.avatar_url) {
-          avatarEl.src = data.avatar_url;
+        if (avatarEl) {
+          applyAvatar(avatarEl, data.avatar_url, username);
         }
       } catch (err) {
         console.error('Failed to load user profile', err);

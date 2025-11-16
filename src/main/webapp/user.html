@@ -82,6 +82,23 @@
       window.location.href = `${base}${path}`;
     };
 
+    const buildIdenticon = (seed) => {
+      const value = seed && seed.trim() ? seed.trim() : 'player';
+      return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
+    };
+
+    const applyAvatar = (img, url, seed) => {
+      if (!img) return;
+      const fallback = buildIdenticon(seed);
+      img.dataset.fallbackApplied = 'false';
+      img.onerror = () => {
+        if (img.dataset.fallbackApplied === 'true') return;
+        img.dataset.fallbackApplied = 'true';
+        img.src = fallback;
+      };
+      img.src = url && url.trim() ? url : fallback;
+    };
+
     backBtn.addEventListener('click', () => goTo('/main'));
     editProfileBtn.addEventListener('click', () => goTo('/profile_edit.html'));
 
@@ -119,9 +136,7 @@
         usernameEl.textContent = `${roleLabel}: ${username}`;
         winSummaryEl.textContent = `${winRateValue}% (${wins}/${participations})`;
 
-        if (data.avatar_url) {
-          avatarEl.src = data.avatar_url;
-        }
+        applyAvatar(avatarEl, data.avatar_url, username);
 
         if (data.top_category && data.top_category !== null) {
           const name = data.top_category.category_name || 'Unknown';
