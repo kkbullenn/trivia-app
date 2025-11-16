@@ -8,25 +8,41 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.*;
 import com.triviaapp.externalapi.WhisperConnection;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.List;
 
 @MultipartConfig
 public class WhisperAnswerCheckerServlet extends HttpServlet {
     private static final WhisperConnection CONNECTION = new WhisperConnection();
+    private static final double MATCH_RESULT_EPSILON = 0.001;
 
     /**
      * Transcribes and checks if the answer is correct for the given question.
      *
      * @param request  multipart form-data containing the file and the question_id of the question to check answers for.
      * @param response returns a json body with a message of "YES" or "NO" to simply say if the answer was correct or not.
+     *                 // Success:
      *                 {
-     *                 "status": "success",
-     *                 "message": "YES"
+     *                 status: "success",
+     *                 playerAnswerKey: "A", (1-1 with db)
+     *                 playerAnswer: "test answer here.", (1-1 with db)
+     *                 transcribedAnswer: "From Whisper Service Directly.",
+     *                 actualAnswerKey: "B",
+     *                 actualAnswer: "Blah Blah..."
+     *                 }
+     *                 <p>
+     *                 Fail:
+     *                 {
+     *                 status: "fail",
+     *                 message: "Could not detect your answer. Please try again."
      *                 }
      */
     @Override
@@ -104,30 +120,11 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
             return;
         }
 
-        // get question info
-        final String answerKey = question.get("answers_key");
-        String answerText = null;
+        // get question info from db
+        final String answerKey = question.get("answers_key"); // actual answer key
+        final String answersOptionStr = question.get("answers_option"); // array of json object with: key & text
 
-        final String answersOptionStr = question.get("answers_option");
-        final JsonNode answerArray = mapper.readTree(answersOptionStr);
-
-        if (answerArray.isArray()) {
-            for (final JsonNode obj : answerArray) {
-                if (obj != null) {
-                    final String key = obj.get("key").asText();
-
-                    if (answerKey.equalsIgnoreCase(key)) {
-                        final String text = obj.get("text").asText();
-
-                        if (text != null) {
-                            answerText = text;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (answerText == null) {
+        if (answersOptionStr == null) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -140,12 +137,70 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
             return;
         }
 
+        final JSONArray optionsArray = new JSONArray(answersOptionStr); // array of json object with: key & text
+        final List<String> answerTexts = new ArrayList<>();
+        final List<String> answerKeys = new ArrayList<>();
+        String actualAnswer = "";
 
-        // get translated text
-        final String translatedText = whisperJson.get("translated_text").asText();
+        for (final Object options : optionsArray) {
+            final JSONObject option = (JSONObject) options;
+            final String text = option.get("text").toString();
+            final String key = option.get("key").toString();
+
+            answerTexts.add(text);
+            answerKeys.add(key);
+
+            if (key.equalsIgnoreCase(answerKey)) {
+                actualAnswer = text;
+            }
+        }
+
+        answerTexts.addAll(answerKeys);
+
+        // get translated text (could be option key, could be answer text, could be both)
+        final String transcribedText = whisperJson.get("translated_text").asText();
 
         // send to a model to depict if the user is any amount of correct (YES or NO).
-        final String result = WhisperConnection.getMatchResult(translatedText, answerText);
+        final JSONArray result = WhisperConnection.getMatchResult(transcribedText, answerTexts);
+
+        // figure out with result which db answer/key is the closest
+        // percentages are organized in order of answerTexts + {A, B, C, D}
+        final List<Double> probs = new ArrayList<>();
+
+        for(int i = 0; i < result.length(); i++) {
+            final double p = result.getDouble(i);
+            probs.add(p);
+        }
+
+        final double maxProb = probs.stream().max(Double::compareTo).orElseThrow();
+
+        if (maxProb + MATCH_RESULT_EPSILON < 0.50) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            final String data = "{"
+                    + "\"status\": \"error\","
+                    + "\"message\": \"Could not detect your answer. Please try again.\""
+                    + "}";
+            resWriter.write(data);
+            return;
+        }
+
+        final int probIndex = probs.indexOf(maxProb);
+
+        final String playerAnswerKey;
+        final String playerAnswer;
+
+        if (probIndex >= 4) {
+            // a key, find answer at index of key
+            playerAnswerKey = answerKeys.get(probIndex % 4);
+            playerAnswer = answerTexts.get(answerKeys.indexOf(playerAnswerKey));
+        } else {
+            // a text, find key and index of answer
+            playerAnswer = answerTexts.get(probIndex % 4);
+            playerAnswerKey = answerKeys.get(answerTexts.indexOf(playerAnswer));
+        }
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
@@ -153,7 +208,11 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
 
         final String data = "{"
                 + "\"status\": \"success\","
-                + "\"message\": \"" + result + "\""
+                + "\"playerAnswerKey\": \"" + playerAnswerKey + "\","
+                + "\"playerAnswer\": \"" + playerAnswer + "\","
+                + "\"transcribedAnswer\": \"" + transcribedText + "\","
+                + "\"actualAnswerKey\": \"" + answerKey + "\","
+                + "\"actualAnswer\": \"" + actualAnswer + "\""
                 + "}";
         resWriter.write(data);
     }

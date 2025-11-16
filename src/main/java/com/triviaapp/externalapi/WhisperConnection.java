@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -33,8 +34,6 @@ public final class WhisperConnection extends ServerConnection {
     private static final int PORT;
     private static final URI WHISPER_URI;
     private static final String HF_API_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/sentence-similarity";
-
-    private static final double MATCH_RESULT_EPSILON = 0.001;
 
     static {
         ENV = Dotenv.load();
@@ -96,8 +95,8 @@ public final class WhisperConnection extends ServerConnection {
     }
 
     @NotNull
-    public static String getMatchResult(final String translatedText, final String answerText) throws IOException {
-        final JSONObject payload = WhisperConnection.getTransformationPayload(translatedText, answerText);
+    public static JSONArray getMatchResult(final String translatedText, final List<String> answersList) throws IOException {
+        final JSONObject payload = WhisperConnection.getTransformationPayload(translatedText, answersList);
         final String payloadStr = payload.toString();
 
         // Setup HttpURLConnection
@@ -127,21 +126,18 @@ public final class WhisperConnection extends ServerConnection {
         final String responseString = new String(responseBytes);
         conn.disconnect();
 
-
-        // Parse response (Hugging Face returns JSON array)
-        final JSONArray responseArray = new JSONArray(responseString);
-        final double successProbability = responseArray.getDouble(0);
         //System.out.println("Success Probability: " + successProbability);
 
-        // Extract YES/NO
-        return (successProbability + MATCH_RESULT_EPSILON >= 0.50) ? "YES" : "NO";
+        // Parse response (Hugging Face returns JSON array)
+        // Extract probability JSONArray
+        return new JSONArray(responseString);
     }
 
     @NotNull
-    private static JSONObject getTransformationPayload(final String translatedText, final String answerText) {
+    private static JSONObject getTransformationPayload(final String translatedText, final List<String> answers) {
         final JSONObject inputs = new JSONObject();
-        inputs.put("source_sentence", answerText);
-        inputs.put("sentences", new String[]{translatedText});
+        inputs.put("source_sentence", translatedText);
+        inputs.put("sentences", answers.toArray());
 
         final JSONObject payload = new JSONObject();
         payload.put("inputs", inputs);

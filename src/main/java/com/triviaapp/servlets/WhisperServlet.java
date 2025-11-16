@@ -35,16 +35,12 @@ public final class WhisperServlet extends HttpServlet {
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        // request given does not matter
-
         final HttpRequest httpRequest = HttpRequest.newBuilder().uri(WhisperConnection.WHISPER_GET_URI).build();
         final HttpClient httpClient = HttpClient.newHttpClient();
-        // response is a string of a JSON object, FE will need to parse this
         final HttpResponse<String> whisperResponse;
 
         try {
             whisperResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
             response.setContentType("application/json");
             response.setStatus(whisperResponse.statusCode());
             response.getWriter().println(whisperResponse.body());
