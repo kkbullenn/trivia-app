@@ -71,6 +71,16 @@
         <url-pattern>/main/data</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/USER</url-pattern>
+    </servlet-mapping>
+
    <servlet>
         <servlet-name>ExitServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.ExitServlet</servlet-class>
@@ -100,6 +110,16 @@
     <servlet-mapping>
         <servlet-name>AdminDataServlet</servlet-name>
         <url-pattern>/admin/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserDataServlet</servlet-name>
+        <url-pattern>/user/data</url-pattern>
     </servlet-mapping>
 
     <!-- Create Quiz Servlets -->

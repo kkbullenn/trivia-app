@@ -1,0 +1,134 @@
+<!--
+   User Page
+   User profile page layout.
+
+   Author: Jerry Xing
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>User Profile</title>
+</head>
+<body class="bg-blue-900 text-yellow-300 min-h-screen">
+<div class="flex min-h-screen flex-col">
+  <header class="flex items-center justify-between bg-blue-950/90 px-4 py-3 shadow">
+    <button id="backButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Back to main">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <h1 class="text-lg font-semibold uppercase tracking-wide">Player Profile</h1>
+    <button id="logoutButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Logout">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-10 px-6 py-12">
+  <div class="flex flex-col items-center gap-6 text-center">
+    <h1 id="username" class="text-2xl font-bold uppercase tracking-wide">Player</h1>
+    <div class="h-36 w-36 overflow-hidden rounded-full border-4 border-yellow-300 bg-blue-950">
+      <img id="avatar" src="" alt="User Avatar" class="h-full w-full object-cover"/>
+    </div>
+  </div>
+
+  <div class="grid w-full gap-6 sm:grid-cols-2">
+    <div class="flex flex-col items-center gap-3 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 text-center">
+      <h2 class="text-lg font-semibold uppercase tracking-wide">Quizzes Won</h2>
+      <p id="winSummary" class="text-2xl font-bold text-yellow-100">0% (0/0)</p>
+    </div>
+    <div class="flex flex-col items-center gap-3 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 text-center">
+      <h2 class="text-lg font-semibold uppercase tracking-wide">Best Category</h2>
+      <p id="bestCategory" class="text-2xl font-bold text-yellow-100">No category yet</p>
+    </div>
+  </div>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const avatarEl = document.getElementById('avatar');
+    const usernameEl = document.getElementById('username');
+    const winSummaryEl = document.getElementById('winSummary');
+    const bestCategoryEl = document.getElementById('bestCategory');
+    const backBtn = document.getElementById('backButton');
+    const logoutBtn = document.getElementById('logoutButton');
+
+    const getContextPath = () => {
+      const path = window.location.pathname;
+      const parts = path.split('/');
+      parts.pop();
+      const joined = parts.join('/');
+      return joined.length ? joined : '';
+    };
+
+    const goTo = (path) => {
+      const base = getContextPath();
+      window.location.href = `${base}${path}`;
+    };
+
+    backBtn.addEventListener('click', () => goTo('/main'));
+
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch(`${getContextPath()}/EXIT`, { method: 'POST', credentials: 'same-origin' });
+      } catch (err) {
+        console.error('Failed to log out', err);
+      } finally {
+        goTo('/login');
+      }
+    });
+
+    async function loadUserData() {
+      try {
+        const response = await fetch(`${getContextPath()}/user/data`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          credentials: 'same-origin'
+        });
+        if (response.status === 401) {
+          window.location.href = `${getContextPath()}/login`;
+          return;
+        }
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user data: ${response.status}`);
+        }
+        const data = await response.json();
+        const username = data.username || 'Player';
+        const participations = data.participations ?? 0;
+        const wins = data.wins ?? 0;
+        const winRateValue = participations > 0 ? Math.round((wins / participations) * 1000) / 10 : 0;
+
+        usernameEl.textContent = username;
+        winSummaryEl.textContent = `${winRateValue}% (${wins}/${participations})`;
+
+        if (data.avatar_url) {
+          avatarEl.src = data.avatar_url;
+        }
+
+        if (data.top_category && data.top_category !== null) {
+          const name = data.top_category.category_name || 'Unknown';
+          bestCategoryEl.textContent = name;
+        } else {
+          bestCategoryEl.textContent = 'No category yet';
+        }
+      } catch (err) {
+        console.error(err);
+        winSummaryEl.textContent = 'N/A';
+        bestCategoryEl.textContent = 'N/A';
+      }
+    }
+
+    loadUserData();
+  })();
+</script>
+</body>
+</html>
