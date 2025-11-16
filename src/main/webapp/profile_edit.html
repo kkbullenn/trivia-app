@@ -175,6 +175,17 @@
           goTo('/login');
           return;
         }
+        if (res.status === 409) {
+          let errMsg = 'Username is already taken. Please choose another one.';
+          try {
+            const data = await res.json();
+            if (data && data.message) {
+              errMsg = data.message;
+            }
+          } catch (_) {}
+          showStatus(errMsg, 'error');
+          return;
+        }
         if (!res.ok) {
           const text = await res.text();
           throw new Error(text || `Failed to save profile: ${res.status}`);

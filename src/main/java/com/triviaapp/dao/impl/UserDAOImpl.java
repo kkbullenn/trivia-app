@@ -27,6 +27,7 @@ public class UserDAOImpl implements UserDAO {
     private static final String SQL_FIND_USERNAME_BY_ID = "SELECT username FROM users WHERE user_id = ?";
     private static final String SQL_FIND_PROFILE_BY_ID = "SELECT username, avatar_url FROM users WHERE user_id = ?";
     private static final String SQL_UPDATE_PROFILE = "UPDATE users SET username = ?, avatar_url = ? WHERE user_id = ?";
+    private static final String SQL_IS_USERNAME_TAKEN = "SELECT COUNT(*) FROM users WHERE LOWER(username) = LOWER(?) AND user_id <> ?";
 
     @Override
     public String findPasswordByEmail(String email) throws SQLException {
@@ -126,5 +127,20 @@ public class UserDAOImpl implements UserDAO {
             ps.setInt(3, userId);
             return ps.executeUpdate() > 0;
         }
+    }
+
+    @Override
+    public boolean isUsernameTaken(String username, int excludeUserId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_IS_USERNAME_TAKEN)) {
+            ps.setString(1, username);
+            ps.setInt(2, excludeUserId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 }

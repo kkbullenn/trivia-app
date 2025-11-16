@@ -47,4 +47,9 @@ public interface UserDAO {
      * Update the user's profile information.
      */
     boolean updateUserProfile(int userId, String username, String avatarUrl) throws SQLException;
+
+    /**
+     * Check if a username is already used by another user (excluding the provided user ID).
+     */
+    boolean isUsernameTaken(String username, int excludeUserId) throws SQLException;
 }

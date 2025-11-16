@@ -110,6 +110,15 @@ public class UserProfileServlet extends HttpServlet {
         UserDAO userDAO = new UserDAOImpl();
 
         try {
+            if (userDAO.isUsernameTaken(username, userId)) {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                JSONObject error = new JSONObject();
+                error.put("success", false);
+                error.put("message", "Username is already taken. Please choose another one.");
+                writeJsonResponse(response, error);
+                return;
+            }
+
             boolean updated = userDAO.updateUserProfile(userId, username, avatarUrl);
             if (!updated) {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update profile");
