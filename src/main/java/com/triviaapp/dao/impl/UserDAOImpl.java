@@ -28,6 +28,8 @@ public class UserDAOImpl implements UserDAO {
     private static final String SQL_FIND_PROFILE_BY_ID = "SELECT username, avatar_url FROM users WHERE user_id = ?";
     private static final String SQL_UPDATE_PROFILE = "UPDATE users SET username = ?, avatar_url = ? WHERE user_id = ?";
     private static final String SQL_IS_USERNAME_TAKEN = "SELECT COUNT(*) FROM users WHERE LOWER(username) = LOWER(?) AND user_id <> ?";
+    private static final String SQL_FIND_PASSWORD_BY_ID = "SELECT password_hash FROM users WHERE user_id = ?";
+    private static final String SQL_UPDATE_PASSWORD = "UPDATE users SET password_hash = ? WHERE user_id = ?";
 
     @Override
     public String findPasswordByEmail(String email) throws SQLException {
@@ -142,5 +144,29 @@ public class UserDAOImpl implements UserDAO {
             }
         }
         return false;
+    }
+
+    @Override
+    public String findPasswordHashById(int userId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_FIND_PASSWORD_BY_ID)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("password_hash");
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean updatePassword(int userId, String passwordHash) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_PASSWORD)) {
+            ps.setString(1, passwordHash);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        }
     }
 }

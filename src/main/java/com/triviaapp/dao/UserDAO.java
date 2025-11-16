@@ -52,4 +52,14 @@ public interface UserDAO {
      * Check if a username is already used by another user (excluding the provided user ID).
      */
     boolean isUsernameTaken(String username, int excludeUserId) throws SQLException;
+
+    /**
+     * Returns the password hash for the given user ID.
+     */
+    String findPasswordHashById(int userId) throws SQLException;
+
+    /**
+     * Update the password hash for the given user ID.
+     */
+    boolean updatePassword(int userId, String passwordHash) throws SQLException;
 }

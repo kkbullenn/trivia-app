@@ -65,6 +65,44 @@
         Save Changes
       </button>
     </section>
+
+    <section class="flex flex-col gap-4 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 shadow-lg">
+      <header class="flex flex-col gap-1">
+        <h2 class="text-lg font-semibold uppercase tracking-wide text-yellow-200">Change Password</h2>
+        <p class="text-xs text-yellow-200/70">Enter your current password to enable setting a new password.</p>
+      </header>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Current Password</span>
+        <div class="relative flex items-center">
+          <input id="oldPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="Current password" autocomplete="current-password"/>
+          <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100" data-target="oldPasswordInput">
+            Show
+          </button>
+        </div>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">New Password</span>
+        <div class="relative flex items-center">
+          <input id="newPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed" placeholder="New password" autocomplete="new-password" disabled/>
+          <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed" data-target="newPasswordInput" disabled>
+            Show
+          </button>
+        </div>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Confirm New Password</span>
+        <div class="relative flex items-center">
+          <input id="confirmPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Confirm new password" autocomplete="new-password" disabled/>
+          <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed" data-target="confirmPasswordInput" disabled>
+            Show
+          </button>
+        </div>
+      </label>
+      <div id="passwordStatus" class="hidden rounded-lg border border-yellow-300/30 bg-blue-900/70 px-4 py-2 text-sm"></div>
+      <button id="updatePasswordButton" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-6 py-3 text-lg font-semibold text-yellow-100 transition hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Update Password
+      </button>
+    </section>
   </main>
 </div>
 
@@ -80,12 +118,19 @@
     const logoutButton = document.getElementById('logoutButton');
     const uploadTrigger = document.getElementById('uploadTrigger');
     const avatarFileInput = document.getElementById('avatarFileInput');
+    const oldPasswordInput = document.getElementById('oldPasswordInput');
+    const newPasswordInput = document.getElementById('newPasswordInput');
+    const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+    const passwordStatus = document.getElementById('passwordStatus');
+    const updatePasswordButton = document.getElementById('updatePasswordButton');
+    const passwordToggles = Array.from(document.querySelectorAll('.password-toggle'));
     let tempObjectUrl = null;
     let uploadedAvatarUrl = '';
     let validatedRemoteUrl = '';
     let isUrlValid = true;
     let urlValidationToken = 0;
     let urlValidationInProgress = false;
+    let passwordRequestInFlight = false;
 
     const getContextPath = () => {
       const path = window.location.pathname;
@@ -142,6 +187,24 @@
           ? 'border-red-400 bg-red-900/50 text-red-200'
           : 'border-yellow-300/30 bg-blue-900/70 text-yellow-100';
       statusMessage.className = `rounded-lg px-4 py-2 text-sm ${toneClass}`;
+    };
+
+    const showPasswordStatus = (message, tone = 'info') => {
+      if (!passwordStatus) return;
+      const normalized = normalizeMessage(message);
+      if (!normalized) {
+        passwordStatus.classList.add('hidden');
+        passwordStatus.textContent = '';
+        return;
+      }
+      passwordStatus.textContent = normalized;
+      passwordStatus.classList.remove('hidden');
+      const toneClass = tone === 'success'
+        ? 'border-green-400 bg-green-900/50 text-green-200'
+        : tone === 'error'
+          ? 'border-red-400 bg-red-900/50 text-red-200'
+          : 'border-yellow-300/30 bg-blue-900/70 text-yellow-100';
+      passwordStatus.className = `rounded-lg px-4 py-2 text-sm ${toneClass}`;
     };
 
     const setPreviewSrc = (src) => {
@@ -205,7 +268,7 @@
       }
     };
 
-    usernameInput.addEventListener('input', updatePreview);
+    usernameInput.addEventListener('input', () => updatePreview());
     avatarInput.addEventListener('input', () => {
       uploadedAvatarUrl = '';
       isUrlValid = false;
@@ -220,6 +283,76 @@
         validateRemoteAvatar(currentValue);
       }
     });
+
+    const togglePasswordInputs = (enabled, preserveStatus = false) => {
+      newPasswordInput.disabled = !enabled;
+      confirmPasswordInput.disabled = !enabled;
+      updatePasswordButton.disabled = !enabled;
+      passwordToggles.forEach((btn) => {
+        const targetId = btn.dataset.target;
+        if (targetId === 'newPasswordInput' || targetId === 'confirmPasswordInput') {
+          btn.disabled = !enabled;
+        }
+        if (btn.disabled) {
+          btn.textContent = 'Show';
+          const input = document.getElementById(targetId);
+          if (input) input.type = 'password';
+        }
+      });
+      if (!enabled) {
+        newPasswordInput.value = '';
+        confirmPasswordInput.value = '';
+        if (!preserveStatus) {
+          showPasswordStatus('', 'info');
+        }
+      }
+    };
+
+    const validatePasswordFields = () => {
+      if (newPasswordInput.disabled) {
+        updatePasswordButton.disabled = true;
+        return false;
+      }
+      const newPassword = newPasswordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      if (!newPassword || !confirmPassword) {
+        updatePasswordButton.disabled = true;
+        showPasswordStatus('Enter and confirm your new password.', 'info');
+        return false;
+      }
+      if (newPassword !== confirmPassword) {
+        updatePasswordButton.disabled = true;
+        showPasswordStatus('New password and confirmation do not match.', 'error');
+        return false;
+      }
+      if (oldPasswordInput.value && oldPasswordInput.value === newPassword) {
+        updatePasswordButton.disabled = true;
+        showPasswordStatus('New password must be different from the current password.', 'error');
+        return false;
+      }
+      if (passwordRequestInFlight) {
+        updatePasswordButton.disabled = true;
+        return false;
+      }
+      updatePasswordButton.disabled = false;
+      showPasswordStatus('', 'info');
+      return true;
+    };
+
+    oldPasswordInput.addEventListener('input', () => {
+      const hasOldPassword = oldPasswordInput.value.trim().length > 0;
+      togglePasswordInputs(hasOldPassword);
+      if (!hasOldPassword) {
+        passwordRequestInFlight = false;
+        return;
+      }
+      validatePasswordFields();
+    });
+
+    newPasswordInput.addEventListener('input', validatePasswordFields);
+    confirmPasswordInput.addEventListener('input', validatePasswordFields);
+
+    togglePasswordInputs(false);
 
     backButton.addEventListener('click', () => goTo('/USER'));
 
@@ -422,6 +555,93 @@
 
     saveButton.addEventListener('click', () => {
       saveProfile();
+    });
+
+    const updatePassword = async () => {
+      if (passwordRequestInFlight) {
+        return;
+      }
+      const oldPassword = oldPasswordInput.value.trim();
+      const newPassword = newPasswordInput.value;
+      if (!oldPassword) {
+        showPasswordStatus('Please enter your current password.', 'error');
+        return;
+      }
+      if (!validatePasswordFields()) {
+        return;
+      }
+      const payload = {
+        old_password: oldPassword,
+        new_password: newPassword
+      };
+      passwordRequestInFlight = true;
+      updatePasswordButton.disabled = true;
+      showPasswordStatus('Updating password...', 'info');
+      try {
+        const res = await fetch(`${getContextPath()}/user/password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+
+        const contentType = res.headers.get('Content-Type') || '';
+        let data = null;
+        let rawText = '';
+        if (contentType.includes('application/json')) {
+          try {
+            data = await res.json();
+          } catch (_) {
+            data = null;
+          }
+        } else {
+          try {
+            rawText = await res.text();
+          } catch (_) {
+            rawText = '';
+          }
+        }
+
+        if (!res.ok) {
+          const message = (data && data.message) || rawText || `Failed to update password: ${res.status}`;
+          throw new Error(message);
+        }
+
+        const successMessage = (data && data.message)
+          ? data.message
+          : 'Password updated successfully.';
+        showPasswordStatus(successMessage, 'success');
+        oldPasswordInput.value = '';
+        togglePasswordInputs(false, true);
+      } catch (err) {
+        console.error(err);
+        showPasswordStatus(err.message || 'Failed to update password.', 'error');
+        updatePasswordButton.disabled = false;
+      } finally {
+        passwordRequestInFlight = false;
+      }
+    };
+
+    updatePasswordButton.addEventListener('click', () => {
+      updatePassword();
+    });
+
+    passwordToggles.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const input = document.getElementById(btn.dataset.target);
+        if (!input) return;
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        btn.textContent = showing ? 'Show' : 'Hide';
+      });
     });
 
     loadProfile();

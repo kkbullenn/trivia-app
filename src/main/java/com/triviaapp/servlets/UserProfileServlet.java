@@ -2,6 +2,7 @@ package com.triviaapp.servlets;
 
 import com.triviaapp.dao.UserDAO;
 import com.triviaapp.dao.impl.UserDAOImpl;
+import com.triviaapp.util.RequestUtils;
 import com.triviaapp.util.SessionUtils;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,14 +10,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Handles profile data retrieval and updates for the authenticated user.
@@ -68,21 +67,8 @@ public class UserProfileServlet extends HttpServlet {
             return;
         }
 
-        String body;
-        try (BufferedReader reader = request.getReader()) {
-            body = reader.lines().collect(Collectors.joining());
-        }
-
-        if (body.isBlank()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Empty payload");
-            return;
-        }
-
-        JSONObject payload;
-        try {
-            payload = new JSONObject(body);
-        } catch (Exception ex) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON");
+        JSONObject payload = RequestUtils.readJsonPayload(request, response);
+        if (payload == null) {
             return;
         }
 
