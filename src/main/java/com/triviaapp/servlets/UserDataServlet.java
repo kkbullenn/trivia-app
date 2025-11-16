@@ -65,6 +65,9 @@ public class UserDataServlet extends HttpServlet {
 
             Map<String, String> topCategory = statsDAO.findTopCategoryByScore(userId);
 
+            Map<String, String> profile = userDAO.findUserProfileById(userId);
+            String storedAvatar = profile != null ? profile.get("avatar_url") : null;
+
             JSONObject payload = new JSONObject();
             payload.put("username", username);
             payload.put("initial", username.substring(0, 1).toUpperCase());
@@ -72,7 +75,9 @@ public class UserDataServlet extends HttpServlet {
             payload.put("participations", participations);
             payload.put("wins", wins);
             payload.put("win_rate", Math.round(winRate * 1000d) / 10d);
-            payload.put("avatar_url", buildAvatarUrl(username));
+            payload.put("avatar_url", storedAvatar == null || storedAvatar.isBlank()
+                    ? buildAvatarUrl(username)
+                    : storedAvatar);
 
             if (topCategory != null) {
                 JSONObject categoryJson = new JSONObject();
