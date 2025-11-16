@@ -5,6 +5,7 @@
    Author: Michael
            Timothy Kim
            Jack Huang
+           Jerry Xing
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -14,43 +15,153 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Sign Up</title>
   </head>
-  <body class="flex items-center justify-center min-h-screen">
-    <div class="flex flex-col items-center mb-[50%]">
-      <h1 class="text-center text-6xl font-bold mb-4">Quiz App</h1>
-      <div class="mb-[5%]">
-          <h1 class="text-center text-3xl">Sign Up</h1>
-          <h2 class="text-center text-xs">Sign up to continue</h2>
+  <body class="min-h-screen bg-blue-900 text-yellow-100">
+    <div class="flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md rounded-2xl border border-yellow-300/40 bg-blue-950/80 p-8 shadow-2xl backdrop-blur">
+        <h1 class="text-center text-5xl font-bold uppercase tracking-widest text-yellow-200">Quiz App</h1>
+        <p class="mt-2 text-center text-sm text-yellow-300/80">Create your trivia account</p>
+
+        <div id="signUpError" class="mt-6 hidden rounded-lg border border-red-400 bg-red-900/40 px-4 py-3 text-sm text-red-100"></div>
+        <div id="signUpHint" class="mt-2 hidden text-sm text-yellow-200/80">
+          Already registered? <a id="signUpHintLink" class="font-semibold text-yellow-100 underline hover:text-yellow-200" href="login">Go to login</a>.
+        </div>
+
+        <form id="signUpForm" class="mt-8 flex flex-col gap-5" action="signUp" method="POST" novalidate>
+          <label class="flex flex-col gap-2 text-left">
+            <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Email</span>
+            <input
+              id="emailInput"
+              class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none"
+              type="email"
+              name="user_id"
+              placeholder="your.email@example.com"
+              autocomplete="email"
+              required
+            />
+          </label>
+
+          <label class="flex flex-col gap-2 text-left">
+            <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Password</span>
+            <input
+              id="passwordInput"
+              class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none"
+              type="password"
+              name="password"
+              autocomplete="new-password"
+              required
+            />
+          </label>
+
+          <label class="flex flex-col gap-2 text-left">
+            <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Select Role</span>
+            <select
+              id="roleSelect"
+              class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none"
+              name="role_id"
+            >
+              <option value="100">User</option>
+              <option value="300">Admin</option>
+            </select>
+          </label>
+
+          <button
+            class="mt-2 rounded-lg bg-yellow-400 px-6 py-3 text-lg font-semibold text-blue-950 transition hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+            type="submit"
+          >
+            Sign Up
+          </button>
+        </form>
+
+        <div class="mt-6 flex flex-col items-center gap-3 text-sm text-yellow-200/80">
+          <span>Already have an account?</span>
+          <a class="rounded-lg border border-yellow-300/40 px-4 py-2 font-semibold text-yellow-100 transition hover:bg-blue-900" href="login">Back to Login</a>
+        </div>
       </div>
-      
-      
-      <form class="flex flex-col w-min" action="signUp" method="POST">
-        <div>
-            <label>Email:</label>
-            <input class="border-1" type="email" name="user_id" placeholder="your.email@example.com" required />
-        </div>
-
-        <div>
-            <label>Password:</label>
-            <input class="border-1" type="password" name="password" id="pswd" />
-        </div>
-
-          <div class="flex flex-col mt-2">
-              <label>Select Role:</label>
-              <select class="border-1 p-1" name="role_id">
-                  <option value="100" selected>User</option>
-                  <option value="300">Admin</option>
-              </select>
-          </div>
-
-        <input
-          class="border rounded p-1 mt-4 cursor-pointer hover:bg-gray-100"
-          id="submitButton"
-          type="submit"
-          value="Sign Up"
-          onclick="return handleSignUp()"
-        />
-      </form>
-    
     </div>
+
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const errorBox = document.getElementById('signUpError');
+        const hintBox = document.getElementById('signUpHint');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const roleSelect = document.getElementById('roleSelect');
+        const form = document.getElementById('signUpForm');
+        const errorMessage = params.get('error');
+        const rememberedEmail = params.get('email');
+        const rememberedRole = params.get('role');
+
+        const showError = (message, showHint = false) => {
+          if (!errorBox) return;
+          errorBox.textContent = message;
+          errorBox.classList.remove('hidden');
+          if (hintBox) {
+            hintBox.classList.toggle('hidden', !showHint);
+          }
+        };
+
+        const clearError = () => {
+          if (!errorBox) return;
+          errorBox.textContent = '';
+          errorBox.classList.add('hidden');
+          if (hintBox) {
+            hintBox.classList.add('hidden');
+          }
+        };
+
+        if (errorMessage && errorBox) {
+          const decoded = decodeURIComponent(errorMessage);
+          const shouldShowHint = decoded.toLowerCase().includes('login');
+          showError(decoded, shouldShowHint);
+        }
+
+        if (rememberedEmail && emailInput) {
+          emailInput.value = decodeURIComponent(rememberedEmail);
+        }
+
+        if (rememberedRole && roleSelect) {
+          const decodedRole = decodeURIComponent(rememberedRole);
+          if ([...roleSelect.options].some(option => option.value === decodedRole)) {
+            roleSelect.value = decodedRole;
+          }
+        }
+
+        if (form) {
+          form.addEventListener('submit', (event) => {
+            clearError();
+            const trimmedEmail = emailInput ? emailInput.value.trim() : '';
+            const trimmedPassword = passwordInput ? passwordInput.value.trim() : '';
+            const messages = [];
+
+            if (!trimmedEmail) {
+              messages.push('Email is required.');
+            } else if (emailInput && emailInput.validity.typeMismatch) {
+              messages.push('Please enter a valid email address.');
+            }
+
+            if (!trimmedPassword) {
+              messages.push('Password is required.');
+            }
+
+            if (messages.length > 0) {
+              event.preventDefault();
+              showError(messages.join(' '));
+              if (!trimmedEmail && emailInput) {
+                emailInput.focus();
+              } else if (trimmedEmail && emailInput && emailInput.validity.typeMismatch) {
+                emailInput.focus();
+              } else if (passwordInput) {
+                passwordInput.focus();
+              }
+            }
+          });
+        }
+
+        if (errorMessage || rememberedEmail || rememberedRole) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      })();
+    </script>
   </body>
 </html>

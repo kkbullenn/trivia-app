@@ -2,17 +2,25 @@ package com.triviaapp.servlets;
 
 import com.triviaapp.dao.UserDAO;
 import com.triviaapp.dao.impl.UserDAOImpl;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.*;
-import java.sql.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 
 /**
  * Handles user registration by validating inputs, hashing passwords, and persisting accounts.
  *
  * @author Timothy Kim
+ * @author Jerry Xing
  */
 public class SignUpServlet extends HttpServlet {
 
@@ -32,7 +40,8 @@ public class SignUpServlet extends HttpServlet {
 
         String email = request.getParameter("user_id");
         String password = request.getParameter("password");
-        int roleId = Integer.parseInt(request.getParameter("role_id"));
+        String roleParam = request.getParameter("role_id");
+        int roleId = roleParam != null ? Integer.parseInt(roleParam) : 100;
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -40,9 +49,17 @@ public class SignUpServlet extends HttpServlet {
         try{
 
             if (userDAO.findPasswordByEmail(email) != null) {
-                request.setAttribute("errorMessage", "Email already registered!");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("/signUp.html");
-                dispatcher.forward(request, response);
+                String error = URLEncoder.encode("Email already registered. Would you like to log in instead?", StandardCharsets.UTF_8);
+                String rememberedEmail = email != null ? URLEncoder.encode(email, StandardCharsets.UTF_8) : "";
+                String rememberedRole = URLEncoder.encode(String.valueOf(roleId), StandardCharsets.UTF_8);
+                String redirectUrl = request.getContextPath() + "/signUp?error=" + error;
+                if (!rememberedEmail.isEmpty()) {
+                    redirectUrl += "&email=" + rememberedEmail;
+                }
+                if (!rememberedRole.isEmpty()) {
+                    redirectUrl += "&role=" + rememberedRole;
+                }
+                response.sendRedirect(redirectUrl);
                 return;
             }
             // generate username based on the email input
