@@ -42,42 +42,45 @@ public class LoginServlet extends HttpServlet {
         final UserDAO userDAO = new UserDAOImpl();
         final RoleDAO roleDAO = new RoleDAOImpl();
 
-        String email = request.getParameter("user_id");
+        String identifier = request.getParameter("user_id");
         String password = request.getParameter("password");
 
         try {
-            String userPasswordByEmail = userDAO.findPasswordByEmail(email);
+            String storedHash = null;
+            int userId = -1;
 
+            if (identifier != null && identifier.contains("@")) {
+                storedHash = userDAO.findPasswordByEmail(identifier);
+                if (storedHash != null) {
+                    userId = userDAO.findUserIdByEmail(identifier);
+                }
+            } else if (identifier != null) {
+                storedHash = userDAO.findPasswordByUsername(identifier);
+                if (storedHash != null) {
+                    userId = userDAO.findUserIdByUsername(identifier);
+                }
+            }
 
-            if (userPasswordByEmail != null && BCrypt.checkpw(password, userPasswordByEmail)) {
+            if (storedHash != null && BCrypt.checkpw(password, storedHash) && userId != -1) {
 
-                // Successful login
                 HttpSession session = request.getSession(true);
-                int userId = userDAO.findUserIdByEmail(email);
                 int roleId = userDAO.findUserRoleIdById(userId);
                 String roleName = roleDAO.findRoleNameById(roleId);
 
-                if (userId == -1) {
-                    throw new SQLException("Database inconsistency: User found but ID not found.");
-                } else {
-                    session.setAttribute("user_id", userId);
-                    session.setAttribute("role_name", roleName);
-                    response.sendRedirect(request.getContextPath() + "/main");
-                }
+                session.setAttribute("user_id", userId);
+                session.setAttribute("role_name", roleName);
+                response.sendRedirect(request.getContextPath() + "/main");
 
 
             } else {
 
                 String error = URLEncoder.encode("Invalid email or password.", StandardCharsets.UTF_8);
-                String remembered = email != null ? URLEncoder.encode(email, StandardCharsets.UTF_8) : "";
+                String remembered = identifier != null ? URLEncoder.encode(identifier, StandardCharsets.UTF_8) : "";
                 String redirectUrl = request.getContextPath() + "/login?error=" + error;
                 if (!remembered.isEmpty()) {
                     redirectUrl += "&user=" + remembered;
                 }
                 response.sendRedirect(redirectUrl);
-                return;
-
-
             }
 
 
