@@ -48,7 +48,7 @@
       <label class="flex flex-col gap-2 text-left">
         <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Avatar URL</span>
         <input id="avatarInput" type="url" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="https://example.com/avatar.png"/>
-        <p class="text-xs text-yellow-200/70">Provide a direct image link (http/https). Leave blank to use default identicon.</p>
+        <span class="block text-xs text-yellow-200/70">Provide a direct image link (http/https). Leave blank to use default identicon.</span>
       </label>
       <div id="statusMessage" class="hidden rounded-lg border border-yellow-300/30 bg-blue-900/70 px-4 py-2 text-sm"></div>
       <button id="saveButton" class="rounded-lg bg-yellow-400 px-6 py-3 text-lg font-semibold text-blue-950 transition hover:bg-yellow-300">
@@ -82,14 +82,41 @@
       window.location.href = `${base}${path}`;
     };
 
+    const normalizeMessage = (value) => {
+      if (value && typeof value === 'object') {
+        if (typeof value.message === 'string') {
+          return value.message;
+        }
+        return JSON.stringify(value);
+      }
+
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+          try {
+            const parsed = JSON.parse(trimmed);
+            if (parsed && typeof parsed.message === 'string') {
+              return parsed.message;
+            }
+          } catch (_) {
+            // ignore JSON parse errors and fall through
+          }
+        }
+        return trimmed;
+      }
+
+      return '';
+    };
+
     const showStatus = (message, tone = 'info') => {
       if (!statusMessage) return;
-      if (!message) {
+      const normalized = normalizeMessage(message);
+      if (!normalized) {
         statusMessage.classList.add('hidden');
         statusMessage.textContent = '';
         return;
       }
-      statusMessage.textContent = message;
+      statusMessage.textContent = normalized;
       statusMessage.classList.remove('hidden');
       const toneClass = tone === 'success'
         ? 'border-green-400 bg-green-900/50 text-green-200'
