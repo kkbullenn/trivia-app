@@ -132,6 +132,16 @@
         <url-pattern>/user/profile</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>UserAvatarUploadServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserAvatarUploadServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserAvatarUploadServlet</servlet-name>
+        <url-pattern>/user/avatar/upload</url-pattern>
+    </servlet-mapping>
+
     <!-- Create Quiz Servlets -->
     <servlet>
         <servlet-name>JoinCreateQuizServlet</servlet-name>

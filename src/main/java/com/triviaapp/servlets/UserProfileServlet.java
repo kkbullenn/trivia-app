@@ -98,9 +98,22 @@ public class UserProfileServlet extends HttpServlet {
         }
 
         if (avatarUrl != null && !avatarUrl.isEmpty()) {
-            if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Avatar URL must start with http or https");
+            String contextPath = request.getContextPath();
+            boolean isHttp = avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://");
+            boolean isContextRelative = contextPath != null && !contextPath.isEmpty() && avatarUrl.startsWith(contextPath + "/");
+            boolean isRootRelative = avatarUrl.startsWith("/");
+
+            if (!isHttp && !isContextRelative && !isRootRelative) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                JSONObject error = new JSONObject();
+                error.put("success", false);
+                error.put("message", "Avatar URL must start with http(s) or be a relative path on this server.");
+                writeJsonResponse(response, error);
                 return;
+            }
+
+            if (isRootRelative && !isContextRelative && contextPath != null && !contextPath.isEmpty()) {
+                avatarUrl = contextPath + avatarUrl;
             }
         } else {
             avatarUrl = null;

@@ -50,6 +50,16 @@
         <input id="avatarInput" type="url" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="https://example.com/avatar.png"/>
         <span class="block text-xs text-yellow-200/70">Provide a direct image link (http/https). Leave blank to use default identicon.</span>
       </label>
+      <div class="flex flex-col gap-3 rounded-lg border border-dashed border-yellow-300/40 bg-blue-900/60 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex flex-col">
+            <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Upload Avatar</span>
+            <span class="text-xs text-yellow-200/70">Supports PNG, JPG, GIF, WEBP under 2MB.</span>
+          </div>
+          <button id="uploadTrigger" type="button" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-2 text-sm font-semibold text-yellow-100 transition hover:bg-blue-800">Choose File</button>
+        </div>
+        <input id="avatarFileInput" type="file" accept="image/*" capture="environment" class="hidden"/>
+      </div>
       <div id="statusMessage" class="hidden rounded-lg border border-yellow-300/30 bg-blue-900/70 px-4 py-2 text-sm"></div>
       <button id="saveButton" class="rounded-lg bg-yellow-400 px-6 py-3 text-lg font-semibold text-blue-950 transition hover:bg-yellow-300">
         Save Changes
@@ -68,6 +78,10 @@
     const saveButton = document.getElementById('saveButton');
     const backButton = document.getElementById('backButton');
     const logoutButton = document.getElementById('logoutButton');
+    const uploadTrigger = document.getElementById('uploadTrigger');
+    const avatarFileInput = document.getElementById('avatarFileInput');
+    let tempObjectUrl = null;
+    let uploadedAvatarUrl = '';
 
     const getContextPath = () => {
       const path = window.location.pathname;
@@ -126,6 +140,14 @@
       statusMessage.className = `rounded-lg px-4 py-2 text-sm ${toneClass}`;
     };
 
+    const setPreviewSrc = (src) => {
+      if (tempObjectUrl && tempObjectUrl !== src) {
+        URL.revokeObjectURL(tempObjectUrl);
+        tempObjectUrl = null;
+      }
+      previewAvatar.src = src;
+    };
+
     const toIdenticon = (name) => {
       const seed = name && name.trim() ? name.trim() : 'player';
       return `https://github.com/identicons/${encodeURIComponent(seed)}.png`;
@@ -135,11 +157,15 @@
       const name = usernameInput.value.trim() || 'Player';
       const avatarUrl = avatarInput.value.trim();
       previewName.textContent = name.toUpperCase();
-      previewAvatar.src = avatarUrl ? avatarUrl : toIdenticon(name);
+      const source = avatarUrl || uploadedAvatarUrl || toIdenticon(name);
+      setPreviewSrc(source);
     };
 
     usernameInput.addEventListener('input', updatePreview);
-    avatarInput.addEventListener('input', updatePreview);
+    avatarInput.addEventListener('input', () => {
+      uploadedAvatarUrl = '';
+      updatePreview();
+    });
 
     backButton.addEventListener('click', () => goTo('/USER'));
 
@@ -169,10 +195,21 @@
         }
         const data = await res.json();
         const username = data.username || 'Player';
-        const avatarUrl = data.using_default ? '' : (data.avatar_url || '');
+        const avatarUrl = data.avatar_url || '';
 
         usernameInput.value = username;
-        avatarInput.value = avatarUrl;
+
+        if (!avatarUrl || data.using_default) {
+          uploadedAvatarUrl = '';
+          avatarInput.value = '';
+        } else if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+          uploadedAvatarUrl = '';
+          avatarInput.value = avatarUrl;
+        } else {
+          uploadedAvatarUrl = avatarUrl;
+          avatarInput.value = '';
+        }
+
         updatePreview();
       } catch (err) {
         console.error(err);
@@ -180,10 +217,81 @@
       }
     }
 
+    uploadTrigger.addEventListener('click', () => {
+      avatarFileInput.click();
+    });
+
+    avatarFileInput.addEventListener('change', async () => {
+      const [file] = avatarFileInput.files;
+      if (!file) {
+        return;
+      }
+      if (!file.type || !file.type.startsWith('image/')) {
+        showStatus('Please select a valid image file.', 'error');
+        avatarFileInput.value = '';
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        showStatus('Image must be smaller than 2MB.', 'error');
+        avatarFileInput.value = '';
+        return;
+      }
+
+      if (tempObjectUrl) {
+        URL.revokeObjectURL(tempObjectUrl);
+      }
+      tempObjectUrl = URL.createObjectURL(file);
+      previewAvatar.src = tempObjectUrl;
+      previewName.textContent = (usernameInput.value.trim() || 'Player').toUpperCase();
+
+      await uploadAvatarFile(file);
+    });
+
+    async function uploadAvatarFile(file) {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      try {
+        showStatus('Uploading avatar...', 'info');
+        const res = await fetch(`${getContextPath()}/user/avatar/upload`, {
+          method: 'POST',
+          body: formData,
+          credentials: 'same-origin'
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `Upload failed: ${res.status}`);
+        }
+        const data = await res.json();
+        uploadedAvatarUrl = data.avatar_url || '';
+        avatarInput.value = '';
+        if (tempObjectUrl) {
+          URL.revokeObjectURL(tempObjectUrl);
+          tempObjectUrl = null;
+        }
+        showStatus('Avatar uploaded successfully.', 'success');
+        updatePreview();
+      } catch (err) {
+        console.error(err);
+        showStatus(err.message || 'Failed to upload avatar.', 'error');
+        if (tempObjectUrl) {
+          URL.revokeObjectURL(tempObjectUrl);
+          tempObjectUrl = null;
+        }
+        updatePreview();
+      } finally {
+        avatarFileInput.value = '';
+      }
+    }
+
     async function saveProfile() {
+      const urlValue = avatarInput.value.trim();
       const payload = {
         username: usernameInput.value.trim(),
-        avatar_url: avatarInput.value.trim()
+        avatar_url: urlValue || uploadedAvatarUrl || ''
       };
 
       try {
@@ -220,7 +328,18 @@
         const data = await res.json();
         showStatus('Profile updated successfully.', 'success');
         usernameInput.value = data.username || payload.username || 'Player';
-        avatarInput.value = data.using_default ? '' : (data.avatar_url || '');
+
+        const savedAvatarUrl = data.avatar_url || '';
+        if (!savedAvatarUrl || data.using_default) {
+          uploadedAvatarUrl = '';
+          avatarInput.value = '';
+        } else if (savedAvatarUrl.startsWith('http://') || savedAvatarUrl.startsWith('https://')) {
+          uploadedAvatarUrl = '';
+          avatarInput.value = savedAvatarUrl;
+        } else {
+          uploadedAvatarUrl = savedAvatarUrl;
+          avatarInput.value = '';
+        }
         updatePreview();
       } catch (err) {
         console.error(err);
