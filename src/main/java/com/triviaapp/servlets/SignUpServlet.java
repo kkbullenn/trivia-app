@@ -9,6 +9,11 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.*;
 import java.sql.*;
 
+/**
+ * Handles user registration by validating inputs, hashing passwords, and persisting accounts.
+ *
+ * @author Timothy Kim
+ */
 public class SignUpServlet extends HttpServlet {
 
     @Override

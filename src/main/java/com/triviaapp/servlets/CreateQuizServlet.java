@@ -14,6 +14,11 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+/**
+ * Facilitates admin quiz creation by validating input, persisting questions, and opening sessions.
+ *
+ * @author Brownie Tran
+ */
 public class CreateQuizServlet extends HttpServlet {
 
     @Override

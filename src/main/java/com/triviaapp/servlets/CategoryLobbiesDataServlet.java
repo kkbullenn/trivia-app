@@ -18,6 +18,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Provides lobby summary data for the current category.
+ *
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class CategoryLobbiesDataServlet extends HttpServlet {
     
     @Override

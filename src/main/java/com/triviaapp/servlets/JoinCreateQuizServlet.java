@@ -9,6 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
+/**
+ * Validates admin access before redirecting users to the quiz creation workflow.
+ *
+ * @author Brownie Tran
+ */
 public class JoinCreateQuizServlet extends HttpServlet {
 
     @Override

@@ -20,6 +20,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Provides category and quiz data for the main dashboard after verifying login status.
+ *
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class MainDataServlet extends HttpServlet {
 
     @Override

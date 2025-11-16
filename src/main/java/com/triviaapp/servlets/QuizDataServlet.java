@@ -25,6 +25,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Provides quiz content and session status data to participants during gameplay.
+ *
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class QuizDataServlet extends HttpServlet {
     private final SessionDAO sessionDAO = new SessionDAOImpl();
     private final QuestionDAO questionDAO = new QuestionDAOImpl();

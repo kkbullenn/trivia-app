@@ -12,6 +12,12 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.*;
 import java.sql.*;
 
+/**
+ * Processes login requests, verifies credentials, and initializes user sessions.
+ *
+ * @author Timothy Kim
+ * @author Brownie Tran
+ */
 public class LoginServlet extends HttpServlet {
 
 
@@ -40,17 +46,16 @@ public class LoginServlet extends HttpServlet {
 
                 // Successful login
                 HttpSession session = request.getSession(true);
-                int user_id = userDAO.findUserIDByEmail(email);
-                int roleId = userDAO.findUserRoleIDByID(user_id);
+                int userId = userDAO.findUserIdByEmail(email);
+                int roleId = userDAO.findUserRoleIdById(userId);
                 String roleName = roleDAO.findRoleNameById(roleId);
 
-                if (user_id == -1) {
+                if (userId == -1) {
                     throw new SQLException("Database inconsistency: User found but ID not found.");
                 } else {
-                    session.setAttribute("user_id", user_id);
+                    session.setAttribute("user_id", userId);
                     session.setAttribute("role_name", roleName);
                     response.sendRedirect("main");
-                    return;
                 }
 
 

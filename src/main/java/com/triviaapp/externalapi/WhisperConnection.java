@@ -17,6 +17,8 @@ import java.util.Objects;
 
 /**
  * This class offers functionality for managing Whisper server's URLs/URIs.
+ *
+ * @author Samarjit Bhogal
  */
 public final class WhisperConnection extends ServerConnection {
     public static final URI WHISPER_GET_URI;

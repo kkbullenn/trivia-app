@@ -4,6 +4,11 @@ import java.sql.SQLException;
 
 /**
  * DAO for user authentication.
+ *
+ * @author Haven Zhang
+ * @author Brownie Tran
+ * @author Timothy Kim
+ * @author Jerry Xing
  */
 public interface UserDAO {
     /**
@@ -20,12 +25,12 @@ public interface UserDAO {
      *
      * Return the User_ID for the given email
      * */
-    int findUserIDByEmail(String email) throws SQLException;
+    int findUserIdByEmail(String email) throws SQLException;
     
     /**
      * Return user role ID for the given user ID
      */
-    int findUserRoleIDByID(int userId) throws SQLException;
+    int findUserRoleIdById(int userId) throws SQLException;
 
     /**
      * Return the username for the given user ID.

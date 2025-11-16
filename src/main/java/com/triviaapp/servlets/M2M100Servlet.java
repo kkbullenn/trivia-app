@@ -30,6 +30,8 @@ import java.time.Duration;
  *  - This servlet streams request bodies through to the Python service and
  *    streams responses back to the FE unchanged (including status + content type).
  *  - Keep the Python service running locally on the configured host/port.
+ *
+ * @author Aira Bassig
  */
 public final class M2M100Servlet extends HttpServlet {
 

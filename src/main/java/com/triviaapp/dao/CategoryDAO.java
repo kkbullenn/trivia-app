@@ -5,6 +5,8 @@ import java.util.Map;
 
 /**
  * DAO for categories. Provides methods useful for simple UI lists (dropdowns).
+ *
+ * @author Haven Zhang
  */
 public interface CategoryDAO {
 

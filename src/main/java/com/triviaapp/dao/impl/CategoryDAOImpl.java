@@ -10,6 +10,11 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Provides JDBC implementations for category-related queries used by the UI layer.
+ *
+ * @author Haven Zhang
+ */
 public class CategoryDAOImpl implements CategoryDAO {
 
     private static final String SQL_SELECT_ALL = "SELECT category_id, name FROM categories ORDER BY display_order, name";

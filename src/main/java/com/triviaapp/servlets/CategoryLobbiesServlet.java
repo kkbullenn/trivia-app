@@ -9,6 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Manages navigation to the category lobbies page after validating session state.
+ *
+ * @author Brownie Tran
+ */
 public class CategoryLobbiesServlet extends HttpServlet {
 
     @Override

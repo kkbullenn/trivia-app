@@ -14,6 +14,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Handles lobby join requests and prepares the session for quiz participation.
+ *
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class JoinQuizServlet extends HttpServlet {
 
     @Override

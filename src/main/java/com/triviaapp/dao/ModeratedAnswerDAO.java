@@ -6,6 +6,10 @@ import java.util.Map;
 
 /**
  * Data access for the `moderated_answers` table.
+ *
+ * @author Haven Zhang
+ * @author Brownie Tran
+ * @author Jerry Xing
  */
 public interface ModeratedAnswerDAO {
 

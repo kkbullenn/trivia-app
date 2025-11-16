@@ -15,6 +15,11 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Map;
 
+/**
+ * Utilizes Whisper transcription to evaluate spoken quiz answers against stored solutions.
+ *
+ * @author Samarjit Bhogal
+ */
 @MultipartConfig
 public class WhisperAnswerCheckerServlet extends HttpServlet {
     private static final WhisperConnection CONNECTION = new WhisperConnection();

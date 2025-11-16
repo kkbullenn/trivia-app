@@ -15,6 +15,9 @@ import java.util.Map;
  * - list participants for a session
  * - join and leave participant operations
  *
+ * @author Haven Zhang
+ * @author Brownie Tran
+ * @author Jerry Xing
  */
 public interface SessionDAO {
 

@@ -12,6 +12,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Manages persistence for moderated answers, including scoring and session summaries.
+ *
+ * @author Haven Zhang
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class ModeratedAnswerDAOImpl implements ModeratedAnswerDAO {
 
     private static final String SQL_INSERT = "INSERT INTO moderated_answers (session_id, question_id, participant_id, selected_answer, is_correct, score) VALUES (?, ?, ?, ?, ?, ?)";

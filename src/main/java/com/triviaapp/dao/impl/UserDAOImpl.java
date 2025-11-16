@@ -8,6 +8,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Handles JDBC operations for user authentication, profiles, and role lookups.
+ *
+ * @author Haven Zhang
+ * @author Timothy Kim
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class UserDAOImpl implements UserDAO {
 
     private static final String SQL_FIND_PASSWORD_BY_EMAIL = "SELECT password_hash FROM users WHERE email = ?";
@@ -42,7 +50,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public int findUserIDByEmail(String email) throws SQLException {
+    public int findUserIdByEmail(String email) throws SQLException {
         try (Connection conn = DBConnectionManager.getConnection()){
             PreparedStatement ps = conn.prepareStatement(SQL_FIND_USERID_BY_EMAIL);
             ps.setString(1, email);
@@ -55,7 +63,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public int findUserRoleIDByID(int userId) throws SQLException {
+    public int findUserRoleIdById(int userId) throws SQLException {
         String sql = "SELECT role_id FROM users WHERE user_id = ?";
         try (Connection conn = DBConnectionManager.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {

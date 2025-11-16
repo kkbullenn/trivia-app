@@ -7,6 +7,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Ends the current user session and redirects to the login page.
+ *
+ * @author Yang Li
+ * @author Jerry Xing
+ */
 public class ExitServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)

@@ -12,11 +12,17 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implements question CRUD operations and retrieval helpers using JDBC.
+ *
+ * @author Haven Zhang
+ * @author Jerry Xing
+ */
 public class QuestionDAOImpl implements QuestionDAO {
 
     private static final String SQL_FIND_QUESTION_BY_ID = "SELECT * FROM questions WHERE question_id = ?";
-    private static final String SQL_LIST_QUESTIONS_BY_CATEGORY = "SELECT * FROM questions WHERE category_id = ? ORDER BY question_id ASC";
-    private static final String SQL_SELECT_IDS_BY_CATEGORY = "SELECT question_id FROM questions WHERE category_id = ? ORDER BY question_id ASC";
+    private static final String SQL_LIST_QUESTIONS_BY_CATEGORY = "SELECT * FROM questions WHERE category_id = ? ORDER BY question_id ";
+    private static final String SQL_SELECT_IDS_BY_CATEGORY = "SELECT question_id FROM questions WHERE category_id = ? ORDER BY question_id ";
     private static final String SQL_INSERT = "INSERT INTO questions (category_id, xml_question, youtube_url, question_text, answers_option, answers_key, points, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE = "UPDATE questions SET category_id = ?, xml_question = ?, youtube_url = ?, question_text = ?, answers_option = ?, answers_key = ?, points = ? WHERE question_id = ?";
     private static final String SQL_DELETE = "DELETE FROM questions WHERE question_id = ?";

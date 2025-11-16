@@ -16,6 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * WebSocket endpoint for handling real-time quiz interactions. Handles joining lobbies,
  * navigating questions, submitting answers, and broadcasting updates such as questions
  * and leaderboards.
+ *
+ * @author Brownie Tran
+ * @author Jerry Xing
  */
 @ServerEndpoint("/quiz/webSocket")
 public class QuizWebSocket {

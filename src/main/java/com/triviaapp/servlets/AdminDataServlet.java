@@ -15,6 +15,11 @@ import com.triviaapp.dao.SessionDAO;
 import com.triviaapp.dao.impl.CategoryDAOImpl;
 import com.triviaapp.dao.impl.SessionDAOImpl;
 
+/**
+ * Supplies admin dashboard data including categories and hosted quiz sessions.
+ *
+ * @author Brownie Tran
+ */
 public class AdminDataServlet extends HttpServlet {
 
     @Override

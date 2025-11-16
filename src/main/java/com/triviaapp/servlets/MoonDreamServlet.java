@@ -22,6 +22,8 @@ import java.util.Collection;
  * Moondream.
  * Available methods: POST (see doPost) for caption/summary, GET (see doGet) for
  * ping.
+ *
+ * @author Hadrian
  */
 @MultipartConfig
 public final class MoonDreamServlet extends HttpServlet {
