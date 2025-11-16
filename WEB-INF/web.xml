@@ -122,6 +122,16 @@
         <url-pattern>/user/data</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>UserProfileServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserProfileServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserProfileServlet</servlet-name>
+        <url-pattern>/user/profile</url-pattern>
+    </servlet-mapping>
+
     <!-- Create Quiz Servlets -->
     <servlet>
         <servlet-name>JoinCreateQuizServlet</servlet-name>

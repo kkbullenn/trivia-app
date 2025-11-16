@@ -1,0 +1,203 @@
+<!--
+   Profile Edit Page
+   Allows editing username and avatar URL.
+
+   Author: Jerry Xing
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Edit Profile</title>
+</head>
+<body class="bg-blue-900 text-yellow-300 min-h-screen">
+<div class="flex min-h-screen flex-col">
+  <header class="flex items-center justify-between bg-blue-950/90 px-4 py-3 shadow">
+    <button id="backButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Back to profile">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <h1 class="text-lg font-semibold uppercase tracking-wide">Edit Profile</h1>
+    <button id="logoutButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Logout">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="mx-auto flex w-full max-w-xl flex-1 flex-col gap-8 px-6 py-12">
+    <section class="flex flex-col items-center gap-4 text-center">
+      <div class="h-32 w-32 overflow-hidden rounded-full border-4 border-yellow-400/80 bg-blue-950">
+        <img id="previewAvatar" src="" alt="Preview Avatar" class="h-full w-full object-cover"/>
+      </div>
+      <h2 id="previewName" class="text-2xl font-bold text-yellow-100">PLAYER</h2>
+    </section>
+
+    <section class="flex flex-col gap-6 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 shadow-lg">
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Username</span>
+        <input id="usernameInput" type="text" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="Enter username"/>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Avatar URL</span>
+        <input id="avatarInput" type="url" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="https://example.com/avatar.png"/>
+        <p class="text-xs text-yellow-200/70">Provide a direct image link (http/https). Leave blank to use default identicon.</p>
+      </label>
+      <div id="statusMessage" class="hidden rounded-lg border border-yellow-300/30 bg-blue-900/70 px-4 py-2 text-sm"></div>
+      <button id="saveButton" class="rounded-lg bg-yellow-400 px-6 py-3 text-lg font-semibold text-blue-950 transition hover:bg-yellow-300">
+        Save Changes
+      </button>
+    </section>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const usernameInput = document.getElementById('usernameInput');
+    const avatarInput = document.getElementById('avatarInput');
+    const previewAvatar = document.getElementById('previewAvatar');
+    const previewName = document.getElementById('previewName');
+    const statusMessage = document.getElementById('statusMessage');
+    const saveButton = document.getElementById('saveButton');
+    const backButton = document.getElementById('backButton');
+    const logoutButton = document.getElementById('logoutButton');
+
+    const getContextPath = () => {
+      const path = window.location.pathname;
+      const parts = path.split('/');
+      parts.pop();
+      const joined = parts.join('/');
+      return joined.length ? joined : '';
+    };
+
+    const goTo = (path) => {
+      const base = getContextPath();
+      window.location.href = `${base}${path}`;
+    };
+
+    const showStatus = (message, tone = 'info') => {
+      if (!statusMessage) return;
+      if (!message) {
+        statusMessage.classList.add('hidden');
+        statusMessage.textContent = '';
+        return;
+      }
+      statusMessage.textContent = message;
+      statusMessage.classList.remove('hidden');
+      const toneClass = tone === 'success'
+        ? 'border-green-400 bg-green-900/50 text-green-200'
+        : tone === 'error'
+          ? 'border-red-400 bg-red-900/50 text-red-200'
+          : 'border-yellow-300/30 bg-blue-900/70 text-yellow-100';
+      statusMessage.className = `rounded-lg px-4 py-2 text-sm ${toneClass}`;
+    };
+
+    const toIdenticon = (name) => {
+      const seed = name && name.trim() ? name.trim() : 'player';
+      return `https://github.com/identicons/${encodeURIComponent(seed)}.png`;
+    };
+
+    const updatePreview = () => {
+      const name = usernameInput.value.trim() || 'Player';
+      const avatarUrl = avatarInput.value.trim();
+      previewName.textContent = name.toUpperCase();
+      previewAvatar.src = avatarUrl ? avatarUrl : toIdenticon(name);
+    };
+
+    usernameInput.addEventListener('input', updatePreview);
+    avatarInput.addEventListener('input', updatePreview);
+
+    backButton.addEventListener('click', () => goTo('/USER'));
+
+    logoutButton.addEventListener('click', async () => {
+      try {
+        await fetch(`${getContextPath()}/EXIT`, { method: 'POST', credentials: 'same-origin' });
+      } catch (err) {
+        console.error('Failed to log out', err);
+      } finally {
+        goTo('/login');
+      }
+    });
+
+    async function loadProfile() {
+      try {
+        const res = await fetch(`${getContextPath()}/user/profile`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          credentials: 'same-origin'
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+        if (!res.ok) {
+          throw new Error(`Failed to load profile: ${res.status}`);
+        }
+        const data = await res.json();
+        const username = data.username || 'Player';
+        const avatarUrl = data.using_default ? '' : (data.avatar_url || '');
+
+        usernameInput.value = username;
+        avatarInput.value = avatarUrl;
+        updatePreview();
+      } catch (err) {
+        console.error(err);
+        showStatus('Failed to load profile. Please refresh.', 'error');
+      }
+    }
+
+    async function saveProfile() {
+      const payload = {
+        username: usernameInput.value.trim(),
+        avatar_url: avatarInput.value.trim()
+      };
+
+      try {
+        saveButton.disabled = true;
+        showStatus('Saving...', 'info');
+        const res = await fetch(`${getContextPath()}/user/profile`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `Failed to save profile: ${res.status}`);
+        }
+        const data = await res.json();
+        showStatus('Profile updated successfully.', 'success');
+        usernameInput.value = data.username || payload.username || 'Player';
+        avatarInput.value = data.using_default ? '' : (data.avatar_url || '');
+        updatePreview();
+      } catch (err) {
+        console.error(err);
+        showStatus(err.message || 'Failed to save profile.', 'error');
+      } finally {
+        saveButton.disabled = false;
+      }
+    }
+
+    saveButton.addEventListener('click', () => {
+      saveProfile();
+    });
+
+    loadProfile();
+  })();
+</script>
+</body>
+</html>

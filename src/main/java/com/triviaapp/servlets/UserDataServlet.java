@@ -6,6 +6,7 @@ import com.triviaapp.dao.UserStatsDAO;
 import com.triviaapp.dao.impl.RoleDAOImpl;
 import com.triviaapp.dao.impl.UserDAOImpl;
 import com.triviaapp.dao.impl.UserStatsDAOImpl;
+import com.triviaapp.util.SessionUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,9 +32,8 @@ public class UserDataServlet extends HttpServlet {
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not logged in");
+        HttpSession session = SessionUtils.requireSession(request, response);
+        if (session == null) {
             return;
         }
 
