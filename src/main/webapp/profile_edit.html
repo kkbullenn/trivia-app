@@ -46,6 +46,10 @@
         <input id="usernameInput" type="text" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="Enter username"/>
       </label>
       <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Email</span>
+        <input id="emailInput" type="email" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="you@example.com" autocomplete="email"/>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
         <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Avatar URL</span>
         <input id="avatarInput" type="url" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="https://example.com/avatar.png"/>
         <span class="block text-xs text-yellow-200/70">Provide a direct image link (http/https). Leave blank to use default identicon.</span>
@@ -73,30 +77,30 @@
       </header>
       <label class="flex flex-col gap-2 text-left">
         <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Current Password</span>
-        <div class="relative flex items-center">
+        <span class="relative flex items-center">
           <input id="oldPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="Current password" autocomplete="current-password"/>
           <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100" data-target="oldPasswordInput">
             Show
           </button>
-        </div>
+        </span>
       </label>
       <label class="flex flex-col gap-2 text-left">
         <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">New Password</span>
-        <div class="relative flex items-center">
+        <span class="relative flex items-center">
           <input id="newPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed" placeholder="New password" autocomplete="new-password" disabled/>
           <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed" data-target="newPasswordInput" disabled>
             Show
           </button>
-        </div>
+        </span>
       </label>
       <label class="flex flex-col gap-2 text-left">
         <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Confirm New Password</span>
-        <div class="relative flex items-center">
+        <span class="relative flex items-center">
           <input id="confirmPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Confirm new password" autocomplete="new-password" disabled/>
           <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed" data-target="confirmPasswordInput" disabled>
             Show
           </button>
-        </div>
+        </span>
       </label>
       <div id="passwordStatus" class="hidden rounded-lg border border-yellow-300/30 bg-blue-900/70 px-4 py-2 text-sm"></div>
       <button id="updatePasswordButton" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-6 py-3 text-lg font-semibold text-yellow-100 transition hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
@@ -109,6 +113,7 @@
 <script>
   (function () {
     const usernameInput = document.getElementById('usernameInput');
+    const emailInput = document.getElementById('emailInput');
     const avatarInput = document.getElementById('avatarInput');
     const previewAvatar = document.getElementById('previewAvatar');
     const previewName = document.getElementById('previewName');
@@ -124,6 +129,7 @@
     const passwordStatus = document.getElementById('passwordStatus');
     const updatePasswordButton = document.getElementById('updatePasswordButton');
     const passwordToggles = Array.from(document.querySelectorAll('.password-toggle'));
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let tempObjectUrl = null;
     let uploadedAvatarUrl = '';
     let validatedRemoteUrl = '';
@@ -268,7 +274,33 @@
       }
     };
 
+    const validateEmail = () => {
+      if (!emailInput) return true;
+      const value = emailInput.value.trim();
+      if (!value) {
+        showStatus('Email is required.', 'error');
+        return false;
+      }
+      if (!emailPattern.test(value)) {
+        showStatus('Please enter a valid email address.', 'error');
+        return false;
+      }
+      return true;
+    };
+
     usernameInput.addEventListener('input', () => updatePreview());
+    if (emailInput) {
+      emailInput.addEventListener('input', () => {
+        const trimmed = emailInput.value.trim();
+        if (!trimmed) {
+          showStatus('Email is required.', 'error');
+        } else if (!emailPattern.test(trimmed)) {
+          showStatus('Please enter a valid email address.', 'error');
+        } else {
+          showStatus('', 'info');
+        }
+      });
+    }
     avatarInput.addEventListener('input', () => {
       uploadedAvatarUrl = '';
       isUrlValid = false;
@@ -383,6 +415,9 @@
         const data = await res.json();
         const username = data.username || 'Player';
         const avatarUrl = data.avatar_url || '';
+        if (emailInput) {
+          emailInput.value = data.email || '';
+        }
 
         usernameInput.value = username;
 
@@ -485,6 +520,7 @@
 
     async function saveProfile() {
       const urlValue = avatarInput.value.trim();
+      const trimmedEmail = emailInput ? emailInput.value.trim() : '';
       if (urlValidationInProgress) {
         showStatus('Please wait for the avatar URL check to finish.', 'info');
         return;
@@ -493,8 +529,12 @@
         showStatus('Avatar URL is invalid. Please provide a working image link.', 'error');
         return;
       }
+      if (!validateEmail()) {
+        return;
+      }
       const payload = {
         username: usernameInput.value.trim(),
+        email: trimmedEmail,
         avatar_url: urlValue || uploadedAvatarUrl || ''
       };
 
@@ -515,7 +555,7 @@
           return;
         }
         if (res.status === 409) {
-          let errMsg = 'Username is already taken. Please choose another one.';
+          let errMsg = 'Unable to save profile with the provided information.';
           try {
             const data = await res.json();
             if (data && data.message) {
@@ -532,6 +572,9 @@
         const data = await res.json();
         showStatus('Profile updated successfully.', 'success');
         usernameInput.value = data.username || payload.username || 'Player';
+        if (emailInput) {
+          emailInput.value = data.email || payload.email || '';
+        }
 
         const savedAvatarUrl = data.avatar_url || '';
         if (!savedAvatarUrl || data.using_default) {

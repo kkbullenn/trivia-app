@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
@@ -71,7 +70,6 @@ public class SignUpServlet extends HttpServlet {
 
             if (success) {
                 response.sendRedirect("login");
-                return;
             } else {
                 out.println("<h3>Sign up failed unexpectedly.</h3>");
             }

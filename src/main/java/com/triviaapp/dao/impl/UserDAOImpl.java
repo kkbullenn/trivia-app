@@ -27,9 +27,10 @@ public class UserDAOImpl implements UserDAO {
     private static final String SQL_FIND_USERID_BY_EMAIL = "SELECT user_id FROM users WHERE email = ?";
     private static final String SQL_FIND_USERID_BY_USERNAME = "SELECT user_id FROM users WHERE username = ?";
     private static final String SQL_FIND_USERNAME_BY_ID = "SELECT username FROM users WHERE user_id = ?";
-    private static final String SQL_FIND_PROFILE_BY_ID = "SELECT username, avatar_url FROM users WHERE user_id = ?";
-    private static final String SQL_UPDATE_PROFILE = "UPDATE users SET username = ?, avatar_url = ? WHERE user_id = ?";
+    private static final String SQL_FIND_PROFILE_BY_ID = "SELECT username, email, avatar_url FROM users WHERE user_id = ?";
+    private static final String SQL_UPDATE_PROFILE = "UPDATE users SET username = ?, email = ?, avatar_url = ? WHERE user_id = ?";
     private static final String SQL_IS_USERNAME_TAKEN = "SELECT COUNT(*) FROM users WHERE LOWER(username) = LOWER(?) AND user_id <> ?";
+    private static final String SQL_IS_EMAIL_TAKEN = "SELECT COUNT(*) FROM users WHERE LOWER(email) = LOWER(?) AND user_id <> ?";
     private static final String SQL_FIND_PASSWORD_BY_ID = "SELECT password_hash FROM users WHERE user_id = ?";
     private static final String SQL_UPDATE_PASSWORD = "UPDATE users SET password_hash = ? WHERE user_id = ?";
 
@@ -120,6 +121,7 @@ public class UserDAOImpl implements UserDAO {
                 if (rs.next()) {
                     Map<String, String> profile = new HashMap<>();
                     profile.put("username", rs.getString("username"));
+                    profile.put("email", rs.getString("email"));
                     profile.put("avatar_url", rs.getString("avatar_url"));
                     return profile;
                 }
@@ -129,33 +131,29 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean updateUserProfile(int userId, String username, String avatarUrl) throws SQLException {
+    public boolean updateUserProfile(int userId, String username, String email, String avatarUrl) throws SQLException {
         try (Connection conn = DBConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_PROFILE)) {
             ps.setString(1, username);
+            ps.setString(2, email);
             if (avatarUrl == null || avatarUrl.isBlank()) {
-                ps.setNull(2, Types.VARCHAR);
+                ps.setNull(3, Types.VARCHAR);
             } else {
-                ps.setString(2, avatarUrl);
+                ps.setString(3, avatarUrl);
             }
-            ps.setInt(3, userId);
+            ps.setInt(4, userId);
             return ps.executeUpdate() > 0;
         }
     }
 
     @Override
     public boolean isUsernameTaken(String username, int excludeUserId) throws SQLException {
-        try (Connection conn = DBConnectionManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_IS_USERNAME_TAKEN)) {
-            ps.setString(1, username);
-            ps.setInt(2, excludeUserId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
+        return existsWithExclusion(SQL_IS_USERNAME_TAKEN, username, excludeUserId);
+    }
+
+    @Override
+    public boolean isEmailTaken(String email, int excludeUserId) throws SQLException {
+        return existsWithExclusion(SQL_IS_EMAIL_TAKEN, email, excludeUserId);
     }
 
     @Override
@@ -193,5 +191,19 @@ public class UserDAOImpl implements UserDAO {
             }
         }
         return null;
+    }
+
+    private boolean existsWithExclusion(String sql, String identifier, int excludeUserId) throws SQLException {
+        try (Connection conn = DBConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, identifier);
+            ps.setInt(2, excludeUserId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 }

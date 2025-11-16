@@ -1,24 +1,23 @@
 package com.triviaapp.servlets;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.triviaapp.dao.CategoryDAO;
 import com.triviaapp.dao.SessionDAO;
 import com.triviaapp.dao.impl.CategoryDAOImpl;
 import com.triviaapp.dao.impl.SessionDAOImpl;
-
+import com.triviaapp.util.SessionUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides category and quiz data for the main dashboard after verifying login status.
@@ -33,10 +32,8 @@ public class MainDataServlet extends HttpServlet {
             throws IOException, ServletException {
 
         // Check if user is logged in
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
-            // Not logged in, redirect to  login page
-            response.sendRedirect("login");
+        HttpSession session = SessionUtils.requireSession(request, response);
+        if (session == null) {
             return;
         }
 

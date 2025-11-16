@@ -56,12 +56,17 @@ public interface UserDAO {
     /**
      * Update the user's profile information.
      */
-    boolean updateUserProfile(int userId, String username, String avatarUrl) throws SQLException;
+    boolean updateUserProfile(int userId, String username, String email, String avatarUrl) throws SQLException;
 
     /**
      * Check if a username is already used by another user (excluding the provided user ID).
      */
     boolean isUsernameTaken(String username, int excludeUserId) throws SQLException;
+
+    /**
+     * Checks whether the provided email already exists for another user.
+     */
+    boolean isEmailTaken(String email, int excludeUserId) throws SQLException;
 
     /**
      * Returns the password hash for the given user ID.

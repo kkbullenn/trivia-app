@@ -96,7 +96,13 @@ public class UserAvatarUploadServlet extends HttpServlet {
             if (username == null || username.isBlank()) {
                 username = "Player" + userId;
             }
-            userDAO.updateUserProfile(userId, username, avatarUrl);
+            String email = profile != null ? profile.get("email") : null;
+            if (email == null || email.isBlank()) {
+                Files.deleteIfExists(destination.toPath());
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "User email not found; cannot update avatar");
+                return;
+            }
+            userDAO.updateUserProfile(userId, username, email, avatarUrl);
         } catch (SQLException ex) {
             Files.deleteIfExists(destination.toPath());
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");

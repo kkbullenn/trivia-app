@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Handles profile data retrieval and updates for the authenticated user.
@@ -23,6 +24,8 @@ import java.util.Map;
  * @author Jerry Xing
  */
 public class UserProfileServlet extends HttpServlet {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -44,12 +47,16 @@ public class UserProfileServlet extends HttpServlet {
                 username = "Player" + userId;
             }
 
+            String email = profile != null ? profile.get("email") : null;
             String storedAvatar = profile != null ? profile.get("avatar_url") : null;
             boolean usingDefault = storedAvatar == null || storedAvatar.isBlank();
             String avatarUrl = usingDefault ? buildAvatarUrl(username) : storedAvatar;
 
             JSONObject payload = new JSONObject();
             payload.put("username", username);
+            if (email != null) {
+                payload.put("email", email);
+            }
             payload.put("avatar_url", avatarUrl);
             payload.put("using_default", usingDefault);
 
@@ -73,6 +80,7 @@ public class UserProfileServlet extends HttpServlet {
         }
 
         String username = payload.optString("username", "").trim();
+        String email = payload.optString("email", "").trim();
         String avatarUrl = payload.has("avatar_url") ? payload.optString("avatar_url", null) : null;
         if (avatarUrl != null) {
             avatarUrl = avatarUrl.trim();
@@ -80,6 +88,20 @@ public class UserProfileServlet extends HttpServlet {
 
         if (username.isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username is required");
+            return;
+        }
+
+        if (email.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email is required");
+            return;
+        }
+
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            JSONObject error = new JSONObject();
+            error.put("success", false);
+            error.put("message", "Please provide a valid email address.");
+            writeJsonResponse(response, error);
             return;
         }
 
@@ -118,7 +140,16 @@ public class UserProfileServlet extends HttpServlet {
                 return;
             }
 
-            boolean updated = userDAO.updateUserProfile(userId, username, avatarUrl);
+            if (userDAO.isEmailTaken(email, userId)) {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                JSONObject error = new JSONObject();
+                error.put("success", false);
+                error.put("message", "Email is already in use. Try logging in instead.");
+                writeJsonResponse(response, error);
+                return;
+            }
+
+            boolean updated = userDAO.updateUserProfile(userId, username, email, avatarUrl);
             if (!updated) {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update profile");
                 return;
@@ -129,6 +160,7 @@ public class UserProfileServlet extends HttpServlet {
             JSONObject result = new JSONObject();
             result.put("success", true);
             result.put("username", username);
+            result.put("email", email);
             result.put("avatar_url", resolvedAvatar);
             result.put("using_default", usingDefault);
 
