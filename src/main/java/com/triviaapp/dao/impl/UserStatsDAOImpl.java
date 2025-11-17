@@ -19,7 +19,7 @@ public class UserStatsDAOImpl implements UserStatsDAO {
 
     private static final String SQL_COUNT_PARTICIPATIONS =
             "SELECT COUNT(DISTINCT session_id) AS participated " +
-            "FROM session_participants WHERE participant_id = ? AND status = 'left'";
+                    "FROM session_participants WHERE participant_id = ? AND status = 'left'";
 
     private static final String SQL_COUNT_WINS = String.join("\n",
             "SELECT COUNT(*) AS win_count",
@@ -46,12 +46,16 @@ public class UserStatsDAOImpl implements UserStatsDAO {
             "LIMIT 1");
 
     @Override
-    public int countSessionsParticipated(int userId) throws SQLException {
-        try (Connection conn = DBConnectionManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_COUNT_PARTICIPATIONS)) {
+    public int countSessionsParticipated(int userId) throws SQLException
+    {
+        try(Connection conn = DBConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(SQL_COUNT_PARTICIPATIONS))
+        {
             ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+            try(ResultSet rs = ps.executeQuery())
+            {
+                if(rs.next())
+                {
                     return rs.getInt("participated");
                 }
             }
@@ -60,12 +64,16 @@ public class UserStatsDAOImpl implements UserStatsDAO {
     }
 
     @Override
-    public int countWins(int userId) throws SQLException {
-        try (Connection conn = DBConnectionManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_COUNT_WINS)) {
+    public int countWins(int userId) throws SQLException
+    {
+        try(Connection conn = DBConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(SQL_COUNT_WINS))
+        {
             ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+            try(ResultSet rs = ps.executeQuery())
+            {
+                if(rs.next())
+                {
                     return rs.getInt("win_count");
                 }
             }
@@ -74,12 +82,16 @@ public class UserStatsDAOImpl implements UserStatsDAO {
     }
 
     @Override
-    public Map<String, String> findTopCategoryByScore(int userId) throws SQLException {
-        try (Connection conn = DBConnectionManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_TOP_CATEGORY)) {
+    public Map<String, String> findTopCategoryByScore(int userId) throws SQLException
+    {
+        try(Connection conn = DBConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(SQL_TOP_CATEGORY))
+        {
             ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+            try(ResultSet rs = ps.executeQuery())
+            {
+                if(rs.next())
+                {
                     Map<String, String> result = new HashMap<>();
                     result.put("category_id", String.valueOf(rs.getInt("category_id")));
                     result.put("category_name", rs.getString("category_name"));

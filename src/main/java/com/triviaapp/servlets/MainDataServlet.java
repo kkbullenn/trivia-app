@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides category and quiz data for the main dashboard after verifying login status.
@@ -27,13 +29,17 @@ import java.util.Map;
  */
 public class MainDataServlet extends HttpServlet {
 
+    private static final Logger LOGGER = Logger.getLogger(MainDataServlet.class.getName());
+
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException, ServletException
+    {
 
         // Check if user is logged in
         HttpSession session = SessionUtils.requireSession(request, response);
-        if (session == null) {
+        if(session == null)
+        {
             return;
         }
 
@@ -44,18 +50,21 @@ public class MainDataServlet extends HttpServlet {
         SessionDAO sessionDAO = new SessionDAOImpl();
         Map<Integer, String> categories;
         List<Map<String, String>> quizzes;
-        try {
+        try
+        {
             categories = categoryDAO.findAllCategories();
             quizzes = sessionDAO.findSessionsByHost(userId);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException e)
+        {
+            LOGGER.log(Level.SEVERE, "Failed to fetch dashboard data for user " + userId, e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
             return;
         }
 
         // Build JSON array for categories using org.json
         JSONArray categoriesArray = new JSONArray();
-        categories.forEach((id, name) -> {
+        categories.forEach((id, name) ->
+        {
             JSONObject obj = new JSONObject();
             obj.put("id", id);
             obj.put("name", name);
@@ -64,7 +73,8 @@ public class MainDataServlet extends HttpServlet {
 
         // Build JSON array for quizzes created by this host
         JSONArray quizzesArray = new JSONArray();
-        for (Map<String, String> quiz : quizzes) {
+        for(Map<String, String> quiz : quizzes)
+        {
             JSONObject obj = new JSONObject();
             obj.put("session_id", quiz.get("session_id"));
             obj.put("quiz_name", quiz.get("session_name"));

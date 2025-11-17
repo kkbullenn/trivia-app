@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Processes login requests, verifies credentials, and initializes user sessions.
@@ -27,17 +29,20 @@ import java.sql.SQLException;
  */
 public class LoginServlet extends HttpServlet {
 
+    private static final Logger LOGGER = Logger.getLogger(LoginServlet.class.getName());
+
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException, ServletException
+    {
         RequestDispatcher dispatcher = request.getRequestDispatcher("/login.html");
         dispatcher.forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+    {
 
         final UserDAO userDAO = new UserDAOImpl();
         final RoleDAO roleDAO = new RoleDAOImpl();
@@ -45,24 +50,29 @@ public class LoginServlet extends HttpServlet {
         String identifier = request.getParameter("user_id");
         String password = request.getParameter("password");
 
-        try {
+        try
+        {
             String storedHash = null;
             int userId = -1;
 
-            if (identifier != null && identifier.contains("@")) {
+            if(identifier != null && identifier.contains("@"))
+            {
                 storedHash = userDAO.findPasswordByEmail(identifier);
-                if (storedHash != null) {
+                if(storedHash != null)
+                {
                     userId = userDAO.findUserIdByEmail(identifier);
                 }
-            } else if (identifier != null) {
+            } else if(identifier != null)
+            {
                 storedHash = userDAO.findPasswordByUsername(identifier);
-                if (storedHash != null) {
+                if(storedHash != null)
+                {
                     userId = userDAO.findUserIdByUsername(identifier);
                 }
             }
 
-            if (storedHash != null && BCrypt.checkpw(password, storedHash) && userId != -1) {
-
+            if(storedHash != null && BCrypt.checkpw(password, storedHash) && userId != -1)
+            {
                 HttpSession session = request.getSession(true);
                 int roleId = userDAO.findUserRoleIdById(userId);
                 String roleName = roleDAO.findRoleNameById(roleId);
@@ -70,22 +80,23 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("user_id", userId);
                 session.setAttribute("role_name", roleName);
                 response.sendRedirect(request.getContextPath() + "/main");
-
-
-            } else {
-
+            } else
+            {
                 String error = URLEncoder.encode("Invalid email or password.", StandardCharsets.UTF_8);
-                String remembered = identifier != null ? URLEncoder.encode(identifier, StandardCharsets.UTF_8) : "";
+                String remembered = identifier != null
+                                    ? URLEncoder.encode(identifier, StandardCharsets.UTF_8)
+                                    : "";
                 String redirectUrl = request.getContextPath() + "/login?error=" + error;
-                if (!remembered.isEmpty()) {
+                if(!remembered.isEmpty())
+                {
                     redirectUrl += "&user=" + remembered;
                 }
                 response.sendRedirect(redirectUrl);
             }
 
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException e)
+        {
+            LOGGER.log(Level.SEVERE, "Login failed due to a database error for identifier: " + identifier, e);
             throw new ServletException("Login failed due to a database error.", e);
         }
     }

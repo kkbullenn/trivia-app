@@ -31,7 +31,8 @@ public class UserAvatarUploadServlet extends HttpServlet {
 
     private static final Map<String, String> IMAGE_EXTENSIONS = new HashMap<>();
 
-    static {
+    static
+    {
         IMAGE_EXTENSIONS.put("image/png", "png");
         IMAGE_EXTENSIONS.put("image/jpeg", "jpg");
         IMAGE_EXTENSIONS.put("image/jpg", "jpg");
@@ -40,28 +41,32 @@ public class UserAvatarUploadServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
+        if(session == null || session.getAttribute("user_id") == null)
+        {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not logged in");
             return;
         }
 
         Part avatarPart = request.getPart("avatar");
-        if (avatarPart == null || avatarPart.getSize() == 0) {
+        if(avatarPart == null || avatarPart.getSize() == 0)
+        {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No file uploaded");
             return;
         }
 
         String contentType = avatarPart.getContentType();
-        if (contentType == null || !IMAGE_EXTENSIONS.containsKey(contentType.toLowerCase())) {
+        if(contentType == null || !IMAGE_EXTENSIONS.containsKey(contentType.toLowerCase()))
+        {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unsupported image type");
             return;
         }
 
         long size = avatarPart.getSize();
-        if (size > 2L * 1024L * 1024L) {
+        if(size > 2L * 1024L * 1024L)
+        {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File exceeds 2MB limit");
             return;
         }
@@ -71,39 +76,51 @@ public class UserAvatarUploadServlet extends HttpServlet {
         String fileName = "user-" + userId + "-" + System.currentTimeMillis() + "." + extension;
 
         String uploadDirPath = getServletContext().getRealPath("/uploads/avatars");
-        if (uploadDirPath == null) {
+        if(uploadDirPath == null)
+        {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Upload path unavailable");
             return;
         }
 
         File uploadDir = new File(uploadDirPath);
-        if (!uploadDir.exists() && !uploadDir.mkdirs()) {
+        if(!uploadDir.exists() && !uploadDir.mkdirs())
+        {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to create upload directory");
             return;
         }
 
         File destination = new File(uploadDir, fileName);
-        try (InputStream input = avatarPart.getInputStream()) {
+        try(InputStream input = avatarPart.getInputStream())
+        {
             Files.copy(input, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
 
         String avatarUrl = request.getContextPath() + "/uploads/avatars/" + fileName;
         UserDAO userDAO = new UserDAOImpl();
 
-        try {
+        try
+        {
             Map<String, String> profile = userDAO.findUserProfileById(userId);
-            String username = profile != null ? profile.get("username") : null;
-            if (username == null || username.isBlank()) {
+            String username = profile != null
+                              ? profile.get("username")
+                              : null;
+            if(username == null || username.isBlank())
+            {
                 username = "Player" + userId;
             }
-            String email = profile != null ? profile.get("email") : null;
-            if (email == null || email.isBlank()) {
+            String email = profile != null
+                           ? profile.get("email")
+                           : null;
+            if(email == null || email.isBlank())
+            {
                 Files.deleteIfExists(destination.toPath());
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "User email not found; cannot update avatar");
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "User email not found; cannot update avatar");
                 return;
             }
             userDAO.updateUserProfile(userId, username, email, avatarUrl);
-        } catch (SQLException ex) {
+        } catch(SQLException ex)
+        {
             Files.deleteIfExists(destination.toPath());
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
             return;
@@ -116,7 +133,8 @@ public class UserAvatarUploadServlet extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try(PrintWriter out = response.getWriter())
+        {
             out.write(result.toString());
         }
     }

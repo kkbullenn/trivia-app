@@ -26,18 +26,19 @@ public interface UserDAO {
      * Create a new user with given username, email and password.
      */
     boolean createUser(String username, String email, String password, int roleId) throws SQLException;
-    
+
     /**
      *
      * Return the User_ID for the given email
-     * */
+     *
+     */
     int findUserIdByEmail(String email) throws SQLException;
 
     /**
      * Locate a user id by username.
      */
     int findUserIdByUsername(String username) throws SQLException;
-    
+
     /**
      * Return user role ID for the given user ID
      */

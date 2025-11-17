@@ -18,10 +18,12 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException, ServletException
+    {
 
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
+        if(session == null || session.getAttribute("user_id") == null)
+        {
             response.sendRedirect("login");
             return;
         }

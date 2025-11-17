@@ -9,8 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Handles requests to the application root and redirects users to the correct entry point
- * based on their session state:
+ * Handles requests to the application root and redirects users to the correct entry point based on their session
+ * state:
  * <ul>
  *   <li>Unauthenticated users are sent to the login page.</li>
  *   <li>Authenticated admins are sent to the admin landing page.</li>
@@ -22,8 +22,8 @@ import jakarta.servlet.http.HttpSession;
 public class RootRedirectServlet extends HttpServlet {
 
     /**
-     * Handles GET requests to the application root and redirects users to the correct
-     * entry point based on their session state.
+     * Handles GET requests to the application root and redirects users to the correct entry point based on their
+     * session state.
      *
      * @param request  The HttpServletRequest object
      * @param response The HttpServletResponse object
@@ -31,8 +31,7 @@ public class RootRedirectServlet extends HttpServlet {
      * @throws ServletException If a servlet error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         HttpSession session = request.getSession(false);
         String contextPath = request.getContextPath();

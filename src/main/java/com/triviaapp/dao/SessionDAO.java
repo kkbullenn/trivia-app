@@ -7,13 +7,9 @@ import java.util.Map;
 
 /**
  * Data access for the `sessions` and `session_participants` tables.
- *
- * Provides CRUD and query operations:
- * - fetch a single session by id
- * - fetch sessions by host
- * - list active sessions summary with current participant counts
- * - list participants for a session
- * - join and leave participant operations
+ * <p>
+ * Provides CRUD and query operations: - fetch a single session by id - fetch sessions by host - list active sessions
+ * summary with current participant counts - list participants for a session - join and leave participant operations
  *
  * @author Haven Zhang
  * @author Brownie Tran
@@ -32,16 +28,10 @@ public interface SessionDAO {
     List<Map<String, String>> findSessionsByHost(int hostUserId) throws SQLException;
 
     /**
-     * Create a session row.
-     * Returns true when insertion succeeded.
+     * Create a session row. Returns true when insertion succeeded.
      */
-    boolean createSession(int hostUserId,
-                          String sessionName,
-                          Integer categoryId,
-                          Integer maxParticipants,
-                          String status,
-                          Timestamp startAt,
-                          Timestamp endAt) throws SQLException;
+    boolean createSession(int hostUserId, String sessionName, Integer categoryId, Integer maxParticipants,
+                          String status, Timestamp startAt, Timestamp endAt) throws SQLException;
 
     /**
      * Update the session status. Returns true if a row was updated.
@@ -54,39 +44,37 @@ public interface SessionDAO {
     boolean deleteSession(int sessionId) throws SQLException;
 
     /**
-     * Set status='completed' and end_at = CURRENT_TIMESTAMP when session is ended.
-     * Returns true if the session was transitioned.
+     * Set status='completed' and end_at = CURRENT_TIMESTAMP when session is ended. Returns true if the session was
+     * transitioned.
      */
     boolean endSessionNow(int sessionId) throws SQLException;
 
     /**
-     * Return a summary list for active sessions. Each map contains:
-     * session_id, session_name, host_user_id, max_participants, status, current_participants.
-     * When {@code categoryId} is non-null, only sessions from that category are returned.
+     * Return a summary list for active sessions. Each map contains: session_id, session_name, host_user_id,
+     * max_participants, status, current_participants. When {@code categoryId} is non-null, only sessions from that
+     * category are returned.
      */
     List<Map<String, String>> listActiveSessionsSummary(Integer categoryId) throws SQLException;
 
     /**
-     * Return participants for a session. Each map contains:
-     * participant_id, username, joined_at, left_at, status
+     * Return participants for a session. Each map contains: participant_id, username, joined_at, left_at, status
      */
     List<Map<String, String>> findParticipantsBySession(int sessionId) throws SQLException;
 
     /**
-     * Insert or refresh a participant row marking the user as joined.
-     * Returns true when the insert/update affected rows.
+     * Insert or refresh a participant row marking the user as joined. Returns true when the insert/update affected
+     * rows.
      */
     boolean joinSession(int sessionId, int participantId) throws SQLException;
 
     /**
-     * Mark a participant as left (sets left_at and status='left').
-     * Returns true when a joined row was updated.
+     * Mark a participant as left (sets left_at and status='left'). Returns true when a joined row was updated.
      */
     boolean leaveSession(int sessionId, int participantId) throws SQLException;
 
     /**
-     * Insert all question IDs from a category into session_questions for the given session.
-     * This operation is idempotent from the caller's perspective (DAO may delete existing rows first).
+     * Insert all question IDs from a category into session_questions for the given session. This operation is
+     * idempotent from the caller's perspective (DAO may delete existing rows first).
      */
     boolean insertAllQuestionsForSession(int sessionId, int categoryId) throws SQLException;
 
@@ -111,8 +99,8 @@ public interface SessionDAO {
     Integer incrementAndGetCurrentIndex(int sessionId) throws SQLException;
 
     /**
-     * Atomically decrement current_index and return the new value. Returns null if session not found
-     * or cannot be decremented (e.g. already at 0).
+     * Atomically decrement current_index and return the new value. Returns null if session not found or cannot be
+     * decremented (e.g. already at 0).
      */
     Integer decrementAndGetCurrentIndex(int sessionId) throws SQLException;
 

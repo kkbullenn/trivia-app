@@ -21,9 +21,8 @@ public interface UserStatsDAO {
     int countWins(int userId) throws SQLException;
 
     /**
-     * Returns the category in which the user earned the highest total score.
-     * The map contains keys: category_id, category_name, total_score.
-     * Returns {@code null} when no scored categories exist for the user.
+     * Returns the category in which the user earned the highest total score. The map contains keys: category_id,
+     * category_name, total_score. Returns {@code null} when no scored categories exist for the user.
      */
     Map<String, String> findTopCategoryByScore(int userId) throws SQLException;
 }

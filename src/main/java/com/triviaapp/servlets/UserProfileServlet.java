@@ -28,75 +28,94 @@ public class UserProfileServlet extends HttpServlet {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
         HttpSession session = SessionUtils.requireSession(request, response);
-        if (session == null) {
+        if(session == null)
+        {
             return;
         }
 
         int userId = (Integer) session.getAttribute("user_id");
         UserDAO userDAO = new UserDAOImpl();
 
-        try {
+        try
+        {
             Map<String, String> profile = userDAO.findUserProfileById(userId);
             String username = profile != null && profile.get("username") != null
-                    ? profile.get("username")
-                    : "Player" + userId;
-            if (username.isBlank()) {
+                              ? profile.get("username")
+                              : "Player" + userId;
+            if(username.isBlank())
+            {
                 username = "Player" + userId;
             }
 
-            String email = profile != null ? profile.get("email") : null;
-            String storedAvatar = profile != null ? profile.get("avatar_url") : null;
+            String email = profile != null
+                           ? profile.get("email")
+                           : null;
+            String storedAvatar = profile != null
+                                  ? profile.get("avatar_url")
+                                  : null;
             boolean usingDefault = storedAvatar == null || storedAvatar.isBlank();
-            String avatarUrl = usingDefault ? buildAvatarUrl(username) : storedAvatar;
+            String avatarUrl = usingDefault
+                               ? buildAvatarUrl(username)
+                               : storedAvatar;
 
             JSONObject payload = new JSONObject();
             payload.put("username", username);
-            if (email != null) {
+            if(email != null)
+            {
                 payload.put("email", email);
             }
             payload.put("avatar_url", avatarUrl);
             payload.put("using_default", usingDefault);
 
             writeJsonResponse(response, payload);
-        } catch (SQLException ex) {
+        } catch(SQLException ex)
+        {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
         HttpSession session = SessionUtils.requireSession(request, response);
-        if (session == null) {
+        if(session == null)
+        {
             return;
         }
 
         JSONObject payload = RequestUtils.readJsonPayload(request, response);
-        if (payload == null) {
+        if(payload == null)
+        {
             return;
         }
 
         String username = payload.optString("username", "").trim();
         String email = payload.optString("email", "").trim();
-        String avatarUrl = payload.has("avatar_url") ? payload.optString("avatar_url", null) : null;
-        if (avatarUrl != null) {
+        String avatarUrl = payload.has("avatar_url")
+                           ? payload.optString("avatar_url", null)
+                           : null;
+        if(avatarUrl != null)
+        {
             avatarUrl = avatarUrl.trim();
         }
 
-        if (username.isEmpty()) {
+        if(username.isEmpty())
+        {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username is required");
             return;
         }
 
-        if (email.isEmpty()) {
+        if(email.isEmpty())
+        {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email is required");
             return;
         }
 
-        if (!EMAIL_PATTERN.matcher(email).matches()) {
+        if(!EMAIL_PATTERN.matcher(email).matches())
+        {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             JSONObject error = new JSONObject();
             error.put("success", false);
@@ -105,13 +124,16 @@ public class UserProfileServlet extends HttpServlet {
             return;
         }
 
-        if (avatarUrl != null && !avatarUrl.isEmpty()) {
+        if(avatarUrl != null && !avatarUrl.isEmpty())
+        {
             String contextPath = request.getContextPath();
             boolean isHttp = avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://");
-            boolean isContextRelative = contextPath != null && !contextPath.isEmpty() && avatarUrl.startsWith(contextPath + "/");
+            boolean isContextRelative =
+                    contextPath != null && !contextPath.isEmpty() && avatarUrl.startsWith(contextPath + "/");
             boolean isRootRelative = avatarUrl.startsWith("/");
 
-            if (!isHttp && !isContextRelative && !isRootRelative) {
+            if(!isHttp && !isContextRelative && !isRootRelative)
+            {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 JSONObject error = new JSONObject();
                 error.put("success", false);
@@ -120,18 +142,22 @@ public class UserProfileServlet extends HttpServlet {
                 return;
             }
 
-            if (isRootRelative && !isContextRelative && contextPath != null && !contextPath.isEmpty()) {
+            if(isRootRelative && !isContextRelative && contextPath != null && !contextPath.isEmpty())
+            {
                 avatarUrl = contextPath + avatarUrl;
             }
-        } else {
+        } else
+        {
             avatarUrl = null;
         }
 
         int userId = (Integer) session.getAttribute("user_id");
         UserDAO userDAO = new UserDAOImpl();
 
-        try {
-            if (userDAO.isUsernameTaken(username, userId)) {
+        try
+        {
+            if(userDAO.isUsernameTaken(username, userId))
+            {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 JSONObject error = new JSONObject();
                 error.put("success", false);
@@ -140,7 +166,8 @@ public class UserProfileServlet extends HttpServlet {
                 return;
             }
 
-            if (userDAO.isEmailTaken(email, userId)) {
+            if(userDAO.isEmailTaken(email, userId))
+            {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 JSONObject error = new JSONObject();
                 error.put("success", false);
@@ -150,13 +177,16 @@ public class UserProfileServlet extends HttpServlet {
             }
 
             boolean updated = userDAO.updateUserProfile(userId, username, email, avatarUrl);
-            if (!updated) {
+            if(!updated)
+            {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update profile");
                 return;
             }
 
             boolean usingDefault = avatarUrl == null;
-            String resolvedAvatar = usingDefault ? buildAvatarUrl(username) : avatarUrl;
+            String resolvedAvatar = usingDefault
+                                    ? buildAvatarUrl(username)
+                                    : avatarUrl;
             JSONObject result = new JSONObject();
             result.put("success", true);
             result.put("username", username);
@@ -165,23 +195,29 @@ public class UserProfileServlet extends HttpServlet {
             result.put("using_default", usingDefault);
 
             writeJsonResponse(response, result);
-        } catch (SQLException ex) {
+        } catch(SQLException ex)
+        {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
         }
     }
 
-    private void writeJsonResponse(HttpServletResponse response, JSONObject json)
-            throws IOException {
+    private void writeJsonResponse(HttpServletResponse response, JSONObject json) throws IOException
+    {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try(PrintWriter out = response.getWriter())
+        {
             out.write(json.toString());
         }
     }
 
-    private String buildAvatarUrl(String username) {
-        String seed = username == null ? "player" : username.trim();
-        if (seed.isEmpty()) {
+    private String buildAvatarUrl(String username)
+    {
+        String seed = username == null
+                      ? "player"
+                      : username.trim();
+        if(seed.isEmpty())
+        {
             seed = "player";
         }
         String encoded = URLEncoder.encode(seed, StandardCharsets.UTF_8);
