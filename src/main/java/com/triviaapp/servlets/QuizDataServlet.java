@@ -137,6 +137,7 @@ public class QuizDataServlet extends HttpServlet {
 
             JSONObject question = new JSONObject();
             question.put("question_number", currentIndex);
+            question.put("question_id", questionId);
             question.put("total_questions", totalQuestions);
             question.put("category_name", categoryName);
             QuestionJsonUtils.putQuestionContent(question, questionData);

@@ -10,10 +10,9 @@
         <url-pattern>/whisper</url-pattern>
     </servlet-mapping>
 
-    <!-- Strictly for audio transcribing  -->
     <servlet-mapping>
         <servlet-name>WhisperServlet</servlet-name>
-        <url-pattern>/whisper/transcribe</url-pattern>
+        <url-pattern>/whisper/transcribe-answer</url-pattern>
     </servlet-mapping>
 
     <!-- Moondream transription -->
@@ -171,18 +170,6 @@
     <servlet-mapping>
         <servlet-name>CreateQuizServlet</servlet-name>
         <url-pattern>/create-quiz</url-pattern>
-    </servlet-mapping>
-
-    <!-- Whisper AI Server Routes End -->
-    <servlet>
-        <servlet-name>WhisperAnswerCheckerServlet</servlet-name>
-        <servlet-class>com.triviaapp.servlets.WhisperAnswerCheckerServlet</servlet-class>
-    </servlet>
-
-    <!-- Audio transcribing to see if vocal answer is correct -->
-    <servlet-mapping>
-        <servlet-name>WhisperAnswerCheckerServlet</servlet-name>
-        <url-pattern>/whisper/transcribe-answer</url-pattern>
     </servlet-mapping>
 
     <!-- Category Lobbies Servlets -->

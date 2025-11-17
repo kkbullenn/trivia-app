@@ -33,6 +33,7 @@
                class="rounded-lg border border-yellow-300/30 bg-blue-900/70 p-4 text-yellow-100 min-h-[84px] overflow-y-auto">
             Loading question...
           </div>
+            <input hidden type="hidden" id="questionId" name="questionId" />
           <span id="questionMeta" class="text-sm text-yellow-200 hidden"></span>
         </div>
       </section>
@@ -95,6 +96,7 @@
     const nextButton = document.getElementById('nextButton');
     const backIcon = document.getElementById('backIcon');
     const exitIcon = document.getElementById('exitIcon');
+    const questionId = document.getElementById('questionId')
 
     let socket = null;
     let lobbyId = null;
@@ -261,6 +263,8 @@
       const answers = normalizeAnswers(payload.answers_option);
       answersContainer.innerHTML = '';
       selectedAnswerKey = null;
+
+        questionId.value = payload.question_id;
       if (!answers.length) {
         const empty = document.createElement('div');
         empty.className = 'rounded border border-slate-700 bg-slate-800/60 p-3 text-sm text-slate-300';
@@ -433,6 +437,7 @@
           switch (data.type) {
             case 'question':
               renderQuestion({
+                  question_id: data.question_id,
                 question_number: data.index,
                 category_name: data.category_name,
                 question_text: data.question_text,
@@ -561,5 +566,7 @@
     loadInitialQuestion();
   })();
 </script>
+<script type="module" src="./internal/scripts/transcription.js"></script>
+<script type="module" src="./internal/components/toast/toast.js"></script>
 </body>
 </html>

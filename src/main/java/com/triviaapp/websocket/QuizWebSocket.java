@@ -297,6 +297,15 @@ public class QuizWebSocket {
             JSONObject payload = new JSONObject();
             payload.put("type", "question");
             payload.put("index", questionIndex);
+            payload.put("question_id", questionId);
+            payload.put("category_name",
+                    CATEGORY_DAO.findCategoryNameById(
+                            Integer.parseInt(qData.get("category_id"))));
+            payload.put("question_text", qData.get("question_text"));
+            payload.put("answers_option", qData.get("answers_option"));
+            payload.put("answers_key", qData.get("answers_key"));
+            payload.put("points", qData.get("points"));
+            payload.put("youtube_url", qData.get("youtube_url"));
             payload.put("category_name", CATEGORY_DAO.findCategoryNameById(Integer.parseInt(qData.get("category_id"))));
             QuestionJsonUtils.putQuestionContent(payload, qData);
             payload.put("total_questions", questionIds.size());
