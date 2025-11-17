@@ -18,419 +18,417 @@
 </head>
 
 <body class="font-mono bg-blue-900">
-<div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between items-center">
-  <form action="USER" method="GET">
-    <button id="UserButton" type="submit" class="flex items-center space-x-3 text-left">
-      <img id="userAvatar" src="" alt="User avatar"
-           class="h-10 w-10 rounded-full border-2 border-yellow-300 bg-blue-800 object-cover"/>
-      <span class="flex flex-col leading-tight">
-        <span id="welcomeLabel" class="text-sm text-yellow-200">Welcome,</span>
-        <span class="font-bold text-yellow-400" id="username">User</span>
-      </span>
-    </button>
-  </form>
-  <form action="EXIT" method="POST">
-    <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g id="SVGRepo_iconCarrier">
-          <path
-                  d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          </path>
-          <path d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"></path>
-        </g>
-      </svg>
-    </button>
-  </form>
-</div>
-<div class="px-4">
-  <div class="py-5 font-bold text-2xl text-yellow-400 text-center">Categories</div>
-  <form action="category-lobbies" method="GET">
-    <div class="py-1 flex flex-col items-center">
-      <div id="category" class="grid grid-cols-3 gap-5">
+  <div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between items-center">
+    <form action="USER" method="GET">
+      <button id="UserButton" type="submit" class="flex items-center space-x-3 text-left">
+        <img id="userAvatar" src="" alt="User avatar"
+          class="h-10 w-10 rounded-full border-2 border-yellow-300 bg-blue-800 object-cover" />
+        <span class="flex flex-col leading-tight">
+          <span id="welcomeLabel" class="text-sm text-yellow-200">Welcome,</span>
+          <span class="font-bold text-yellow-400" id="username">User</span>
+        </span>
+      </button>
+    </form>
+    <form action="EXIT" method="POST">
+      <button id="ExitButton" type="submit" class="p-0 bg-transparent border-0">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            </path>
+            <path d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"></path>
+          </g>
+        </svg>
+      </button>
+    </form>
+  </div>
+  <div class="px-4">
+    <div class="py-5 font-bold text-2xl text-yellow-400 text-center">Categories</div>
+    <form action="category-lobbies" method="GET">
+      <div class="py-1 flex flex-col items-center">
+        <div id="category" class="grid grid-cols-3 gap-5">
+        </div>
       </div>
-    </div>
-  </form>
-  <div class="py-5 font-bold text-2xl text-yellow-400 text-center">My Quizzes</div>
-  <div id="MyQuizzes" class="flex flex-col w-full space-y-4">
-
-    <template id="quizTpl">
-      <form action="join-quiz" method="POST" class="w-full">
-        <input type="hidden" name="lobby_id" class="lobby-id" value="">
-        <button type="submit"
-                class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 focus:outline-none">
-          <span class="flex flex-col text-left">
-            <span class="font-bold text-yellow-400 quiz-name">My Quiz</span>
-            <span class="flex flex-row text-yellow-300">
-              Category:
-              <span class="ml-1 quiz-category">Action</span>
+    </form>
+    <div class="py-5 font-bold text-2xl text-yellow-400 text-center">My Quizzes</div>
+    <div id="MyQuizzes" class="flex flex-col w-full space-y-4">
+      <template id="quizTpl">
+        <form action="join-quiz" method="POST" class="w-full">
+          <input type="hidden" name="lobby_id" class="lobby-id" value="">
+          <button type="submit"
+            class="flex items-center justify-between w-full px-4 py-4 text-lg rounded-lg bg-blue-950 focus:outline-none">
+            <span class="flex flex-col text-left">
+              <span class="font-bold text-yellow-400 quiz-name">My Quiz</span>
+              <span class="flex flex-row text-yellow-300">
+                Category:
+                <span class="ml-1 quiz-category">Action</span>
+              </span>
             </span>
-          </span>
 
-          <span class="flex-shrink-0">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                 xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+            <span class="flex-shrink-0">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                stroke="#ffffff">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path
+                    d="M4 6H20L18.4199 20.2209C18.3074 21.2337 17.4512 22 16.4321 22H7.56786C6.54876 22 5.69264 21.2337 5.5801 20.2209L4 6Z"
+                    stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path
+                    d="M7.34491 3.14716C7.67506 2.44685 8.37973 2 9.15396 2H14.846C15.6203 2 16.3249 2.44685 16.6551 3.14716L18 6H6L7.34491 3.14716Z"
+                    stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M2 6H22" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  </path>
+                  <path d="M10 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  </path>
+                  <path d="M14 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  </path>
+                </g>
+              </svg>
+            </span>
+          </button>
+        </form>
+      </template>
+
+      <template id="createQuizTpl">
+        <a href="create-quiz" onclick="return checkAdminAccess(event)">
+          <div class="flex items-center justify-center w-full px-4 py-4 text-lg rounded-lg bg-blue-950
+        hover:bg-blue-900">
+            <svg class="w-6 h-6 text-yellow-400" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor">
               <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
               <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
               <g id="SVGRepo_iconCarrier">
-                <path
-                        d="M4 6H20L18.4199 20.2209C18.3074 21.2337 17.4512 22 16.4321 22H7.56786C6.54876 22 5.69264 21.2337 5.5801 20.2209L4 6Z"
-                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round"></path>
-                <path
-                        d="M7.34491 3.14716C7.67506 2.44685 8.37973 2 9.15396 2H14.846C15.6203 2 16.3249 2.44685 16.6551 3.14716L18 6H6L7.34491 3.14716Z"
-                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round"></path>
-                <path d="M2 6H22" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                      stroke-linejoin="round"></path>
-                <path d="M10 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                      stroke-linejoin="round"></path>
-                <path d="M14 11V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                      stroke-linejoin="round"></path>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                  <g id="Icon-Set" transform="translate(-464.000000, -1087.000000)" fill="currentColor">
+                    <path
+                      d="M480,1117 C472.268,1117 466,1110.73 466,1103 C466,1095.27 472.268,1089 480,1089 C487.732,1089 494,1095.27 494,1103 C494,1110.73 487.732,1117 480,1117 L480,1117 Z M480,1087 C471.163,1087 464,1094.16 464,1103 C464,1111.84 471.163,1119 480,1119 C488.837,1119 496,1111.84 496,1103 C496,1094.16 488.837,1087 480,1087 L480,1087 Z M486,1102 L481,1102 L481,1097 C481,1096.45 480.553,1096 480,1096 C479.447,1096 479,1096.45 479,1097 L479,1102 L474,1102 C473.447,1102 473,1102.45 473,1103 C473,1103.55 473.447,1104 474,1104 L479,1104 L479,1109 C479,1109.55 479.447,1110 480,1110 C480.553,1110 481,1109.55 481,1109 L481,1104 L486,1104 C486.553,1104 487,1103.55 487,1103 C487,1102.45 486.553,1102 486,1102 L486,1102 Z"
+                      id="plus-circle"></path>
+                  </g>
+                </g>
               </g>
             </svg>
-          </span>
+          </div>
+        </a>
+      </template>
+    </div>
+
+    <template id="categoryTpl">
+      <form action="join-category" method="POST" class="w-full">
+        <input type="hidden" name="category_id" class="category-id" value="">
+        <button type="submit"
+          class="w-full bg-blue-950 text-yellow-300 rounded-lg p-6 shadow hover:bg-blue-900 focus:outline-none">
+          <span class="category-name"></span>
         </button>
       </form>
     </template>
-
-    <template id="createQuizTpl">
-      <a href="create-quiz" onclick="return checkAdminAccess(event)">
-        <div class="flex items-center justify-center w-full px-4 py-4 text-lg rounded-lg bg-blue-950">
-          <svg class="w-6 h-6" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-            <g id="SVGRepo_iconCarrier">
-              <defs></defs>
-              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Icon-Set"
-                   transform="translate(-464.000000, -1087.000000)" fill="#000000">
-                  <path
-                          d="M480,1117 C472.268,1117 466,1110.73 466,1103 C466,1095.27 472.268,1089 480,1089 C487.732,1089 494,1095.27 494,1103 C494,1110.73 487.732,1117 480,1117 L480,1117 Z M480,1087 C471.163,1087 464,1094.16 464,1103 C464,1111.84 471.163,1119 480,1119 C488.837,1119 496,1111.84 496,1103 C496,1094.16 488.837,1087 480,1087 L480,1087 Z M486,1102 L481,1102 L481,1097 C481,1096.45 480.553,1096 480,1096 C479.447,1096 479,1096.45 479,1097 L479,1102 L474,1102 C473.447,1102 473,1102.45 473,1103 C473,1103.55 473.447,1104 474,1104 L479,1104 L479,1109 C479,1109.55 479.447,1110 480,1110 C480.553,1110 481,1109.55 481,1109 L481,1104 L486,1104 C486.553,1104 487,1103.55 487,1103 C487,1102.45 486.553,1102 486,1102 L486,1102 Z"
-                          id="plus-circle"></path>
-                </g>
-              </g>
-            </g>
-          </svg>
-        </div>
-      </a>
-    </template>
   </div>
 
-  <template id="categoryTpl">
-    <form action="join-category" method="POST" class="w-full">
-      <input type="hidden" name="category_id" class="category-id" value="">
-      <button type="submit"
-              class="w-full bg-blue-950 text-yellow-300 rounded-lg p-6 shadow hover:bg-blue-900 focus:outline-none">
-        <span class="category-name"></span>
-      </button>
-    </form>
-  </template>
-</div>
+  <script>
+    // Store admin status for reuse
+    let isAdmin = false;
+    let latestMainData = null;
 
-<script>
-  // Store admin status for reuse
-  let isAdmin = false;
-  let latestMainData = null;
-
-  // Helper function to get context path
-  function getContextPath() {
-    const pathParts = window.location.pathname.split('/');
-    pathParts.pop();
-    return pathParts.join('/') || '';
-  }
-
-  // Helper function to show error messages
-  function showUnauthorizedError(message) {
-    const existingError = document.querySelector('.unauthorized-error');
-    if (existingError) existingError.remove();
-    
-    const errorMsg = document.createElement('div');
-    errorMsg.className = 'unauthorized-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center';
-    errorMsg.textContent = message || 'You do not have permission to access this feature.';
-    
-    const container = document.querySelector('.px-4');
-    if (container) {
-      container.insertBefore(errorMsg, container.firstChild);
-      setTimeout(() => errorMsg.remove(), 5000);
-    }
-  }
-
-  (async function () {
-    const contextPath = getContextPath();
-    const welcomeLabel = document.getElementById('welcomeLabel');
-    const usernameDisplay = document.getElementById('username');
-    const avatarEl = document.getElementById('userAvatar');
-    const catContainer = document.getElementById('category');
-    const catTpl = document.getElementById('categoryTpl');
-    const quizContainer = document.getElementById('MyQuizzes');
-    const quizTpl = document.getElementById('quizTpl');
-    const createTpl = document.getElementById('createQuizTpl');
-
-    // Check for error messages in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error') || urlParams.get('unauthorized');
-    if (error) {
-      showUnauthorizedError(error);
-      window.history.replaceState({}, document.title, window.location.pathname);
+    // Helper function to get context path
+    function getContextPath() {
+      const pathParts = window.location.pathname.split('/');
+      pathParts.pop();
+      return pathParts.join('/') || '';
     }
 
-    const SESSION_CACHE_KEY = 'triviaUserData';
-    const MAIN_CACHE_KEY = 'triviaMainData';
-    const MAIN_CACHE_TTL = 2 * 60 * 1000;
+    // Helper function to show error messages
+    function showUnauthorizedError(message) {
+      const existingError = document.querySelector('.unauthorized-error');
+      if (existingError) existingError.remove();
 
-    const getCachedUserData = () => {
-      try {
-        const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
-        if (!raw) return null;
-        const stored = JSON.parse(raw);
-        if (!stored || !stored.data) return null;
-        const maxAgeMs = 5 * 60 * 1000;
-        if (stored.timestamp && Date.now() - stored.timestamp <= maxAgeMs) {
-          return stored.data;
-        }
-        sessionStorage.removeItem(SESSION_CACHE_KEY);
-      } catch (err) {
-        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'unauthorized-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center';
+      errorMsg.textContent = message || 'You do not have permission to access this feature.';
+
+      const container = document.querySelector('.px-4');
+      if (container) {
+        container.insertBefore(errorMsg, container.firstChild);
+        setTimeout(() => errorMsg.remove(), 5000);
       }
-      return null;
-    };
+    }
 
-    const setCachedUserData = (data) => {
-      try {
-        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({
-          timestamp: Date.now(),
-          data
-        }));
-      } catch (err) {
-        sessionStorage.removeItem(SESSION_CACHE_KEY);
+    (async function () {
+      const contextPath = getContextPath();
+      const welcomeLabel = document.getElementById('welcomeLabel');
+      const usernameDisplay = document.getElementById('username');
+      const avatarEl = document.getElementById('userAvatar');
+      const catContainer = document.getElementById('category');
+      const catTpl = document.getElementById('categoryTpl');
+      const quizContainer = document.getElementById('MyQuizzes');
+      const quizTpl = document.getElementById('quizTpl');
+      const createTpl = document.getElementById('createQuizTpl');
+
+      // Check for error messages in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const error = urlParams.get('error') || urlParams.get('unauthorized');
+      if (error) {
+        showUnauthorizedError(error);
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
-    };
 
-    const buildIdenticon = (seed) => {
-      const value = seed && seed.trim() ? seed.trim() : 'player';
-      return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
-    };
+      const SESSION_CACHE_KEY = 'triviaUserData';
+      const MAIN_CACHE_KEY = 'triviaMainData';
+      const MAIN_CACHE_TTL = 2 * 60 * 1000;
 
-    const getCachedMainData = () => {
-      try {
-        const raw = sessionStorage.getItem(MAIN_CACHE_KEY);
-        if (!raw) return null;
-        const stored = JSON.parse(raw);
-        if (!stored || !stored.data) return null;
-        if (stored.timestamp && Date.now() - stored.timestamp <= MAIN_CACHE_TTL) {
-          return stored.data;
-        }
-        sessionStorage.removeItem(MAIN_CACHE_KEY);
-      } catch (err) {
-        sessionStorage.removeItem(MAIN_CACHE_KEY);
-      }
-      return null;
-    };
-
-    const setCachedMainData = (data) => {
-      try {
-        sessionStorage.setItem(MAIN_CACHE_KEY, JSON.stringify({
-          timestamp: Date.now(),
-          data
-        }));
-      } catch (err) {
-        sessionStorage.removeItem(MAIN_CACHE_KEY);
-      }
-    };
-
-    const mergeCachedMainData = (partial) => {
-      if (!partial || typeof partial !== 'object') return;
-      const existing = getCachedMainData();
-      const merged = existing ? { ...existing, ...partial } : { ...partial };
-      setCachedMainData(merged);
-    };
-
-    const renderCategories = (categories) => {
-      if (!catContainer || !catTpl) return;
-      catContainer.innerHTML = '';
-      if (!Array.isArray(categories) || !categories.length) {
-        const empty = document.createElement('div');
-        empty.className = 'text-center text-yellow-300 col-span-3';
-        empty.textContent = 'No categories available';
-        catContainer.appendChild(empty);
-        return;
-      }
-      categories.forEach(cat => {
-        const node = catTpl.content.cloneNode(true);
-        const catIdInput = node.querySelector('.category-id');
-        if (catIdInput) catIdInput.value = String(cat.id ?? '');
-        const nameEl = node.querySelector('.category-name');
-        if (nameEl) nameEl.textContent = cat.name ?? String(cat);
-        const formEl = node.querySelector('form');
-        if (formEl) formEl.action = `${contextPath}/join-category`;
-        catContainer.appendChild(node);
-      });
-    };
-
-    const renderQuizzes = (quizzes, adminFlag) => {
-      if (!quizContainer || !quizTpl) return;
-      quizContainer.innerHTML = '';
-
-      if (!Array.isArray(quizzes) || !quizzes.length) {
-        const empty = document.createElement('div');
-        empty.className = 'text-center text-yellow-300';
-        empty.textContent = 'No quizzes yet';
-        quizContainer.appendChild(empty);
-      } else {
-        quizzes.forEach(q => {
-          const node = quizTpl.content.cloneNode(true);
-          const lobbyInput = node.querySelector('.lobby-id');
-          if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
-          const quizNameEl = node.querySelector('.quiz-name');
-          if (quizNameEl) quizNameEl.textContent = q.quiz_name ?? 'Untitled';
-          const statusEl = node.querySelector('.quiz-category');
-          const statusText = q.status && q.status !== 'null' ? q.status : '';
-          if (statusEl) statusEl.textContent = statusText ? `Status: ${statusText}` : '';
-          const metaEl = node.querySelector('.quiz-meta');
-          if (metaEl) {
-            const maxParticipants = q.max_participants && q.max_participants !== 'null' ? `Max: ${q.max_participants}` : '';
-            const startAt = q.start_at && q.start_at !== 'null' ? `Start: ${q.start_at}` : '';
-            const endAt = q.end_at && q.end_at !== 'null' ? `End: ${q.end_at}` : '';
-            const metaParts = [maxParticipants, startAt, endAt].filter(Boolean);
-            metaEl.textContent = metaParts.join(' · ');
+      const getCachedUserData = () => {
+        try {
+          const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
+          if (!raw) return null;
+          const stored = JSON.parse(raw);
+          if (!stored || !stored.data) return null;
+          const maxAgeMs = 5 * 60 * 1000;
+          if (stored.timestamp && Date.now() - stored.timestamp <= maxAgeMs) {
+            return stored.data;
           }
-          const formEl = node.querySelector('form');
-          if (formEl) formEl.action = `${contextPath}/join-quiz`;
-          quizContainer.appendChild(node);
-        });
-      }
-
-      if (createTpl && adminFlag) {
-        quizContainer.appendChild(createTpl.content.cloneNode(true));
-      }
-    };
-
-    const applyAvatar = (img, url, seed) => {
-      if (!img) return;
-      const fallback = buildIdenticon(seed);
-      img.dataset.fallbackApplied = 'false';
-      img.onerror = () => {
-        if (img.dataset.fallbackApplied === 'true') return;
-        img.dataset.fallbackApplied = 'true';
-        img.src = fallback;
-      };
-      img.src = url && url.trim() ? url : fallback;
-    };
-
-    const renderUserData = (data) => {
-      const username = data.username || 'Player';
-      const rawRole = data.role_name || 'User';
-      const roleLabel = `${rawRole.charAt(0).toUpperCase()}${rawRole.slice(1).toLowerCase()}`;
-      if (welcomeLabel) {
-        welcomeLabel.textContent = `Welcome, ${roleLabel}:`;
-      }
-      if (usernameDisplay) {
-        usernameDisplay.textContent = username;
-      }
-      if (avatarEl) {
-        applyAvatar(avatarEl, data.avatar_url, username);
-      }
-    };
-
-    const renderMainData = (data, options = {}) => {
-      if (!data) return;
-      latestMainData = data;
-      const adminFlag = options.isAdmin !== undefined ? options.isAdmin : isAdmin;
-      renderCategories(data.categories);
-      renderQuizzes(data.quizzes, adminFlag);
-    };
-
-    const loadUserGreeting = async () => {
-      const cached = getCachedUserData();
-      if (cached) {
-        renderUserData(cached);
-      }
-
-      try {
-        const res = await fetch(`${contextPath}/user/data`, {
-          method: 'GET',
-          credentials: 'same-origin',
-          headers: { 'Accept': 'application/json' }
-        });
-        if (res.status === 401) {
           sessionStorage.removeItem(SESSION_CACHE_KEY);
-          window.location.href = `${contextPath}/login`;
+        } catch (err) {
+          sessionStorage.removeItem(SESSION_CACHE_KEY);
+        }
+        return null;
+      };
+
+      const setCachedUserData = (data) => {
+        try {
+          sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({
+            timestamp: Date.now(),
+            data
+          }));
+        } catch (err) {
+          sessionStorage.removeItem(SESSION_CACHE_KEY);
+        }
+      };
+
+      const buildIdenticon = (seed) => {
+        const value = seed && seed.trim() ? seed.trim() : 'player';
+        return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
+      };
+
+      const getCachedMainData = () => {
+        try {
+          const raw = sessionStorage.getItem(MAIN_CACHE_KEY);
+          if (!raw) return null;
+          const stored = JSON.parse(raw);
+          if (!stored || !stored.data) return null;
+          if (stored.timestamp && Date.now() - stored.timestamp <= MAIN_CACHE_TTL) {
+            return stored.data;
+          }
+          sessionStorage.removeItem(MAIN_CACHE_KEY);
+        } catch (err) {
+          sessionStorage.removeItem(MAIN_CACHE_KEY);
+        }
+        return null;
+      };
+
+      const setCachedMainData = (data) => {
+        try {
+          sessionStorage.setItem(MAIN_CACHE_KEY, JSON.stringify({
+            timestamp: Date.now(),
+            data
+          }));
+        } catch (err) {
+          sessionStorage.removeItem(MAIN_CACHE_KEY);
+        }
+      };
+
+      const mergeCachedMainData = (partial) => {
+        if (!partial || typeof partial !== 'object') return;
+        const existing = getCachedMainData();
+        const merged = existing ? { ...existing, ...partial } : { ...partial };
+        setCachedMainData(merged);
+      };
+
+      const renderCategories = (categories) => {
+        if (!catContainer || !catTpl) return;
+        catContainer.innerHTML = '';
+        if (!Array.isArray(categories) || !categories.length) {
+          const empty = document.createElement('div');
+          empty.className = 'text-center text-yellow-300 col-span-3';
+          empty.textContent = 'No categories available';
+          catContainer.appendChild(empty);
           return;
         }
-        if (!res.ok) throw new Error(`Failed to load user data: ${res.status}`);
-        const data = await res.json();
-        renderUserData(data);
-        setCachedUserData(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    const cachedMain = getCachedMainData();
-    if (cachedMain) {
-      if (typeof cachedMain.isAdmin === 'boolean') {
-        isAdmin = cachedMain.isAdmin;
-      }
-      renderMainData(cachedMain, { isAdmin });
-    }
-
-    const userPromise = loadUserGreeting();
-
-    const adminPromise = (async () => {
-      try {
-        const adminCheck = await fetch(`${contextPath}/admin/data`, {
-          method: 'GET',
-          credentials: 'same-origin',
-          headers: { 'Accept': 'application/json' }
+        categories.forEach(cat => {
+          const node = catTpl.content.cloneNode(true);
+          const catIdInput = node.querySelector('.category-id');
+          if (catIdInput) catIdInput.value = String(cat.id ?? '');
+          const nameEl = node.querySelector('.category-name');
+          if (nameEl) nameEl.textContent = cat.name ?? String(cat);
+          const formEl = node.querySelector('form');
+          if (formEl) formEl.action = `${contextPath}/join-category`;
+          catContainer.appendChild(node);
         });
-        const adminFlag = adminCheck.ok;
-        isAdmin = adminFlag;
-        mergeCachedMainData({ isAdmin: adminFlag });
-        if (latestMainData) {
-          renderQuizzes(latestMainData.quizzes, isAdmin);
+      };
+
+      const renderQuizzes = (quizzes, adminFlag) => {
+        if (!quizContainer || !quizTpl) return;
+        quizContainer.innerHTML = '';
+
+        if (!Array.isArray(quizzes) || !quizzes.length) {
+          const empty = document.createElement('div');
+          empty.className = 'text-center text-yellow-300';
+          empty.textContent = 'No quizzes yet';
+          quizContainer.appendChild(empty);
+        } else {
+          quizzes.forEach(q => {
+            const node = quizTpl.content.cloneNode(true);
+            const lobbyInput = node.querySelector('.lobby-id');
+            if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
+            const quizNameEl = node.querySelector('.quiz-name');
+            if (quizNameEl) quizNameEl.textContent = q.quiz_name ?? 'Untitled';
+            const statusEl = node.querySelector('.quiz-category');
+            const statusText = q.status && q.status !== 'null' ? q.status : '';
+            if (statusEl) statusEl.textContent = statusText ? `Status: ${statusText}` : '';
+            const metaEl = node.querySelector('.quiz-meta');
+            if (metaEl) {
+              const maxParticipants = q.max_participants && q.max_participants !== 'null' ? `Max: ${q.max_participants}` : '';
+              const startAt = q.start_at && q.start_at !== 'null' ? `Start: ${q.start_at}` : '';
+              const endAt = q.end_at && q.end_at !== 'null' ? `End: ${q.end_at}` : '';
+              const metaParts = [maxParticipants, startAt, endAt].filter(Boolean);
+              metaEl.textContent = metaParts.join(' · ');
+            }
+            const formEl = node.querySelector('form');
+            if (formEl) formEl.action = `${contextPath}/join-quiz`;
+            quizContainer.appendChild(node);
+          });
         }
-      } catch (err) {
-        isAdmin = false;
+
+        if (createTpl && adminFlag) {
+          quizContainer.appendChild(createTpl.content.cloneNode(true));
+        }
+      };
+
+      const applyAvatar = (img, url, seed) => {
+        if (!img) return;
+        const fallback = buildIdenticon(seed);
+        img.dataset.fallbackApplied = 'false';
+        img.onerror = () => {
+          if (img.dataset.fallbackApplied === 'true') return;
+          img.dataset.fallbackApplied = 'true';
+          img.src = fallback;
+        };
+        img.src = url && url.trim() ? url : fallback;
+      };
+
+      const renderUserData = (data) => {
+        const username = data.username || 'Player';
+        const rawRole = data.role_name || 'User';
+        const roleLabel = `${rawRole.charAt(0).toUpperCase()}${rawRole.slice(1).toLowerCase()}`;
+        if (welcomeLabel) {
+          welcomeLabel.textContent = `Welcome, ${roleLabel}:`;
+        }
+        if (usernameDisplay) {
+          usernameDisplay.textContent = username;
+        }
+        if (avatarEl) {
+          applyAvatar(avatarEl, data.avatar_url, username);
+        }
+      };
+
+      const renderMainData = (data, options = {}) => {
+        if (!data) return;
+        latestMainData = data;
+        const adminFlag = options.isAdmin !== undefined ? options.isAdmin : isAdmin;
+        renderCategories(data.categories);
+        renderQuizzes(data.quizzes, adminFlag);
+      };
+
+      const loadUserGreeting = async () => {
+        const cached = getCachedUserData();
+        if (cached) {
+          renderUserData(cached);
+        }
+
+        try {
+          const res = await fetch(`${contextPath}/user/data`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+          });
+          if (res.status === 401) {
+            sessionStorage.removeItem(SESSION_CACHE_KEY);
+            window.location.href = `${contextPath}/login`;
+            return;
+          }
+          if (!res.ok) throw new Error(`Failed to load user data: ${res.status}`);
+          const data = await res.json();
+          renderUserData(data);
+          setCachedUserData(data);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      const cachedMain = getCachedMainData();
+      if (cachedMain) {
+        if (typeof cachedMain.isAdmin === 'boolean') {
+          isAdmin = cachedMain.isAdmin;
+        }
+        renderMainData(cachedMain, { isAdmin });
       }
+
+      const userPromise = loadUserGreeting();
+
+      const adminPromise = (async () => {
+        try {
+          const adminCheck = await fetch(`${contextPath}/admin/data`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+          });
+          const adminFlag = adminCheck.ok;
+          isAdmin = adminFlag;
+          mergeCachedMainData({ isAdmin: adminFlag });
+          if (latestMainData) {
+            renderQuizzes(latestMainData.quizzes, isAdmin);
+          }
+        } catch (err) {
+          isAdmin = false;
+        }
+      })();
+
+      const mainDataPromise = (async () => {
+        try {
+          const res = await fetch(`${contextPath}/main/data`, {
+            method: 'GET',
+            headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
+            credentials: 'same-origin'
+          });
+          if (!res.ok) throw new Error('Network error: ' + res.status);
+          const data = await res.json();
+          renderMainData(data, { isAdmin });
+          setCachedMainData({
+            categories: data.categories,
+            quizzes: data.quizzes,
+            isAdmin
+          });
+        } catch (err) {
+          console.error('Failed to load data', err);
+        }
+      })();
+
+      await Promise.allSettled([userPromise, adminPromise, mainDataPromise]);
     })();
 
-    const mainDataPromise = (async () => {
-      try {
-        const res = await fetch(`${contextPath}/main/data`, {
-          method: 'GET',
-          headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
-          credentials: 'same-origin'
-        });
-        if (!res.ok) throw new Error('Network error: ' + res.status);
-        const data = await res.json();
-        renderMainData(data, { isAdmin });
-        setCachedMainData({
-          categories: data.categories,
-          quizzes: data.quizzes,
-          isAdmin
-        });
-      } catch (err) {
-        console.error('Failed to load data', err);
+    // Check admin access before navigating
+    function checkAdminAccess(event) {
+      if (!isAdmin) {
+        event.preventDefault();
+        showUnauthorizedError('Only administrators can create quizzes.');
+        return false;
       }
-    })();
-
-    await Promise.allSettled([userPromise, adminPromise, mainDataPromise]);
-  })();
-
-  // Check admin access before navigating
-  function checkAdminAccess(event) {
-    if (!isAdmin) {
-      event.preventDefault();
-      showUnauthorizedError('Only administrators can create quizzes.');
-      return false;
+      return true;
     }
-    return true;
-  }
-</script>
+  </script>
 </body>
 
 </html>
