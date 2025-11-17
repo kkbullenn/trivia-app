@@ -87,6 +87,8 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
                     + "\"message\": \"Expected 'question_id' and 'file' in multipart/form-data.\""
                     + "}";
             resWriter.write(data);
+            resWriter.flush();
+            resWriter.close();
             return;
         }
 
@@ -122,6 +124,8 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
                     + "\"message\": \"Question could not be transcribed as it does not exist.\""
                     + "}";
             resWriter.write(data);
+            resWriter.flush();
+            resWriter.close();
             return;
         }
 
@@ -139,6 +143,8 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
                     + "\"message\": \"Question didn't have a legible answer.\""
                     + "}";
             resWriter.write(data);
+            resWriter.flush();
+            resWriter.close();
             return;
         }
 
@@ -180,7 +186,7 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
         final double maxProb = probs.stream().max(Double::compareTo).orElseThrow();
 
         if (maxProb + MATCH_RESULT_EPSILON < 0.50) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
@@ -189,6 +195,8 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
                     + "\"message\": \"Could not detect your answer. Please try again.\""
                     + "}";
             resWriter.write(data);
+            resWriter.flush();
+            resWriter.close();
             return;
         }
 
@@ -220,5 +228,7 @@ public class WhisperAnswerCheckerServlet extends HttpServlet {
                 + "\"actualAnswer\": \"" + actualAnswer + "\""
                 + "}";
         resWriter.write(data);
+        resWriter.flush();
+        resWriter.close();
     }
 }

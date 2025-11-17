@@ -91,8 +91,10 @@ async function transcribeAnswer(questionId, audio) {
         const res = await sendMultipartFormData(`${contextPath}/whisper/transcribe-answer`, formData);
 
         return res.playerAnswerKey;
-    } catch (errorMsg) {
-        // user feedback with errorMsg in DOM
+    } catch (error) {
+        const voiceBtn = document.getElementById("voiceButton");
+
+        showPointingToast(voiceBtn, "Could not detect your answer. Please try again.");
     }
 }
 
