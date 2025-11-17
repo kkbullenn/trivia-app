@@ -21,7 +21,8 @@
 <div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between items-center">
   <form action="USER" method="GET">
     <button id="UserButton" type="submit" class="flex items-center space-x-3 text-left">
-      <img id="userAvatar" src="" alt="User avatar" class="h-10 w-10 rounded-full border-2 border-yellow-300 bg-blue-800 object-cover"/>
+      <img id="userAvatar" src="" alt="User avatar"
+           class="h-10 w-10 rounded-full border-2 border-yellow-300 bg-blue-800 object-cover"/>
       <span class="flex flex-col leading-tight">
         <span id="welcomeLabel" class="text-sm text-yellow-200">Welcome,</span>
         <span class="font-bold text-yellow-400" id="username">User</span>
@@ -171,6 +172,36 @@
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
+    const SESSION_CACHE_KEY = 'triviaUserData';
+
+    const getCachedUserData = () => {
+      try {
+        const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (!stored || !stored.data) return null;
+        const maxAgeMs = 5 * 60 * 1000;
+        if (stored.timestamp && Date.now() - stored.timestamp <= maxAgeMs) {
+          return stored.data;
+        }
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+      return null;
+    };
+
+    const setCachedUserData = (data) => {
+      try {
+        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data
+        }));
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+    };
+
     const buildIdenticon = (seed) => {
       const value = seed && seed.trim() ? seed.trim() : 'player';
       return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
@@ -188,7 +219,27 @@
       img.src = url && url.trim() ? url : fallback;
     };
 
+    const renderUserData = (data) => {
+      const username = data.username || 'Player';
+      const rawRole = data.role_name || 'User';
+      const roleLabel = `${rawRole.charAt(0).toUpperCase()}${rawRole.slice(1).toLowerCase()}`;
+      if (welcomeLabel) {
+        welcomeLabel.textContent = `Welcome, ${roleLabel}:`;
+      }
+      if (usernameDisplay) {
+        usernameDisplay.textContent = username;
+      }
+      if (avatarEl) {
+        applyAvatar(avatarEl, data.avatar_url, username);
+      }
+    };
+
     const loadUserGreeting = async () => {
+      const cached = getCachedUserData();
+      if (cached) {
+        renderUserData(cached);
+      }
+
       try {
         const res = await fetch(`${contextPath}/user/data`, {
           method: 'GET',
@@ -196,25 +247,16 @@
           headers: { 'Accept': 'application/json' }
         });
         if (res.status === 401) {
+          sessionStorage.removeItem(SESSION_CACHE_KEY);
           window.location.href = `${contextPath}/login`;
           return;
         }
         if (!res.ok) throw new Error(`Failed to load user data: ${res.status}`);
         const data = await res.json();
-        const username = data.username || 'Player';
-        const rawRole = data.role_name || 'User';
-        const roleLabel = `${rawRole.charAt(0).toUpperCase()}${rawRole.slice(1).toLowerCase()}`;
-        if (welcomeLabel) {
-          welcomeLabel.textContent = `Welcome, ${roleLabel}:`;
-        }
-        if (usernameDisplay) {
-          usernameDisplay.textContent = username;
-        }
-        if (avatarEl) {
-          applyAvatar(avatarEl, data.avatar_url, username);
-        }
+        renderUserData(data);
+        setCachedUserData(data);
       } catch (err) {
-        console.error('Failed to load user profile', err);
+        console.error(err);
       }
     };
 

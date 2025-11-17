@@ -130,6 +130,7 @@
     const updatePasswordButton = document.getElementById('updatePasswordButton');
     const passwordToggles = Array.from(document.querySelectorAll('.password-toggle'));
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const SESSION_CACHE_KEY = 'triviaUserData';
     let tempObjectUrl = null;
     let uploadedAvatarUrl = '';
     let validatedRemoteUrl = '';
@@ -149,6 +150,41 @@
     const goTo = (path) => {
       const base = getContextPath();
       window.location.href = `${base}${path}`;
+    };
+
+    const getCachedUserData = () => {
+      try {
+        const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (!stored || !stored.data) return null;
+        const maxAgeMs = 5 * 60 * 1000;
+        if (stored.timestamp && Date.now() - stored.timestamp <= maxAgeMs) {
+          return stored.data;
+        }
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+      return null;
+    };
+
+    const setCachedUserData = (data) => {
+      try {
+        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data
+        }));
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+    };
+
+    const mergeCachedUserData = (partial) => {
+      if (!partial || typeof partial !== 'object') return;
+      const existing = getCachedUserData();
+      const merged = existing ? { ...existing, ...partial } : { ...partial };
+      setCachedUserData(merged);
     };
 
     const normalizeMessage = (value) => {
@@ -413,33 +449,13 @@
           throw new Error(`Failed to load profile: ${res.status}`);
         }
         const data = await res.json();
-        const username = data.username || 'Player';
-        const avatarUrl = data.avatar_url || '';
-        if (emailInput) {
-          emailInput.value = data.email || '';
-        }
-
-        usernameInput.value = username;
-
-        if (!avatarUrl || data.using_default) {
-          uploadedAvatarUrl = '';
-          avatarInput.value = '';
-          isUrlValid = true;
-          validatedRemoteUrl = '';
-        } else if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
-          uploadedAvatarUrl = '';
-          avatarInput.value = avatarUrl;
-          isUrlValid = true;
-          validatedRemoteUrl = avatarUrl;
-          validateRemoteAvatar(avatarUrl);
-        } else {
-          uploadedAvatarUrl = avatarUrl;
-          avatarInput.value = '';
-          isUrlValid = true;
-          validatedRemoteUrl = '';
-        }
-
-        updatePreview();
+        applyProfileData(data);
+        mergeCachedUserData({
+          username: data.username || 'Player',
+          email: data.email !== undefined ? data.email : null,
+          avatar_url: data.avatar_url || '',
+          using_default: !!data.using_default
+        });
       } catch (err) {
         console.error(err);
         showStatus('Failed to load profile. Please refresh.', 'error');
@@ -476,6 +492,54 @@
       await uploadAvatarFile(file);
     });
 
+    const applyProfileData = (data, { triggerValidation = true } = {}) => {
+      if (!data || typeof data !== 'object') return;
+      const username = data.username || 'Player';
+      const emailValue = data.email === null || data.email === undefined ? '' : data.email;
+      const avatarUrl = data.avatar_url || '';
+      const usingDefault = data.using_default !== undefined
+        ? !!data.using_default
+        : !(avatarUrl && avatarUrl.trim());
+
+      usernameInput.value = username;
+      previewName.textContent = username.toUpperCase();
+      if (emailInput) {
+        emailInput.value = emailValue;
+      }
+
+      if (!avatarUrl || usingDefault) {
+        uploadedAvatarUrl = '';
+        avatarInput.value = '';
+        isUrlValid = true;
+        validatedRemoteUrl = '';
+      } else if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+        uploadedAvatarUrl = '';
+        avatarInput.value = avatarUrl;
+        isUrlValid = true;
+        validatedRemoteUrl = avatarUrl;
+        if (triggerValidation) {
+          validateRemoteAvatar(avatarUrl);
+        }
+      } else {
+        uploadedAvatarUrl = avatarUrl;
+        avatarInput.value = '';
+        isUrlValid = true;
+        validatedRemoteUrl = '';
+      }
+
+      updatePreview();
+    };
+
+    const cachedUserData = getCachedUserData();
+    if (cachedUserData) {
+      applyProfileData({
+        username: cachedUserData.username,
+        email: cachedUserData.email === null ? '' : cachedUserData.email,
+        avatar_url: cachedUserData.avatar_url,
+        using_default: cachedUserData.using_default
+      }, { triggerValidation: false });
+    }
+
     async function uploadAvatarFile(file) {
       const formData = new FormData();
       formData.append('avatar', file);
@@ -505,6 +569,12 @@
         }
         showStatus('Avatar uploaded successfully.', 'success');
         updatePreview();
+        mergeCachedUserData({
+          username: usernameInput.value.trim() || 'Player',
+          email: emailInput ? (emailInput.value.trim() || null) : null,
+          avatar_url: uploadedAvatarUrl || toIdenticon(usernameInput.value.trim() || 'Player'),
+          using_default: !uploadedAvatarUrl
+        });
       } catch (err) {
         console.error(err);
         showStatus(err.message || 'Failed to upload avatar.', 'error');
@@ -588,6 +658,12 @@
           avatarInput.value = '';
         }
         updatePreview();
+        mergeCachedUserData({
+          username: data.username || payload.username || 'Player',
+          email: data.email !== undefined ? data.email : payload.email || null,
+          avatar_url: data.avatar_url || savedAvatarUrl || '',
+          using_default: !!data.using_default
+        });
       } catch (err) {
         console.error(err);
         showStatus(err.message || 'Failed to save profile.', 'error');

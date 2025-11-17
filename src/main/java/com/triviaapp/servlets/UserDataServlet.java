@@ -82,6 +82,10 @@ public class UserDataServlet extends HttpServlet {
             String storedAvatar = profile != null
                                   ? profile.get("avatar_url")
                                   : null;
+            String storedEmail = profile != null
+                                 ? profile.get("email")
+                                 : null;
+            boolean usingDefaultAvatar = storedAvatar == null || storedAvatar.isBlank();
 
             JSONObject payload = new JSONObject();
             payload.put("username", username);
@@ -90,9 +94,17 @@ public class UserDataServlet extends HttpServlet {
             payload.put("participations", participations);
             payload.put("wins", wins);
             payload.put("win_rate", Math.round(winRate * 1000d) / 10d);
-            payload.put("avatar_url", storedAvatar == null || storedAvatar.isBlank()
+            payload.put("avatar_url", usingDefaultAvatar
                                       ? buildAvatarUrl(username)
                                       : storedAvatar);
+            payload.put("using_default", usingDefaultAvatar);
+            if(storedEmail != null && !storedEmail.isBlank())
+            {
+                payload.put("email", storedEmail);
+            } else
+            {
+                payload.put("email", JSONObject.NULL);
+            }
 
             if(topCategory != null)
             {
