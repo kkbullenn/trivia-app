@@ -20,6 +20,8 @@ import java.net.http.HttpResponse;
  * See WhisperAnswerCheckerServlet for answer checking functionality. This servlet is strictly for transcription.
  * <p>
  * Available methods: POST (see doPost).
+ *
+ * @author Samarjit Bhogal
  */
 @MultipartConfig
 public final class WhisperServlet extends HttpServlet {

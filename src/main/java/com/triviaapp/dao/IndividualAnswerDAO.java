@@ -12,6 +12,7 @@ import java.util.Map;
  * - fetch answers by user
  * - compute total score of a user in a category（individual mode）
  *
+ * @author Haven Zhang
  */
 public interface IndividualAnswerDAO {
 

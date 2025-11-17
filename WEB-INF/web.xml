@@ -52,6 +52,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>RootRedirectServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.RootRedirectServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RootRedirectServlet</servlet-name>
+        <url-pattern>/root</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>MainDataServlet</servlet-name>
         <servlet-class>com.triviaapp.servlets.MainDataServlet</servlet-class>
     </servlet>
@@ -59,6 +69,16 @@
     <servlet-mapping>
         <servlet-name>MainDataServlet</servlet-name>
         <url-pattern>/main/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/USER</url-pattern>
     </servlet-mapping>
 
    <servlet>
@@ -90,6 +110,46 @@
     <servlet-mapping>
         <servlet-name>AdminDataServlet</servlet-name>
         <url-pattern>/admin/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserDataServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserDataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserDataServlet</servlet-name>
+        <url-pattern>/user/data</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserProfileServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserProfileServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserProfileServlet</servlet-name>
+        <url-pattern>/user/profile</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserAvatarUploadServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserAvatarUploadServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserAvatarUploadServlet</servlet-name>
+        <url-pattern>/user/avatar/upload</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserPasswordServlet</servlet-name>
+        <servlet-class>com.triviaapp.servlets.UserPasswordServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserPasswordServlet</servlet-name>
+        <url-pattern>/user/password</url-pattern>
     </servlet-mapping>
 
     <!-- Create Quiz Servlets -->
@@ -256,4 +316,8 @@
         <url-pattern>/test-db</url-pattern>
     </servlet-mapping>
     <!-- Test Database Servlet (will be deleted)-->
+
+    <welcome-file-list>
+        <welcome-file>root</welcome-file>
+    </welcome-file-list>
 </web-app>

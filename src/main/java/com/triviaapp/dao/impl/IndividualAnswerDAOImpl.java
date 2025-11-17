@@ -12,6 +12,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implements persistence operations for individual quiz answers and scoring.
+ *
+ * @author Haven Zhang
+ */
 public class IndividualAnswerDAOImpl implements IndividualAnswerDAO {
 
     private static final String SQL_INSERT = "INSERT INTO individual_answers (question_id, user_id, selected_answer, is_correct, score) VALUES (?, ?, ?, ?, ?)";

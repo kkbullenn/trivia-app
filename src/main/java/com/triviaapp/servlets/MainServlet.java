@@ -8,6 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Directs authenticated users with the standard role to the quiz selection page.
+ *
+ * @author Brownie Tran
+ */
 public class MainServlet extends HttpServlet {
 
     @Override

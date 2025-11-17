@@ -1,0 +1,770 @@
+<!--
+   Profile Edit Page
+   Allows editing username and avatar URL.
+
+   Author: Jerry Xing
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Edit Profile</title>
+</head>
+<body class="bg-blue-900 text-yellow-300 min-h-screen">
+<div class="flex min-h-screen flex-col">
+  <header class="flex items-center justify-between bg-blue-950/90 px-4 py-3 shadow">
+    <button id="backButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Back to profile">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <h1 class="text-lg font-semibold uppercase tracking-wide">Edit Profile</h1>
+    <button id="logoutButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Logout">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="mx-auto flex w-full max-w-xl flex-1 flex-col gap-8 px-6 py-12">
+    <section class="flex flex-col items-center gap-4 text-center">
+      <div class="h-32 w-32 overflow-hidden rounded-full border-4 border-yellow-400/80 bg-blue-950">
+        <img id="previewAvatar" src="" alt="Preview Avatar" class="h-full w-full object-cover"/>
+      </div>
+      <h2 id="previewName" class="text-2xl font-bold text-yellow-100">PLAYER</h2>
+    </section>
+
+    <section class="flex flex-col gap-6 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 shadow-lg">
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Username</span>
+        <input id="usernameInput" type="text" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="Enter username"/>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Email</span>
+        <input id="emailInput" type="email" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="you@example.com" autocomplete="email"/>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Avatar URL</span>
+        <input id="avatarInput" type="url" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="https://example.com/avatar.png"/>
+        <span class="block text-xs text-yellow-200/70">Provide a direct image link (http/https). Leave blank to use default identicon.</span>
+      </label>
+      <div class="flex flex-col gap-3 rounded-lg border border-dashed border-yellow-300/40 bg-blue-900/60 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex flex-col">
+            <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Upload Avatar</span>
+            <span class="text-xs text-yellow-200/70">Supports PNG, JPG, GIF, WEBP under 2MB.</span>
+          </div>
+          <button id="uploadTrigger" type="button" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-2 text-sm font-semibold text-yellow-100 transition hover:bg-blue-800">Choose File</button>
+        </div>
+        <input id="avatarFileInput" type="file" accept="image/*" capture="environment" class="hidden"/>
+      </div>
+      <div id="statusMessage" class="hidden rounded-lg border border-yellow-300/30 bg-blue-900/70 px-4 py-2 text-sm"></div>
+      <button id="saveButton" class="rounded-lg bg-yellow-400 px-6 py-3 text-lg font-semibold text-blue-950 transition hover:bg-yellow-300">
+        Save Changes
+      </button>
+    </section>
+
+    <section class="flex flex-col gap-4 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 shadow-lg">
+      <header class="flex flex-col gap-1">
+        <h2 class="text-lg font-semibold uppercase tracking-wide text-yellow-200">Change Password</h2>
+        <p class="text-xs text-yellow-200/70">Enter your current password to enable setting a new password.</p>
+      </header>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Current Password</span>
+        <span class="relative flex items-center">
+          <input id="oldPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none" placeholder="Current password" autocomplete="current-password"/>
+          <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100" data-target="oldPasswordInput">
+            Show
+          </button>
+        </span>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">New Password</span>
+        <span class="relative flex items-center">
+          <input id="newPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed" placeholder="New password" autocomplete="new-password" disabled/>
+          <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed" data-target="newPasswordInput" disabled>
+            Show
+          </button>
+        </span>
+      </label>
+      <label class="flex flex-col gap-2 text-left">
+        <span class="text-sm font-semibold uppercase tracking-wide text-yellow-200">Confirm New Password</span>
+        <span class="relative flex items-center">
+          <input id="confirmPasswordInput" type="password" class="w-full rounded-lg border border-yellow-300/40 bg-blue-900 px-4 py-3 pr-12 text-yellow-100 focus:border-yellow-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Confirm new password" autocomplete="new-password" disabled/>
+          <button type="button" class="password-toggle absolute right-3 top-1/2 h-6 -translate-y-1/2 rounded border border-yellow-200 bg-blue-950/80 px-2 text-xs font-semibold uppercase tracking-wide text-yellow-50 transition hover:bg-blue-900 hover:text-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed" data-target="confirmPasswordInput" disabled>
+            Show
+          </button>
+        </span>
+      </label>
+      <div id="passwordStatus" class="hidden rounded-lg border border-yellow-300/30 bg-blue-900/70 px-4 py-2 text-sm"></div>
+      <button id="updatePasswordButton" class="rounded-lg border border-yellow-300/40 bg-blue-900 px-6 py-3 text-lg font-semibold text-yellow-100 transition hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Update Password
+      </button>
+    </section>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const usernameInput = document.getElementById('usernameInput');
+    const emailInput = document.getElementById('emailInput');
+    const avatarInput = document.getElementById('avatarInput');
+    const previewAvatar = document.getElementById('previewAvatar');
+    const previewName = document.getElementById('previewName');
+    const statusMessage = document.getElementById('statusMessage');
+    const saveButton = document.getElementById('saveButton');
+    const backButton = document.getElementById('backButton');
+    const logoutButton = document.getElementById('logoutButton');
+    const uploadTrigger = document.getElementById('uploadTrigger');
+    const avatarFileInput = document.getElementById('avatarFileInput');
+    const oldPasswordInput = document.getElementById('oldPasswordInput');
+    const newPasswordInput = document.getElementById('newPasswordInput');
+    const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+    const passwordStatus = document.getElementById('passwordStatus');
+    const updatePasswordButton = document.getElementById('updatePasswordButton');
+    const passwordToggles = Array.from(document.querySelectorAll('.password-toggle'));
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const SESSION_CACHE_KEY = 'triviaUserData';
+    let tempObjectUrl = null;
+    let uploadedAvatarUrl = '';
+    let validatedRemoteUrl = '';
+    let isUrlValid = true;
+    let urlValidationToken = 0;
+    let urlValidationInProgress = false;
+    let passwordRequestInFlight = false;
+
+    const getContextPath = () => {
+      const path = window.location.pathname;
+      const parts = path.split('/');
+      parts.pop();
+      const joined = parts.join('/');
+      return joined.length ? joined : '';
+    };
+
+    const goTo = (path) => {
+      const base = getContextPath();
+      window.location.href = `${base}${path}`;
+    };
+
+    const getCachedUserData = () => {
+      try {
+        const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (!stored || !stored.data) return null;
+        const maxAgeMs = 5 * 60 * 1000;
+        if (stored.timestamp && Date.now() - stored.timestamp <= maxAgeMs) {
+          return stored.data;
+        }
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+      return null;
+    };
+
+    const setCachedUserData = (data) => {
+      try {
+        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data
+        }));
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+    };
+
+    const mergeCachedUserData = (partial) => {
+      if (!partial || typeof partial !== 'object') return;
+      const existing = getCachedUserData();
+      const merged = existing ? { ...existing, ...partial } : { ...partial };
+      setCachedUserData(merged);
+    };
+
+    const normalizeMessage = (value) => {
+      if (value && typeof value === 'object') {
+        if (typeof value.message === 'string') {
+          return value.message;
+        }
+        return JSON.stringify(value);
+      }
+
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+          try {
+            const parsed = JSON.parse(trimmed);
+            if (parsed && typeof parsed.message === 'string') {
+              return parsed.message;
+            }
+          } catch (_) {
+            // ignore JSON parse errors and fall through
+          }
+        }
+        return trimmed;
+      }
+
+      return '';
+    };
+
+    const showStatus = (message, tone = 'info') => {
+      if (!statusMessage) return;
+      const normalized = normalizeMessage(message);
+      if (!normalized) {
+        statusMessage.classList.add('hidden');
+        statusMessage.textContent = '';
+        return;
+      }
+      statusMessage.textContent = normalized;
+      statusMessage.classList.remove('hidden');
+      const toneClass = tone === 'success'
+        ? 'border-green-400 bg-green-900/50 text-green-200'
+        : tone === 'error'
+          ? 'border-red-400 bg-red-900/50 text-red-200'
+          : 'border-yellow-300/30 bg-blue-900/70 text-yellow-100';
+      statusMessage.className = `rounded-lg px-4 py-2 text-sm ${toneClass}`;
+    };
+
+    const showPasswordStatus = (message, tone = 'info') => {
+      if (!passwordStatus) return;
+      const normalized = normalizeMessage(message);
+      if (!normalized) {
+        passwordStatus.classList.add('hidden');
+        passwordStatus.textContent = '';
+        return;
+      }
+      passwordStatus.textContent = normalized;
+      passwordStatus.classList.remove('hidden');
+      const toneClass = tone === 'success'
+        ? 'border-green-400 bg-green-900/50 text-green-200'
+        : tone === 'error'
+          ? 'border-red-400 bg-red-900/50 text-red-200'
+          : 'border-yellow-300/30 bg-blue-900/70 text-yellow-100';
+      passwordStatus.className = `rounded-lg px-4 py-2 text-sm ${toneClass}`;
+    };
+
+    const setPreviewSrc = (src) => {
+      if (tempObjectUrl && tempObjectUrl !== src) {
+        URL.revokeObjectURL(tempObjectUrl);
+        tempObjectUrl = null;
+      }
+      previewAvatar.src = src;
+    };
+
+    const toIdenticon = (name) => {
+      const seed = name && name.trim() ? name.trim() : 'player';
+      return `https://github.com/identicons/${encodeURIComponent(seed)}.png`;
+    };
+
+    const updatePreview = () => {
+      const name = usernameInput.value.trim() || 'Player';
+      const avatarUrl = avatarInput.value.trim();
+      previewName.textContent = name.toUpperCase();
+      const source = avatarUrl
+        ? (isUrlValid ? avatarUrl : toIdenticon(name))
+        : (uploadedAvatarUrl || toIdenticon(name));
+      setPreviewSrc(source);
+    };
+
+    const validateRemoteAvatar = (url) => {
+      const trimmed = url.trim();
+      if (!trimmed) {
+        isUrlValid = true;
+        validatedRemoteUrl = '';
+        urlValidationInProgress = false;
+        showStatus('', 'info');
+        updatePreview();
+        return;
+      }
+
+      urlValidationInProgress = true;
+      const currentToken = ++urlValidationToken;
+      showStatus('Checking avatar URL...', 'info');
+      const tester = new Image();
+      tester.onload = () => {
+        if (currentToken !== urlValidationToken) return;
+        isUrlValid = true;
+        validatedRemoteUrl = trimmed;
+        urlValidationInProgress = false;
+        showStatus('', 'info');
+        setPreviewSrc(trimmed);
+      };
+      tester.onerror = () => {
+        if (currentToken !== urlValidationToken) return;
+        isUrlValid = false;
+        validatedRemoteUrl = '';
+        urlValidationInProgress = false;
+        showStatus('Avatar URL could not be loaded. Please choose another image or upload a file.', 'error');
+        updatePreview();
+      };
+      try {
+        tester.src = trimmed;
+      } catch (err) {
+        tester.onerror();
+      }
+    };
+
+    const validateEmail = () => {
+      if (!emailInput) return true;
+      const value = emailInput.value.trim();
+      if (!value) {
+        showStatus('Email is required.', 'error');
+        return false;
+      }
+      if (!emailPattern.test(value)) {
+        showStatus('Please enter a valid email address.', 'error');
+        return false;
+      }
+      return true;
+    };
+
+    usernameInput.addEventListener('input', () => updatePreview());
+    if (emailInput) {
+      emailInput.addEventListener('input', () => {
+        const trimmed = emailInput.value.trim();
+        if (!trimmed) {
+          showStatus('Email is required.', 'error');
+        } else if (!emailPattern.test(trimmed)) {
+          showStatus('Please enter a valid email address.', 'error');
+        } else {
+          showStatus('', 'info');
+        }
+      });
+    }
+    avatarInput.addEventListener('input', () => {
+      uploadedAvatarUrl = '';
+      isUrlValid = false;
+      validatedRemoteUrl = '';
+      updatePreview();
+      const currentValue = avatarInput.value.trim();
+      if (!currentValue) {
+        isUrlValid = true;
+        showStatus('', 'info');
+        updatePreview();
+      } else {
+        validateRemoteAvatar(currentValue);
+      }
+    });
+
+    const togglePasswordInputs = (enabled, preserveStatus = false) => {
+      newPasswordInput.disabled = !enabled;
+      confirmPasswordInput.disabled = !enabled;
+      updatePasswordButton.disabled = !enabled;
+      passwordToggles.forEach((btn) => {
+        const targetId = btn.dataset.target;
+        if (targetId === 'newPasswordInput' || targetId === 'confirmPasswordInput') {
+          btn.disabled = !enabled;
+        }
+        if (btn.disabled) {
+          btn.textContent = 'Show';
+          const input = document.getElementById(targetId);
+          if (input) input.type = 'password';
+        }
+      });
+      if (!enabled) {
+        newPasswordInput.value = '';
+        confirmPasswordInput.value = '';
+        if (!preserveStatus) {
+          showPasswordStatus('', 'info');
+        }
+      }
+    };
+
+    const validatePasswordFields = () => {
+      if (newPasswordInput.disabled) {
+        updatePasswordButton.disabled = true;
+        return false;
+      }
+      const newPassword = newPasswordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      if (!newPassword || !confirmPassword) {
+        updatePasswordButton.disabled = true;
+        showPasswordStatus('Enter and confirm your new password.', 'info');
+        return false;
+      }
+      if (newPassword !== confirmPassword) {
+        updatePasswordButton.disabled = true;
+        showPasswordStatus('New password and confirmation do not match.', 'error');
+        return false;
+      }
+      if (oldPasswordInput.value && oldPasswordInput.value === newPassword) {
+        updatePasswordButton.disabled = true;
+        showPasswordStatus('New password must be different from the current password.', 'error');
+        return false;
+      }
+      if (passwordRequestInFlight) {
+        updatePasswordButton.disabled = true;
+        return false;
+      }
+      updatePasswordButton.disabled = false;
+      showPasswordStatus('', 'info');
+      return true;
+    };
+
+    oldPasswordInput.addEventListener('input', () => {
+      const hasOldPassword = oldPasswordInput.value.trim().length > 0;
+      togglePasswordInputs(hasOldPassword);
+      if (!hasOldPassword) {
+        passwordRequestInFlight = false;
+        return;
+      }
+      validatePasswordFields();
+    });
+
+    newPasswordInput.addEventListener('input', validatePasswordFields);
+    confirmPasswordInput.addEventListener('input', validatePasswordFields);
+
+    togglePasswordInputs(false);
+
+    backButton.addEventListener('click', () => goTo('/USER'));
+
+    logoutButton.addEventListener('click', async () => {
+      try {
+        await fetch(`${getContextPath()}/EXIT`, { method: 'POST', credentials: 'same-origin' });
+      } catch (err) {
+        console.error('Failed to log out', err);
+      } finally {
+        goTo('/login');
+      }
+    });
+
+    async function loadProfile() {
+      try {
+        const res = await fetch(`${getContextPath()}/user/profile`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          credentials: 'same-origin'
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+        if (!res.ok) {
+          throw new Error(`Failed to load profile: ${res.status}`);
+        }
+        const data = await res.json();
+        applyProfileData(data);
+        mergeCachedUserData({
+          username: data.username || 'Player',
+          email: data.email !== undefined ? data.email : null,
+          avatar_url: data.avatar_url || '',
+          using_default: !!data.using_default
+        });
+      } catch (err) {
+        console.error(err);
+        showStatus('Failed to load profile. Please refresh.', 'error');
+      }
+    }
+
+    uploadTrigger.addEventListener('click', () => {
+      avatarFileInput.click();
+    });
+
+    avatarFileInput.addEventListener('change', async () => {
+      const [file] = avatarFileInput.files;
+      if (!file) {
+        return;
+      }
+      if (!file.type || !file.type.startsWith('image/')) {
+        showStatus('Please select a valid image file.', 'error');
+        avatarFileInput.value = '';
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        showStatus('Image must be smaller than 2MB.', 'error');
+        avatarFileInput.value = '';
+        return;
+      }
+
+      if (tempObjectUrl) {
+        URL.revokeObjectURL(tempObjectUrl);
+      }
+      tempObjectUrl = URL.createObjectURL(file);
+      previewAvatar.src = tempObjectUrl;
+      previewName.textContent = (usernameInput.value.trim() || 'Player').toUpperCase();
+
+      await uploadAvatarFile(file);
+    });
+
+    const applyProfileData = (data, { triggerValidation = true } = {}) => {
+      if (!data || typeof data !== 'object') return;
+      const username = data.username || 'Player';
+      const emailValue = data.email === null || data.email === undefined ? '' : data.email;
+      const avatarUrl = data.avatar_url || '';
+      const usingDefault = data.using_default !== undefined
+        ? !!data.using_default
+        : !(avatarUrl && avatarUrl.trim());
+
+      usernameInput.value = username;
+      previewName.textContent = username.toUpperCase();
+      if (emailInput) {
+        emailInput.value = emailValue;
+      }
+
+      if (!avatarUrl || usingDefault) {
+        uploadedAvatarUrl = '';
+        avatarInput.value = '';
+        isUrlValid = true;
+        validatedRemoteUrl = '';
+      } else if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+        uploadedAvatarUrl = '';
+        avatarInput.value = avatarUrl;
+        isUrlValid = true;
+        validatedRemoteUrl = avatarUrl;
+        if (triggerValidation) {
+          validateRemoteAvatar(avatarUrl);
+        }
+      } else {
+        uploadedAvatarUrl = avatarUrl;
+        avatarInput.value = '';
+        isUrlValid = true;
+        validatedRemoteUrl = '';
+      }
+
+      updatePreview();
+    };
+
+    const cachedUserData = getCachedUserData();
+    if (cachedUserData) {
+      applyProfileData({
+        username: cachedUserData.username,
+        email: cachedUserData.email === null ? '' : cachedUserData.email,
+        avatar_url: cachedUserData.avatar_url,
+        using_default: cachedUserData.using_default
+      }, { triggerValidation: false });
+    }
+
+    async function uploadAvatarFile(file) {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      try {
+        showStatus('Uploading avatar...', 'info');
+        const res = await fetch(`${getContextPath()}/user/avatar/upload`, {
+          method: 'POST',
+          body: formData,
+          credentials: 'same-origin'
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `Upload failed: ${res.status}`);
+        }
+        const data = await res.json();
+        uploadedAvatarUrl = data.avatar_url || '';
+        avatarInput.value = '';
+        isUrlValid = true;
+        validatedRemoteUrl = '';
+        if (tempObjectUrl) {
+          URL.revokeObjectURL(tempObjectUrl);
+          tempObjectUrl = null;
+        }
+        showStatus('Avatar uploaded successfully.', 'success');
+        updatePreview();
+        mergeCachedUserData({
+          username: usernameInput.value.trim() || 'Player',
+          email: emailInput ? (emailInput.value.trim() || null) : null,
+          avatar_url: uploadedAvatarUrl || toIdenticon(usernameInput.value.trim() || 'Player'),
+          using_default: !uploadedAvatarUrl
+        });
+      } catch (err) {
+        console.error(err);
+        showStatus(err.message || 'Failed to upload avatar.', 'error');
+        if (tempObjectUrl) {
+          URL.revokeObjectURL(tempObjectUrl);
+          tempObjectUrl = null;
+        }
+        updatePreview();
+      } finally {
+        avatarFileInput.value = '';
+      }
+    }
+
+    async function saveProfile() {
+      const urlValue = avatarInput.value.trim();
+      const trimmedEmail = emailInput ? emailInput.value.trim() : '';
+      if (urlValidationInProgress) {
+        showStatus('Please wait for the avatar URL check to finish.', 'info');
+        return;
+      }
+      if (urlValue && !isUrlValid) {
+        showStatus('Avatar URL is invalid. Please provide a working image link.', 'error');
+        return;
+      }
+      if (!validateEmail()) {
+        return;
+      }
+      const payload = {
+        username: usernameInput.value.trim(),
+        email: trimmedEmail,
+        avatar_url: urlValue || uploadedAvatarUrl || ''
+      };
+
+      try {
+        saveButton.disabled = true;
+        showStatus('Saving...', 'info');
+        const res = await fetch(`${getContextPath()}/user/profile`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+        if (res.status === 409) {
+          let errMsg = 'Unable to save profile with the provided information.';
+          try {
+            const data = await res.json();
+            if (data && data.message) {
+              errMsg = data.message;
+            }
+          } catch (_) {}
+          showStatus(errMsg, 'error');
+          return;
+        }
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `Failed to save profile: ${res.status}`);
+        }
+        const data = await res.json();
+        showStatus('Profile updated successfully.', 'success');
+        usernameInput.value = data.username || payload.username || 'Player';
+        if (emailInput) {
+          emailInput.value = data.email || payload.email || '';
+        }
+
+        const savedAvatarUrl = data.avatar_url || '';
+        if (!savedAvatarUrl || data.using_default) {
+          uploadedAvatarUrl = '';
+          avatarInput.value = '';
+        } else if (savedAvatarUrl.startsWith('http://') || savedAvatarUrl.startsWith('https://')) {
+          uploadedAvatarUrl = '';
+          avatarInput.value = savedAvatarUrl;
+        } else {
+          uploadedAvatarUrl = savedAvatarUrl;
+          avatarInput.value = '';
+        }
+        updatePreview();
+        mergeCachedUserData({
+          username: data.username || payload.username || 'Player',
+          email: data.email !== undefined ? data.email : payload.email || null,
+          avatar_url: data.avatar_url || savedAvatarUrl || '',
+          using_default: !!data.using_default
+        });
+      } catch (err) {
+        console.error(err);
+        showStatus(err.message || 'Failed to save profile.', 'error');
+      } finally {
+        saveButton.disabled = false;
+      }
+    }
+
+    saveButton.addEventListener('click', () => {
+      saveProfile();
+    });
+
+    const updatePassword = async () => {
+      if (passwordRequestInFlight) {
+        return;
+      }
+      const oldPassword = oldPasswordInput.value.trim();
+      const newPassword = newPasswordInput.value;
+      if (!oldPassword) {
+        showPasswordStatus('Please enter your current password.', 'error');
+        return;
+      }
+      if (!validatePasswordFields()) {
+        return;
+      }
+      const payload = {
+        old_password: oldPassword,
+        new_password: newPassword
+      };
+      passwordRequestInFlight = true;
+      updatePasswordButton.disabled = true;
+      showPasswordStatus('Updating password...', 'info');
+      try {
+        const res = await fetch(`${getContextPath()}/user/password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+        if (res.status === 401) {
+          goTo('/login');
+          return;
+        }
+
+        const contentType = res.headers.get('Content-Type') || '';
+        let data = null;
+        let rawText = '';
+        if (contentType.includes('application/json')) {
+          try {
+            data = await res.json();
+          } catch (_) {
+            data = null;
+          }
+        } else {
+          try {
+            rawText = await res.text();
+          } catch (_) {
+            rawText = '';
+          }
+        }
+
+        if (!res.ok) {
+          const message = (data && data.message) || rawText || `Failed to update password: ${res.status}`;
+          throw new Error(message);
+        }
+
+        const successMessage = (data && data.message)
+          ? data.message
+          : 'Password updated successfully.';
+        showPasswordStatus(successMessage, 'success');
+        oldPasswordInput.value = '';
+        togglePasswordInputs(false, true);
+      } catch (err) {
+        console.error(err);
+        showPasswordStatus(err.message || 'Failed to update password.', 'error');
+        updatePasswordButton.disabled = false;
+      } finally {
+        passwordRequestInFlight = false;
+      }
+    };
+
+    updatePasswordButton.addEventListener('click', () => {
+      updatePassword();
+    });
+
+    passwordToggles.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const input = document.getElementById(btn.dataset.target);
+        if (!input) return;
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        btn.textContent = showing ? 'Show' : 'Hide';
+      });
+    });
+
+    loadProfile();
+  })();
+</script>
+</body>
+</html>

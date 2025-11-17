@@ -9,6 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Validates quiz session access and forwards players to the active quiz view.
+ *
+ * @author Brownie Tran
+ */
 public class QuizServlet extends HttpServlet {
 
     @Override

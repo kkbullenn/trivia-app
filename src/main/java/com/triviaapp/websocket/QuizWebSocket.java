@@ -2,6 +2,7 @@ package com.triviaapp.websocket;
 
 import com.triviaapp.dao.*;
 import com.triviaapp.dao.impl.*;
+import com.triviaapp.util.QuestionJsonUtils;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.json.JSONArray;
@@ -11,14 +12,20 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * WebSocket endpoint for handling real-time quiz interactions. Handles joining lobbies,
- * navigating questions, submitting answers, and broadcasting updates such as questions
- * and leaderboards.
+ * WebSocket endpoint for handling real-time quiz interactions. Handles joining lobbies, navigating questions,
+ * submitting answers, and broadcasting updates such as questions and leaderboards.
+ *
+ * @author Brownie Tran
+ * @author Jerry Xing
  */
 @ServerEndpoint("/quiz/webSocket")
 public class QuizWebSocket {
+
+    private static final Logger LOGGER = Logger.getLogger(QuizWebSocket.class.getName());
 
     // --- DAO dependencies for DB interaction ---
     // Handles quiz session state
@@ -28,25 +35,20 @@ public class QuizWebSocket {
     // Retrieves category names
     private static final CategoryDAO CATEGORY_DAO = new CategoryDAOImpl();
     // Stores and validates answers
-    private static final ModeratedAnswerDAO MODERATED_ANSWER_DAO =
-            new ModeratedAnswerDAOImpl();
+    private static final ModeratedAnswerDAO MODERATED_ANSWER_DAO = new ModeratedAnswerDAOImpl();
 
     // --- WebSocket session tracking structures ---
     // Maps lobby_id → all WebSocket sessions (clients) currently in that lobby
-    private static final Map<Integer, Set<Session>> LOBBY_SESSIONS =
-            new ConcurrentHashMap<>();
+    private static final Map<Integer, Set<Session>> LOBBY_SESSIONS = new ConcurrentHashMap<>();
 
     // Maps a WebSocket session → its associated lobby_id
-    private static final Map<Session, Integer> SESSION_LOBBY_MAP =
-            new ConcurrentHashMap<>();
+    private static final Map<Session, Integer> SESSION_LOBBY_MAP = new ConcurrentHashMap<>();
 
     // Maps a WebSocket session → [user_id, username]
-    private static final Map<Session, Object[]> SESSION_USER_MAP =
-            new ConcurrentHashMap<>();
+    private static final Map<Session, Object[]> SESSION_USER_MAP = new ConcurrentHashMap<>();
 
     // Maps lobby_id → current question index in that session
-    private static final Map<Integer, Integer> LOBBY_CURRENT_QUESTION =
-            new ConcurrentHashMap<>();
+    private static final Map<Integer, Integer> LOBBY_CURRENT_QUESTION = new ConcurrentHashMap<>();
 
 
     /** Called when a new client connects to the WebSocket */
@@ -58,7 +60,7 @@ public class QuizWebSocket {
 
     /** Called when a message is received from a client */
     @OnMessage
-    public void onMessage(Session session, String message) throws IOException
+    public void onMessage(Session session, String message)
     {
         JSONObject msg = new JSONObject(message);
         String type = msg.getString("type");
@@ -125,7 +127,8 @@ public class QuizWebSocket {
                 SESSION_DAO.leaveSession(lobbyId, participantId);
             } catch(SQLException e)
             {
-                e.printStackTrace();
+                LOGGER.log(Level.WARNING, "Failed to remove participant " + participantId +
+                        " from lobby " + lobbyId, e);
             }
 
             // Notify others in the lobby that this user left
@@ -142,7 +145,8 @@ public class QuizWebSocket {
     @OnError
     public void onError(Session session, Throwable throwable)
     {
-        throwable.printStackTrace();
+        String sessionId = session != null ? session.getId() : "unknown";
+        LOGGER.log(Level.SEVERE, "WebSocket error for session " + sessionId, throwable);
     }
 
     /** Move to the next question in the lobby and broadcast it */
@@ -158,7 +162,7 @@ public class QuizWebSocket {
             }
         } catch(Exception e)
         {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to advance to next question for lobby " + lobbyId, e);
         }
     }
 
@@ -175,7 +179,7 @@ public class QuizWebSocket {
             }
         } catch(Exception e)
         {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to move to previous question for lobby " + lobbyId, e);
         }
     }
 
@@ -191,8 +195,7 @@ public class QuizWebSocket {
         int participantId = (int) userInfo[0];
         String username = (String) userInfo[1];
 
-        System.out.println(
-                "Player " + username + " answered: " + answer + " in lobby " + lobbyId);
+        System.out.println("Player " + username + " answered: " + answer + " in lobby " + lobbyId);
 
         try
         {
@@ -220,60 +223,56 @@ public class QuizWebSocket {
             String categoryName = null;
             try
             {
-                categoryName = CATEGORY_DAO.findCategoryNameById(
-                        Integer.parseInt(questionData.get("category_id")));
-            }
-            catch(NumberFormatException ignored)
+                categoryName = CATEGORY_DAO.findCategoryNameById(Integer.parseInt(questionData.get("category_id")));
+            } catch(NumberFormatException ignored)
             {
             }
 
             Map<String, String> existingAnswer =
-                    MODERATED_ANSWER_DAO.findAnswerForParticipantAndQuestion(lobbyId,
-                            currentQuestionId, participantId);
+                    MODERATED_ANSWER_DAO.findAnswerForParticipantAndQuestion(lobbyId, currentQuestionId, participantId);
 
             int totalQuestions = questionIds.size();
-            int answeredCountBefore = MODERATED_ANSWER_DAO
-                    .countAnswersForParticipantInSession(lobbyId, participantId);
+            int answeredCountBefore = MODERATED_ANSWER_DAO.countAnswersForParticipantInSession(lobbyId, participantId);
 
             if(existingAnswer != null)
             {
                 sendAnswerResult(session, lobbyId, currentQuestionId, currentIndex,
                         existingAnswer.get("selected_answer"), correctAnswerKey,
                         Boolean.parseBoolean(existingAnswer.get("is_correct")), true,
-                        parseScore(existingAnswer.get("score")), answeredCountBefore,
-                        totalQuestions, null, participantId);
+                        parseScore(existingAnswer.get("score")), answeredCountBefore, totalQuestions, null,
+                        participantId);
                 return;
             }
 
             boolean isCorrect = MODERATED_ANSWER_DAO.isAnswerCorrect(currentQuestionId, answer);
             int questionPoints = parseScore(questionData.get("points"));
-            int score = isCorrect ? questionPoints : 0;
+            int score = isCorrect
+                        ? questionPoints
+                        : 0;
 
-            MODERATED_ANSWER_DAO.createModeratedAnswer(lobbyId, currentQuestionId,
-                    participantId, answer, isCorrect, score);
+            MODERATED_ANSWER_DAO.createModeratedAnswer(lobbyId, currentQuestionId, participantId, answer, isCorrect,
+                    score);
 
-            List<Map<String, String>> leaderboard =
-                    MODERATED_ANSWER_DAO.getSessionLeaderboard(lobbyId);
+            List<Map<String, String>> leaderboard = MODERATED_ANSWER_DAO.getSessionLeaderboard(lobbyId);
             broadcastLeaderboard(lobbyId, leaderboard);
 
-            int answeredCountAfter = MODERATED_ANSWER_DAO
-                    .countAnswersForParticipantInSession(lobbyId, participantId);
+            int answeredCountAfter = MODERATED_ANSWER_DAO.countAnswersForParticipantInSession(lobbyId, participantId);
 
-            sendAnswerResult(session, lobbyId, currentQuestionId, currentIndex, answer,
-                    correctAnswerKey, isCorrect, false, score, answeredCountAfter,
-                    totalQuestions, leaderboard, participantId);
+            sendAnswerResult(session, lobbyId, currentQuestionId, currentIndex, answer, correctAnswerKey, isCorrect,
+                    false, score, answeredCountAfter, totalQuestions, leaderboard, participantId);
 
             if(answeredCountAfter >= totalQuestions)
             {
                 int totalScore = findParticipantScore(leaderboard, participantId);
                 int totalPossibleScore = computeTotalPossibleScore(questionIds);
-                sendCompletion(session, lobbyId, totalQuestions, answeredCountAfter,
-                        totalScore, totalPossibleScore, leaderboard, categoryName);
+                sendCompletion(session, lobbyId, totalQuestions, answeredCountAfter, totalScore, totalPossibleScore,
+                        leaderboard, categoryName);
             }
 
         } catch(Exception e)
         {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to process answer from participant " + participantId +
+                    " in lobby " + lobbyId, e);
         }
     }
 
@@ -307,13 +306,16 @@ public class QuizWebSocket {
             payload.put("answers_key", qData.get("answers_key"));
             payload.put("points", qData.get("points"));
             payload.put("youtube_url", qData.get("youtube_url"));
+            payload.put("category_name", CATEGORY_DAO.findCategoryNameById(Integer.parseInt(qData.get("category_id"))));
+            QuestionJsonUtils.putQuestionContent(payload, qData);
             payload.put("total_questions", questionIds.size());
 
             broadcastToLobby(lobbyId, payload.toString());
 
         } catch(Exception e)
         {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to send question index " + questionIndex +
+                    " for lobby " + lobbyId, e);
         }
     }
 
@@ -339,8 +341,7 @@ public class QuizWebSocket {
     }
 
     /** Broadcasts the current leaderboard to all players in the lobby */
-    private void broadcastLeaderboard(Integer lobbyId,
-                                      List<Map<String, String>> leaderboard)
+    private void broadcastLeaderboard(Integer lobbyId, List<Map<String, String>> leaderboard)
     {
         JSONObject payload = new JSONObject();
         payload.put("type", "leaderboard");
@@ -362,19 +363,17 @@ public class QuizWebSocket {
                     s.getBasicRemote().sendText(message);
                 } catch(IOException e)
                 {
-                    e.printStackTrace();
+                    LOGGER.log(Level.WARNING, "Failed to broadcast message to session " + s.getId() +
+                            " in lobby " + lobbyId, e);
                 }
             }
         }
     }
 
-    private void sendAnswerResult(Session session, Integer lobbyId, int questionId,
-                                  int questionIndex, String selectedAnswer,
-                                  String correctAnswer, boolean isCorrect,
-                                  boolean alreadyAnswered, int scoreAwarded,
-                                  int answeredCount, int totalQuestions,
-                                  List<Map<String, String>> leaderboard,
-                                  int participantId) throws IOException
+    private void sendAnswerResult(Session session, Integer lobbyId, int questionId, int questionIndex,
+                                  String selectedAnswer, String correctAnswer, boolean isCorrect,
+                                  boolean alreadyAnswered, int scoreAwarded, int answeredCount, int totalQuestions,
+                                  List<Map<String, String>> leaderboard, int participantId) throws IOException
     {
         JSONObject payload = new JSONObject();
         payload.put("type", "answerResult");
@@ -399,10 +398,9 @@ public class QuizWebSocket {
         sendToSession(session, payload);
     }
 
-    private void sendCompletion(Session session, Integer lobbyId, int totalQuestions,
-                                int answeredCount, int totalScore, int totalPossibleScore,
-                                List<Map<String, String>> leaderboard,
-                                String categoryName) throws IOException
+    private void sendCompletion(Session session, Integer lobbyId, int totalQuestions, int answeredCount, int totalScore,
+                                int totalPossibleScore, List<Map<String, String>> leaderboard, String categoryName)
+            throws IOException
     {
         JSONObject payload = new JSONObject();
         payload.put("type", "quizComplete");
@@ -461,8 +459,7 @@ public class QuizWebSocket {
                     {
                         return parseScore(entry.get("total_score"));
                     }
-                }
-                catch(NumberFormatException ignored)
+                } catch(NumberFormatException ignored)
                 {
                 }
             }
@@ -494,7 +491,8 @@ public class QuizWebSocket {
             }
             catch(SQLException e)
             {
-                e.printStackTrace();
+                LOGGER.log(Level.WARNING, "Failed to retrieve question " + qId +
+                        " while computing total possible score", e);
             }
         }
         return total;
@@ -509,8 +507,7 @@ public class QuizWebSocket {
         try
         {
             return Integer.parseInt(value.trim());
-        }
-        catch(NumberFormatException ex)
+        } catch(NumberFormatException ex)
         {
             return 0;
         }

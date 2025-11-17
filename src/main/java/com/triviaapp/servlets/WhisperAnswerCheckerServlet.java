@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 
+/**
+ * Utilizes Whisper transcription to evaluate spoken quiz answers against stored solutions.
+ *
+ * @author Samarjit Bhogal
+ */
 @MultipartConfig
 public class WhisperAnswerCheckerServlet extends HttpServlet {
     private static final WhisperConnection CONNECTION = new WhisperConnection();

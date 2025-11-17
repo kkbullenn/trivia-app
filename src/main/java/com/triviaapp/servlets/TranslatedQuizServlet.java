@@ -93,6 +93,8 @@ import java.util.Map;
  * 
  * MANUAL TESTING NOTE :
  *   http://localhost:8081/trivia-app/quiz/translated?categoryId=1&target=tl
+ *
+ * @author Aira Bassig
  */
 @WebServlet(name = "TranslatedQuizServlet", urlPatterns = {"/quiz/translated"})
 public class TranslatedQuizServlet extends HttpServlet {

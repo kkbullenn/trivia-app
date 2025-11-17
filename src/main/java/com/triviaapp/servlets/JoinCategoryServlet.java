@@ -8,6 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Records the selected category in session and routes the user to lobby listings.
+ *
+ * @author Brownie Tran
+ */
 public class JoinCategoryServlet extends HttpServlet {
 
     @Override

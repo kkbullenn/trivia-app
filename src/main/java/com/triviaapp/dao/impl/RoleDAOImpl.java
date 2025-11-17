@@ -10,6 +10,11 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Provides JDBC-backed access to role metadata for authentication flows.
+ *
+ * @author Haven Zhang
+ */
 public class RoleDAOImpl implements RoleDAO {
 
     private static final String SQL_SELECT_ALL = "SELECT role_id, role_name FROM roles ORDER BY role_name";

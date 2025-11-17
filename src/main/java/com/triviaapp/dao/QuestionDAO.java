@@ -13,6 +13,7 @@ import java.util.Map;
  * - fetch an ordered list of question ids for navigation
  * - create, update and delete questions
  *
+ * @author Haven Zhang
  */
 public interface QuestionDAO {
 
