@@ -1,9 +1,15 @@
 package com.triviaapp.dao;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * DAO for user authentication.
+ *
+ * @author Haven Zhang
+ * @author Brownie Tran
+ * @author Timothy Kim
+ * @author Jerry Xing
  */
 public interface UserDAO {
     /**
@@ -12,23 +18,64 @@ public interface UserDAO {
     String findPasswordByEmail(String email) throws SQLException;
 
     /**
+     * Returns the password hash stored for the provided username.
+     */
+    String findPasswordByUsername(String username) throws SQLException;
+
+    /**
      * Create a new user with given username, email and password.
      */
     boolean createUser(String username, String email, String password, int roleId) throws SQLException;
-    
+
     /**
      *
      * Return the User_ID for the given email
-     * */
-    int findUserIDByEmail(String email) throws SQLException;
-    
+     *
+     */
+    int findUserIdByEmail(String email) throws SQLException;
+
+    /**
+     * Locate a user id by username.
+     */
+    int findUserIdByUsername(String username) throws SQLException;
+
     /**
      * Return user role ID for the given user ID
      */
-    int findUserRoleIDByID(int userId) throws SQLException;
+    int findUserRoleIdById(int userId) throws SQLException;
 
     /**
      * Return the username for the given user ID.
      */
     String findUsernameById(int userId) throws SQLException;
+
+    /**
+     * Returns profile details (username, avatar_url, etc.) for the given user ID.
+     */
+    Map<String, String> findUserProfileById(int userId) throws SQLException;
+
+    /**
+     * Update the user's profile information.
+     */
+    boolean updateUserProfile(int userId, String username, String email, String avatarUrl) throws SQLException;
+
+    /**
+     * Check if a username is already used by another user (excluding the provided user ID).
+     */
+    boolean isUsernameTaken(String username, int excludeUserId) throws SQLException;
+
+    /**
+     * Checks whether the provided email already exists for another user.
+     */
+    boolean isEmailTaken(String email, int excludeUserId) throws SQLException;
+
+    /**
+     * Returns the password hash for the given user ID.
+     */
+    String findPasswordHashById(int userId) throws SQLException;
+
+    /**
+     * Update the password hash for the given user ID.
+     */
+    boolean updatePassword(int userId, String passwordHash) throws SQLException;
 }

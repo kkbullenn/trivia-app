@@ -10,19 +10,26 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
+/**
+ * Provides database operations for trivia sessions, including lifecycle and participant management.
+ *
+ * @author Haven Zhang
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class SessionDAOImpl implements SessionDAO {
 
     private static final String SQL_FIND_BY_ID = "SELECT * FROM sessions WHERE session_id = ?";
     private static final String SQL_LIST_BY_HOST = "SELECT * FROM sessions WHERE host_user_id = ? ORDER BY start_at DESC";
     private static final String SQL_INSERT = "INSERT INTO sessions (host_user_id, session_name, category_id, max_participants, status, start_at, end_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_UPDATE_STATUS = "UPDATE sessions SET status = ?, end_at = CASE WHEN ? = 'completed' THEN CURRENT_TIMESTAMP ELSE end_at END WHERE session_id = ?";
+    private static final String SQL_UPDATE_STATUS = "UPDATE sessions SET status = ?, end_at = IF(? = 'completed', CURRENT_TIMESTAMP, end_at) WHERE session_id = ?";
     private static final String SQL_END_SESSION_NOW = "UPDATE sessions SET status = 'completed', end_at = CURRENT_TIMESTAMP WHERE session_id = ? AND status <> 'completed'";
     private static final String SQL_DELETE = "DELETE FROM sessions WHERE session_id = ?";
     // session_questions helper SQL
     private static final String SQL_DELETE_SESSION_QUESTIONS = "DELETE FROM session_questions WHERE session_id = ?";
     private static final String SQL_INSERT_FROM_CATEGORY = "INSERT INTO session_questions (session_id, question_id) SELECT ?, q.question_id FROM questions q WHERE q.category_id = ?";
     private static final String SQL_INSERT_SESSSION_QUESTIONS = "INSERT INTO session_questions (session_id, question_id) VALUES (?, ?)";
-    private static final String SQL_SELECT_SESSION_QUESTION_IDS = "SELECT question_id FROM session_questions WHERE session_id = ? ORDER BY question_id ASC";
+    private static final String SQL_SELECT_SESSION_QUESTION_IDS = "SELECT question_id FROM session_questions WHERE session_id = ? ORDER BY question_id ";
 
     // current_index management on sessions table (multiplayer host-driven sync)
     private static final String SQL_GET_CURRENT_INDEX = "SELECT current_index FROM sessions WHERE session_id = ?";

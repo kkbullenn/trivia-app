@@ -1,3 +1,12 @@
+<!--
+   Select Quiz Page
+   Allows users to select a quiz to join.
+
+   Author: Persephone Wong
+           Brownie Tran
+           Jack Huang
+           Jerry Xing
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,22 +18,15 @@
 </head>
 
 <body class="font-mono bg-blue-900">
-<div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between">
+<div class="px-3 py-2 gap-2 bg-blue-950 flex flex-row justify-between items-center">
   <form action="USER" method="GET">
-    <button id="UserButton" type="submit" class="text-lg flex flex-row space-x-2">
-      <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g id="SVGRepo_iconCarrier">
-          <path
-                  d="M8 7C9.65685 7 11 5.65685 11 4C11 2.34315 9.65685 1 8 1C6.34315 1 5 2.34315 5 4C5 5.65685 6.34315 7 8 7Z"
-                  fill="#000000"></path>
-          <path d="M14 12C14 10.3431 12.6569 9 11 9H5C3.34315 9 2 10.3431 2 12V15H14V12Z" fill="#000000">
-          </path>
-        </g>
-      </svg>
-      <span class="text-white">Welcome,</span>
-      <span class="font-bold text-yellow-400" id="username">User</span>
+    <button id="UserButton" type="submit" class="flex items-center space-x-3 text-left">
+      <img id="userAvatar" src="" alt="User avatar"
+           class="h-10 w-10 rounded-full border-2 border-yellow-300 bg-blue-800 object-cover"/>
+      <span class="flex flex-col leading-tight">
+        <span id="welcomeLabel" class="text-sm text-yellow-200">Welcome,</span>
+        <span class="font-bold text-yellow-400" id="username">User</span>
+      </span>
     </button>
   </form>
   <form action="EXIT" method="POST">
@@ -117,7 +119,7 @@
       </a>
     </template>
   </div>
-  
+
   <template id="categoryTpl">
     <form action="join-category" method="POST" class="w-full">
       <input type="hidden" name="category_id" class="category-id" value="">
@@ -132,6 +134,7 @@
 <script>
   // Store admin status for reuse
   let isAdmin = false;
+  let latestMainData = null;
 
   // Helper function to get context path
   function getContextPath() {
@@ -158,6 +161,14 @@
 
   (async function () {
     const contextPath = getContextPath();
+    const welcomeLabel = document.getElementById('welcomeLabel');
+    const usernameDisplay = document.getElementById('username');
+    const avatarEl = document.getElementById('userAvatar');
+    const catContainer = document.getElementById('category');
+    const catTpl = document.getElementById('categoryTpl');
+    const quizContainer = document.getElementById('MyQuizzes');
+    const quizTpl = document.getElementById('quizTpl');
+    const createTpl = document.getElementById('createQuizTpl');
 
     // Check for error messages in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -167,59 +178,110 @@
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
-    // Check user role
-    try {
-      const adminCheck = await fetch(`${contextPath}/admin/data`, {
-        method: 'GET',
-        credentials: 'same-origin',
-        headers: { 'Accept': 'application/json' }
-      });
-      isAdmin = adminCheck.ok;
-    } catch (err) {
-      isAdmin = false;
-    }
+    const SESSION_CACHE_KEY = 'triviaUserData';
+    const MAIN_CACHE_KEY = 'triviaMainData';
+    const MAIN_CACHE_TTL = 2 * 60 * 1000;
 
-    try {
-      const res = await fetch(`${contextPath}/main/data`, {
-        method: 'GET',
-        headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
-        credentials: 'same-origin'
-      });
-      if (!res.ok) throw new Error('Network error: ' + res.status);
-      const data = await res.json();
-
-      // Categories
-      const catContainer = document.getElementById('category');
-      const catTpl = document.getElementById('categoryTpl');
-      if (catContainer && catTpl && Array.isArray(data.categories)) {
-        catContainer.innerHTML = '';
-        data.categories.forEach(cat => {
-          const node = catTpl.content.cloneNode(true);
-          const catIdInput = node.querySelector('.category-id');
-          if (catIdInput) catIdInput.value = String(cat.id ?? '');
-          const nameEl = node.querySelector('.category-name');
-          if (nameEl) nameEl.textContent = cat.name ?? String(cat);
-          const formEl = node.querySelector('form');
-          if (formEl) formEl.action = `${contextPath}/join-category`;
-          catContainer.appendChild(node);
-        });
-      }
-
-      // Quizzes — use keys returned by MainDataServlet
-      const quizContainer = document.getElementById('MyQuizzes');
-      const quizTpl = document.getElementById('quizTpl');
-      const createTpl = document.getElementById('createQuizTpl');
-      if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
-        quizContainer.innerHTML = '';
-
-        if (!data.quizzes.length) {
-          const empty = document.createElement('div');
-          empty.className = 'text-center text-yellow-300';
-          empty.textContent = 'No quizzes yet';
-          quizContainer.appendChild(empty);
+    const getCachedUserData = () => {
+      try {
+        const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (!stored || !stored.data) return null;
+        const maxAgeMs = 5 * 60 * 1000;
+        if (stored.timestamp && Date.now() - stored.timestamp <= maxAgeMs) {
+          return stored.data;
         }
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+      return null;
+    };
 
-        data.quizzes.forEach(q => {
+    const setCachedUserData = (data) => {
+      try {
+        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data
+        }));
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+    };
+
+    const buildIdenticon = (seed) => {
+      const value = seed && seed.trim() ? seed.trim() : 'player';
+      return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
+    };
+
+    const getCachedMainData = () => {
+      try {
+        const raw = sessionStorage.getItem(MAIN_CACHE_KEY);
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (!stored || !stored.data) return null;
+        if (stored.timestamp && Date.now() - stored.timestamp <= MAIN_CACHE_TTL) {
+          return stored.data;
+        }
+        sessionStorage.removeItem(MAIN_CACHE_KEY);
+      } catch (err) {
+        sessionStorage.removeItem(MAIN_CACHE_KEY);
+      }
+      return null;
+    };
+
+    const setCachedMainData = (data) => {
+      try {
+        sessionStorage.setItem(MAIN_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data
+        }));
+      } catch (err) {
+        sessionStorage.removeItem(MAIN_CACHE_KEY);
+      }
+    };
+
+    const mergeCachedMainData = (partial) => {
+      if (!partial || typeof partial !== 'object') return;
+      const existing = getCachedMainData();
+      const merged = existing ? { ...existing, ...partial } : { ...partial };
+      setCachedMainData(merged);
+    };
+
+    const renderCategories = (categories) => {
+      if (!catContainer || !catTpl) return;
+      catContainer.innerHTML = '';
+      if (!Array.isArray(categories) || !categories.length) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center text-yellow-300 col-span-3';
+        empty.textContent = 'No categories available';
+        catContainer.appendChild(empty);
+        return;
+      }
+      categories.forEach(cat => {
+        const node = catTpl.content.cloneNode(true);
+        const catIdInput = node.querySelector('.category-id');
+        if (catIdInput) catIdInput.value = String(cat.id ?? '');
+        const nameEl = node.querySelector('.category-name');
+        if (nameEl) nameEl.textContent = cat.name ?? String(cat);
+        const formEl = node.querySelector('form');
+        if (formEl) formEl.action = `${contextPath}/join-category`;
+        catContainer.appendChild(node);
+      });
+    };
+
+    const renderQuizzes = (quizzes, adminFlag) => {
+      if (!quizContainer || !quizTpl) return;
+      quizContainer.innerHTML = '';
+
+      if (!Array.isArray(quizzes) || !quizzes.length) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center text-yellow-300';
+        empty.textContent = 'No quizzes yet';
+        quizContainer.appendChild(empty);
+      } else {
+        quizzes.forEach(q => {
           const node = quizTpl.content.cloneNode(true);
           const lobbyInput = node.querySelector('.lobby-id');
           if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
@@ -240,15 +302,123 @@
           if (formEl) formEl.action = `${contextPath}/join-quiz`;
           quizContainer.appendChild(node);
         });
-
-        // Only show "Create Quiz" button to admins
-        if (createTpl && isAdmin) {
-          quizContainer.appendChild(createTpl.content.cloneNode(true));
-        }
       }
-    } catch (err) {
-      console.error('Failed to load data', err);
+
+      if (createTpl && adminFlag) {
+        quizContainer.appendChild(createTpl.content.cloneNode(true));
+      }
+    };
+
+    const applyAvatar = (img, url, seed) => {
+      if (!img) return;
+      const fallback = buildIdenticon(seed);
+      img.dataset.fallbackApplied = 'false';
+      img.onerror = () => {
+        if (img.dataset.fallbackApplied === 'true') return;
+        img.dataset.fallbackApplied = 'true';
+        img.src = fallback;
+      };
+      img.src = url && url.trim() ? url : fallback;
+    };
+
+    const renderUserData = (data) => {
+      const username = data.username || 'Player';
+      const rawRole = data.role_name || 'User';
+      const roleLabel = `${rawRole.charAt(0).toUpperCase()}${rawRole.slice(1).toLowerCase()}`;
+      if (welcomeLabel) {
+        welcomeLabel.textContent = `Welcome, ${roleLabel}:`;
+      }
+      if (usernameDisplay) {
+        usernameDisplay.textContent = username;
+      }
+      if (avatarEl) {
+        applyAvatar(avatarEl, data.avatar_url, username);
+      }
+    };
+
+    const renderMainData = (data, options = {}) => {
+      if (!data) return;
+      latestMainData = data;
+      const adminFlag = options.isAdmin !== undefined ? options.isAdmin : isAdmin;
+      renderCategories(data.categories);
+      renderQuizzes(data.quizzes, adminFlag);
+    };
+
+    const loadUserGreeting = async () => {
+      const cached = getCachedUserData();
+      if (cached) {
+        renderUserData(cached);
+      }
+
+      try {
+        const res = await fetch(`${contextPath}/user/data`, {
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.status === 401) {
+          sessionStorage.removeItem(SESSION_CACHE_KEY);
+          window.location.href = `${contextPath}/login`;
+          return;
+        }
+        if (!res.ok) throw new Error(`Failed to load user data: ${res.status}`);
+        const data = await res.json();
+        renderUserData(data);
+        setCachedUserData(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const cachedMain = getCachedMainData();
+    if (cachedMain) {
+      if (typeof cachedMain.isAdmin === 'boolean') {
+        isAdmin = cachedMain.isAdmin;
+      }
+      renderMainData(cachedMain, { isAdmin });
     }
+
+    const userPromise = loadUserGreeting();
+
+    const adminPromise = (async () => {
+      try {
+        const adminCheck = await fetch(`${contextPath}/admin/data`, {
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: { 'Accept': 'application/json' }
+        });
+        const adminFlag = adminCheck.ok;
+        isAdmin = adminFlag;
+        mergeCachedMainData({ isAdmin: adminFlag });
+        if (latestMainData) {
+          renderQuizzes(latestMainData.quizzes, isAdmin);
+        }
+      } catch (err) {
+        isAdmin = false;
+      }
+    })();
+
+    const mainDataPromise = (async () => {
+      try {
+        const res = await fetch(`${contextPath}/main/data`, {
+          method: 'GET',
+          headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
+          credentials: 'same-origin'
+        });
+        if (!res.ok) throw new Error('Network error: ' + res.status);
+        const data = await res.json();
+        renderMainData(data, { isAdmin });
+        setCachedMainData({
+          categories: data.categories,
+          quizzes: data.quizzes,
+          isAdmin
+        });
+      } catch (err) {
+        console.error('Failed to load data', err);
+      }
+    })();
+
+    await Promise.allSettled([userPromise, adminPromise, mainDataPromise]);
   })();
 
   // Check admin access before navigating

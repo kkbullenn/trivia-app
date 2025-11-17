@@ -5,6 +5,8 @@ import java.util.Map;
 
 /**
  * DAO for roles. Returns a map of role_id -> role_name.
+ *
+ * @author Haven Zhang
  */
 public interface RoleDAO {
 

@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,28 +20,40 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Provides lobby summary data for the current category.
+ *
+ * @author Brownie Tran
+ * @author Jerry Xing
+ */
 public class CategoryLobbiesDataServlet extends HttpServlet {
-    
+
+    private static final Logger LOGGER = Logger.getLogger(CategoryLobbiesDataServlet.class.getName());
+
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException, ServletException
+    {
 
         // Check if user is logged in
         HttpSession session = request.getSession(false);
         String ajaxHeader = request.getHeader("AJAX-Requested-With");
 
-        if (session == null || session.getAttribute("user_id") == null) {
+        if(session == null || session.getAttribute("user_id") == null)
+        {
             // Not logged in -> redirect to login page
             response.sendRedirect("login");
             return;
-        } else if (!"fetch".equals(ajaxHeader)) {
+        } else if(!"fetch".equals(ajaxHeader))
+        {
             // Not an AJAX fetch request → redirect to main page
             response.sendRedirect("main");
             return;
         }
 
         Integer categoryId = (Integer) session.getAttribute("category_id");
-        if (categoryId == null) {
+        if(categoryId == null)
+        {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No category selected");
             return;
         }
@@ -47,17 +61,20 @@ public class CategoryLobbiesDataServlet extends HttpServlet {
         // Create Session DAO object to grab available sessions from database for this category
         SessionDAO sessionDAO = new SessionDAOImpl();
         List<Map<String, String>> sessions;
-        try {
+        try
+        {
             sessions = sessionDAO.listActiveSessionsSummary(categoryId);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException e)
+        {
+            LOGGER.log(Level.SEVERE, "Failed to list lobbies for category " + categoryId, e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
             return;
         }
 
         // Build JSON array for sessions using org.json
         JSONArray sessionsArray = new JSONArray();
-        for (Map<String, String> sessionData : sessions) {
+        for(Map<String, String> sessionData : sessions)
+        {
             JSONObject sessionJson = new JSONObject();
             sessionJson.put("lobby_id", sessionData.get("session_id"));
             sessionJson.put("lobby_name", sessionData.get("session_name"));

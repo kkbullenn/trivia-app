@@ -4,6 +4,11 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.*;
 
+/**
+ * Handles access control and forwarding for the admin landing page.
+ *
+ * @author Brownie Tran
+ */
 public class AdminServlet extends HttpServlet {
 
     @Override

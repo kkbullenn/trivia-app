@@ -9,6 +9,8 @@ import java.sql.SQLException;
      * Obtain a JDBC Connection using DriverManager.
      * Configuration must be provided via .env (JDBC_URL/JDBC_USER/JDBC_PASS)
      * or system environment variables.
+     *
+     * @author Haven Zhang
      */
 public class DBConnectionManager {
 
@@ -33,9 +35,18 @@ public class DBConnectionManager {
             }
         }
 
-        if (url == null || url.isEmpty()) url = System.getenv("JDBC_URL");
-        if (user == null || user.isEmpty()) user = System.getenv("JDBC_USER");
-        if (pass == null || pass.isEmpty()) pass = System.getenv("JDBC_PASS");
+        if (url == null || url.isEmpty())
+        {
+            url = System.getenv("JDBC_URL");
+        }
+        if (user == null || user.isEmpty())
+        {
+            user = System.getenv("JDBC_USER");
+        }
+        if (pass == null || pass.isEmpty())
+        {
+            pass = System.getenv("JDBC_PASS");
+        }
 
         if (url == null || url.isEmpty() || user == null || user.isEmpty() || pass == null || pass.isEmpty()) {
             throw new SQLException("Missing database configuration: JDBC_URL, JDBC_USER and JDBC_PASS must be set in .env or environment variables");

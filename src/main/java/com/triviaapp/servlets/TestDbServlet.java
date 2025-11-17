@@ -29,6 +29,9 @@ import com.triviaapp.dao.impl.ModeratedAnswerDAOImpl;
 /**
  * Simple servlet to test database connectivity using DBConnectionManager.
  * Visit /test-db after deploying to verify connection works.
+ *
+ * @author Haven Zhang
+ * @author Hadrian
  */
 public class TestDbServlet extends HttpServlet {
     @Override

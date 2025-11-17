@@ -12,6 +12,8 @@ import java.net.URL;
  * Connection helper to talk to the local M2M100 Python service.
  * Example endpoint:
  *      http://localhost:8892/m2m100/translate/questions-answers
+ *
+ * @author Aira Bassig
  */
 public class M2M100Connection {
 

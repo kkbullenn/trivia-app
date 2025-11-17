@@ -1,0 +1,200 @@
+<!--
+   User Page
+   User profile page layout.
+
+   Author: Jerry Xing
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>User Profile</title>
+</head>
+<body class="bg-blue-900 text-yellow-300 min-h-screen">
+<div class="flex min-h-screen flex-col">
+  <header class="flex items-center justify-between bg-blue-950/90 px-4 py-3 shadow">
+    <button id="backButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Back to main">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <h1 class="text-lg font-semibold uppercase tracking-wide">Player Profile</h1>
+    <button id="logoutButton" class="text-yellow-300 transition hover:text-yellow-100" aria-label="Logout">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-10 px-6 py-12">
+    <div class="flex flex-col items-center gap-6 text-center">
+      <h1 id="username" class="text-2xl font-bold uppercase tracking-wide">Player</h1>
+      <div class="h-36 w-36 overflow-hidden rounded-full border-4 border-yellow-300 bg-blue-950">
+        <img id="avatar" src="" alt="User Avatar" class="h-full w-full object-cover"/>
+      </div>
+    </div>
+
+    <div class="grid w-full gap-6 sm:grid-cols-2">
+      <div class="flex flex-col items-center gap-3 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 text-center">
+        <h2 class="text-lg font-semibold uppercase tracking-wide">Quizzes Won</h2>
+        <p id="winSummary" class="text-2xl font-bold text-yellow-100">0% (0/0)</p>
+      </div>
+      <div class="flex flex-col items-center gap-3 rounded-xl border border-yellow-400/40 bg-blue-950/80 p-6 text-center">
+        <h2 class="text-lg font-semibold uppercase tracking-wide">Best Category</h2>
+        <p id="bestCategory" class="text-2xl font-bold text-yellow-100">No category yet</p>
+      </div>
+    </div>
+
+    <div class="w-full flex justify-center">
+      <button id="editProfile"
+              class="mt-2 rounded-lg border border-yellow-400 bg-blue-950/80 px-6 py-3 text-lg font-semibold text-yellow-200 transition hover:bg-blue-800">
+        Edit Profile
+      </button>
+    </div>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const avatarEl = document.getElementById('avatar');
+    const usernameEl = document.getElementById('username');
+    const winSummaryEl = document.getElementById('winSummary');
+    const bestCategoryEl = document.getElementById('bestCategory');
+    const backBtn = document.getElementById('backButton');
+    const logoutBtn = document.getElementById('logoutButton');
+    const editProfileBtn = document.getElementById('editProfile');
+
+    const getContextPath = () => {
+      const path = window.location.pathname;
+      const parts = path.split('/');
+      parts.pop();
+      const joined = parts.join('/');
+      return joined.length ? joined : '';
+    };
+
+    const goTo = (path) => {
+      const base = getContextPath();
+      window.location.href = `${base}${path}`;
+    };
+
+    const SESSION_CACHE_KEY = 'triviaUserData';
+
+    const getCachedUserData = () => {
+      try {
+        const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (!stored || !stored.data) return null;
+        const maxAgeMs = 5 * 60 * 1000;
+        if (stored.timestamp && Date.now() - stored.timestamp <= maxAgeMs) {
+          return stored.data;
+        }
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+      return null;
+    };
+
+    const setCachedUserData = (data) => {
+      try {
+        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data
+        }));
+      } catch (err) {
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+      }
+    };
+
+    const buildIdenticon = (seed) => {
+      const value = seed && seed.trim() ? seed.trim() : 'player';
+      return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
+    };
+
+    const applyAvatar = (img, url, seed) => {
+      if (!img) return;
+      const fallback = buildIdenticon(seed);
+      img.dataset.fallbackApplied = 'false';
+      img.onerror = () => {
+        if (img.dataset.fallbackApplied === 'true') return;
+        img.dataset.fallbackApplied = 'true';
+        img.src = fallback;
+      };
+      img.src = url && url.trim() ? url : fallback;
+    };
+
+    backBtn.addEventListener('click', () => goTo('/main'));
+    editProfileBtn.addEventListener('click', () => goTo('/profile_edit.html'));
+
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch(`${getContextPath()}/EXIT`, { method: 'POST', credentials: 'same-origin' });
+      } catch (err) {
+        console.error('Failed to log out', err);
+      } finally {
+        goTo('/login');
+      }
+    });
+
+    const renderUserData = (data) => {
+        const username = data.username || 'Player';
+        const roleLabel = (data.role_name || 'User').toUpperCase();
+        const participations = data.participations ?? 0;
+        const wins = data.wins ?? 0;
+        const winRateValue = participations > 0 ? Math.round((wins / participations) * 1000) / 10 : 0;
+
+        usernameEl.textContent = `${roleLabel}: ${username}`;
+        winSummaryEl.textContent = `${winRateValue}% (${wins}/${participations})`;
+        applyAvatar(avatarEl, data.avatar_url, username);
+
+        if (data.top_category && data.top_category !== null) {
+          const name = data.top_category.category_name || 'Unknown';
+          bestCategoryEl.textContent = name;
+        } else {
+          bestCategoryEl.textContent = 'No category yet';
+        }
+    };
+
+    async function loadUserData() {
+      const cached = getCachedUserData();
+      if (cached) {
+        renderUserData(cached);
+      }
+
+      try {
+        const response = await fetch(`${getContextPath()}/user/data`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          credentials: 'same-origin'
+        });
+        if (response.status === 401) {
+          sessionStorage.removeItem(SESSION_CACHE_KEY);
+          window.location.href = `${getContextPath()}/login`;
+          return;
+        }
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user data: ${response.status}`);
+        }
+        const data = await response.json();
+        renderUserData(data);
+        setCachedUserData(data);
+
+      } catch (err) {
+        console.error(err);
+        winSummaryEl.textContent = 'N/A';
+        bestCategoryEl.textContent = 'N/A';
+      }
+    }
+
+    loadUserData();
+  })();
+</script>
+</body>
+</html>
