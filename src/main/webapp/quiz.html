@@ -508,6 +508,13 @@
         renderQuestion(data);
         showStatus('', 'success');
 
+        // *** ADDED by aira: prefetch Tagalog default translations in the background ***
+        if (window.translation && window.translation.ensureTranslationsLoaded) {
+          // fire-and-forget; don't block quiz load
+          window.translation.ensureTranslationsLoaded('tl');
+        }
+        // *** END CHANGE ***
+
         if (!socket || socket.readyState !== WebSocket.OPEN) {
           initWebSocket();
         }
@@ -567,6 +574,7 @@
   })();
 </script>
 <script type="module" src="./internal/scripts/transcription.js"></script>
+<script type="module" src="./internal/scripts/translation.js"></script>
 <script type="module" src="./internal/components/toast/toast.js"></script>
 </body>
 </html>

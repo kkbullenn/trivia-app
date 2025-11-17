@@ -457,6 +457,7 @@ public class TranslatedQuizServlet extends HttpServlet {
      */
     private void sendJson(HttpServletResponse resp, int status, JSONObject obj) throws IOException {
         resp.setStatus(status);
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json");
         resp.getWriter().write(obj.toString());
     }
@@ -468,6 +469,7 @@ public class TranslatedQuizServlet extends HttpServlet {
      */
     private void sendJson(HttpServletResponse resp, int status, JSONArray arr) throws IOException {
         resp.setStatus(status);
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json");
         resp.getWriter().write(arr.toString());
     }

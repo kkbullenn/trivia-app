@@ -140,6 +140,11 @@ public class QuizDataServlet extends HttpServlet {
             question.put("question_id", questionId);
             question.put("total_questions", totalQuestions);
             question.put("category_name", categoryName);
+
+            // *** ADDED by aira: expose category_id so FE translation code can discover it ***
+            question.put("category_id", Integer.parseInt(questionData.get("category_id")));
+            // *** END CHANGE ***
+
             QuestionJsonUtils.putQuestionContent(question, questionData);
 
             Integer userId = (Integer) session.getAttribute("user_id");
