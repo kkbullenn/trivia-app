@@ -16,37 +16,24 @@ function init() {
 function setUpRecorder() {
     navigator.mediaDevices.getUserMedia({audio: true, video: false})
         .then(function (stream) {
-            hasPermissions = true;
             mediaRecorder = new MediaRecorder(stream);
+            hasPermissions = true;
 
             mediaRecorder.ondataavailable = function (event) {
                 audioChunks.push(event.data);
             };
 
+            mediaRecorder.onstart = () => {
+                isRecording = true;
+            }
+
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks, {type: 'audio/webm'});
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
 
-                console.log("Got audio!")
-
-                // // --- DOWNLOAD LOCALLY ---
-                // const a = document.createElement("a");
-                // a.href = audioUrl;
-                // a.download = "recording.webm";   // File name
-                // document.body.appendChild(a);
-                // a.click();
-                // document.body.removeChild(a);
-                // // -------------------------
-                //
-                // console.log("Saved locally!");
-
-                await handleTranscribe(audio);
+                await handleTranscribe(audioBlob);
 
                 // Clear for next recording
                 audioChunks = [];
-                mediaRecorder = undefined;
-                hasPermissions = false;
                 isRecording = false;
             };
         })
@@ -62,34 +49,32 @@ function setUpVoiceBtn() {
 }
 
 function startRecording() {
-    if (mediaRecorder && !isRecording) {
+    if (mediaRecorder && hasPermissions) {
         mediaRecorder.start();
-        isRecording = true;
     }
 }
 
 function stopRecording() {
-    if (mediaRecorder && isRecording) {
+    if (mediaRecorder && hasPermissions) {
         mediaRecorder.stop();
-        isRecording = false;
     }
 }
 
 function handleRecorderBtn() {
     const voiceBtn = document.getElementById("voiceButton");
 
-    showPointingToast(voiceBtn, "Listening for your answer... Tap again to save it!");
-
-    if (hasPermissions && !isRecording) {
+    if (!isRecording) {
         startRecording();
+        showPointingToast(voiceBtn, "Listening for your answer... Tap again to save it!");
     } else {
         stopRecording();
+        showPointingToast(voiceBtn, "Recording saved!");
     }
 }
 
 async function handleTranscribe(audio) {
     // get questionId from DOM
-    const questionId = 1;
+    const questionId = document.getElementById("questionId").value;
     const playerAnswerKey = await transcribeAnswer(questionId, audio);
 
     handleAnswerSelect(playerAnswerKey);
@@ -99,8 +84,8 @@ async function handleTranscribe(audio) {
 async function transcribeAnswer(questionId, audio) {
     const contextPath = getContextPath();
     const formData = new FormData();
-    formData.append("questionId", questionId);
-    formData.append("file", audio)
+    formData.append("question_id", questionId);
+    formData.append("file", audio, "recording.webm")
 
     try {
         const res = await sendMultipartFormData(`${contextPath}/whisper/transcribe-answer`, formData);
@@ -113,7 +98,8 @@ async function transcribeAnswer(questionId, audio) {
 
 // need function for selecting appropriate answer based on whisper response
 function handleAnswerSelect(playerAnswerKey) {
-    // select answer in the DOM
+    const btn = document.querySelector(`button[data-key="${playerAnswerKey}"]`);
+    if (btn) btn.click();
 }
 
 init();
