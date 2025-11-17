@@ -235,6 +235,7 @@
     };
 
     const renderQuestion = (payload) => {
+        console.log(payload)
       const receivedIndex = toIndex(payload.question_number, currentQuestionIndex);
       currentQuestionIndex = receivedIndex;
       totalQuestionCount = toNumber(payload.total_questions, totalQuestionCount);
@@ -426,6 +427,7 @@
           switch (data.type) {
             case 'question':
               renderQuestion({
+                  question_id: data.question_id,
                 question_number: data.index,
                 category_name: data.category_name,
                 question_text: data.question_text,
@@ -554,5 +556,7 @@
     loadInitialQuestion();
   })();
 </script>
+<script type="module" src="./internal/scripts/transcription.js"></script>
+<script type="module" src="./internal/components/toast/toast.js"></script>
 </body>
 </html>

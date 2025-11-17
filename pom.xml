@@ -114,6 +114,17 @@
                                 <exclude>**/*.xml</exclude>
                             </excludes>
                         </fileset>
+
+                        <fileset>
+                            <directory>${project.basedir}/internal</directory>
+                            <followSymlinks>false</followSymlinks>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*.xml</exclude>
+                            </excludes>
+                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>

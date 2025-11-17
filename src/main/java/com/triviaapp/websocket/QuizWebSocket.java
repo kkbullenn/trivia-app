@@ -298,6 +298,7 @@ public class QuizWebSocket {
             JSONObject payload = new JSONObject();
             payload.put("type", "question");
             payload.put("index", questionIndex);
+            payload.put("question_id", questionId);
             payload.put("category_name",
                     CATEGORY_DAO.findCategoryNameById(
                             Integer.parseInt(qData.get("category_id"))));
