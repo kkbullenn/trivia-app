@@ -134,6 +134,7 @@
 <script>
   // Store admin status for reuse
   let isAdmin = false;
+  let latestMainData = null;
 
   // Helper function to get context path
   function getContextPath() {
@@ -163,6 +164,11 @@
     const welcomeLabel = document.getElementById('welcomeLabel');
     const usernameDisplay = document.getElementById('username');
     const avatarEl = document.getElementById('userAvatar');
+    const catContainer = document.getElementById('category');
+    const catTpl = document.getElementById('categoryTpl');
+    const quizContainer = document.getElementById('MyQuizzes');
+    const quizTpl = document.getElementById('quizTpl');
+    const createTpl = document.getElementById('createQuizTpl');
 
     // Check for error messages in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -173,6 +179,8 @@
     }
 
     const SESSION_CACHE_KEY = 'triviaUserData';
+    const MAIN_CACHE_KEY = 'triviaMainData';
+    const MAIN_CACHE_TTL = 2 * 60 * 1000;
 
     const getCachedUserData = () => {
       try {
@@ -207,6 +215,100 @@
       return `https://github.com/identicons/${encodeURIComponent(value)}.png`;
     };
 
+    const getCachedMainData = () => {
+      try {
+        const raw = sessionStorage.getItem(MAIN_CACHE_KEY);
+        if (!raw) return null;
+        const stored = JSON.parse(raw);
+        if (!stored || !stored.data) return null;
+        if (stored.timestamp && Date.now() - stored.timestamp <= MAIN_CACHE_TTL) {
+          return stored.data;
+        }
+        sessionStorage.removeItem(MAIN_CACHE_KEY);
+      } catch (err) {
+        sessionStorage.removeItem(MAIN_CACHE_KEY);
+      }
+      return null;
+    };
+
+    const setCachedMainData = (data) => {
+      try {
+        sessionStorage.setItem(MAIN_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          data
+        }));
+      } catch (err) {
+        sessionStorage.removeItem(MAIN_CACHE_KEY);
+      }
+    };
+
+    const mergeCachedMainData = (partial) => {
+      if (!partial || typeof partial !== 'object') return;
+      const existing = getCachedMainData();
+      const merged = existing ? { ...existing, ...partial } : { ...partial };
+      setCachedMainData(merged);
+    };
+
+    const renderCategories = (categories) => {
+      if (!catContainer || !catTpl) return;
+      catContainer.innerHTML = '';
+      if (!Array.isArray(categories) || !categories.length) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center text-yellow-300 col-span-3';
+        empty.textContent = 'No categories available';
+        catContainer.appendChild(empty);
+        return;
+      }
+      categories.forEach(cat => {
+        const node = catTpl.content.cloneNode(true);
+        const catIdInput = node.querySelector('.category-id');
+        if (catIdInput) catIdInput.value = String(cat.id ?? '');
+        const nameEl = node.querySelector('.category-name');
+        if (nameEl) nameEl.textContent = cat.name ?? String(cat);
+        const formEl = node.querySelector('form');
+        if (formEl) formEl.action = `${contextPath}/join-category`;
+        catContainer.appendChild(node);
+      });
+    };
+
+    const renderQuizzes = (quizzes, adminFlag) => {
+      if (!quizContainer || !quizTpl) return;
+      quizContainer.innerHTML = '';
+
+      if (!Array.isArray(quizzes) || !quizzes.length) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center text-yellow-300';
+        empty.textContent = 'No quizzes yet';
+        quizContainer.appendChild(empty);
+      } else {
+        quizzes.forEach(q => {
+          const node = quizTpl.content.cloneNode(true);
+          const lobbyInput = node.querySelector('.lobby-id');
+          if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
+          const quizNameEl = node.querySelector('.quiz-name');
+          if (quizNameEl) quizNameEl.textContent = q.quiz_name ?? 'Untitled';
+          const statusEl = node.querySelector('.quiz-category');
+          const statusText = q.status && q.status !== 'null' ? q.status : '';
+          if (statusEl) statusEl.textContent = statusText ? `Status: ${statusText}` : '';
+          const metaEl = node.querySelector('.quiz-meta');
+          if (metaEl) {
+            const maxParticipants = q.max_participants && q.max_participants !== 'null' ? `Max: ${q.max_participants}` : '';
+            const startAt = q.start_at && q.start_at !== 'null' ? `Start: ${q.start_at}` : '';
+            const endAt = q.end_at && q.end_at !== 'null' ? `End: ${q.end_at}` : '';
+            const metaParts = [maxParticipants, startAt, endAt].filter(Boolean);
+            metaEl.textContent = metaParts.join(' · ');
+          }
+          const formEl = node.querySelector('form');
+          if (formEl) formEl.action = `${contextPath}/join-quiz`;
+          quizContainer.appendChild(node);
+        });
+      }
+
+      if (createTpl && adminFlag) {
+        quizContainer.appendChild(createTpl.content.cloneNode(true));
+      }
+    };
+
     const applyAvatar = (img, url, seed) => {
       if (!img) return;
       const fallback = buildIdenticon(seed);
@@ -232,6 +334,14 @@
       if (avatarEl) {
         applyAvatar(avatarEl, data.avatar_url, username);
       }
+    };
+
+    const renderMainData = (data, options = {}) => {
+      if (!data) return;
+      latestMainData = data;
+      const adminFlag = options.isAdmin !== undefined ? options.isAdmin : isAdmin;
+      renderCategories(data.categories);
+      renderQuizzes(data.quizzes, adminFlag);
     };
 
     const loadUserGreeting = async () => {
@@ -260,90 +370,55 @@
       }
     };
 
-    await loadUserGreeting();
-
-    // Check user role
-    try {
-      const adminCheck = await fetch(`${contextPath}/admin/data`, {
-        method: 'GET',
-        credentials: 'same-origin',
-        headers: { 'Accept': 'application/json' }
-      });
-      isAdmin = adminCheck.ok;
-    } catch (err) {
-      isAdmin = false;
+    const cachedMain = getCachedMainData();
+    if (cachedMain) {
+      if (typeof cachedMain.isAdmin === 'boolean') {
+        isAdmin = cachedMain.isAdmin;
+      }
+      renderMainData(cachedMain, { isAdmin });
     }
 
-    try {
-      const res = await fetch(`${contextPath}/main/data`, {
-        method: 'GET',
-        headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
-        credentials: 'same-origin'
-      });
-      if (!res.ok) throw new Error('Network error: ' + res.status);
-      const data = await res.json();
+    const userPromise = loadUserGreeting();
 
-      // Categories
-      const catContainer = document.getElementById('category');
-      const catTpl = document.getElementById('categoryTpl');
-      if (catContainer && catTpl && Array.isArray(data.categories)) {
-        catContainer.innerHTML = '';
-        data.categories.forEach(cat => {
-          const node = catTpl.content.cloneNode(true);
-          const catIdInput = node.querySelector('.category-id');
-          if (catIdInput) catIdInput.value = String(cat.id ?? '');
-          const nameEl = node.querySelector('.category-name');
-          if (nameEl) nameEl.textContent = cat.name ?? String(cat);
-          const formEl = node.querySelector('form');
-          if (formEl) formEl.action = `${contextPath}/join-category`;
-          catContainer.appendChild(node);
+    const adminPromise = (async () => {
+      try {
+        const adminCheck = await fetch(`${contextPath}/admin/data`, {
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: { 'Accept': 'application/json' }
         });
-      }
-
-      // Quizzes — use keys returned by MainDataServlet
-      const quizContainer = document.getElementById('MyQuizzes');
-      const quizTpl = document.getElementById('quizTpl');
-      const createTpl = document.getElementById('createQuizTpl');
-      if (quizContainer && quizTpl && Array.isArray(data.quizzes)) {
-        quizContainer.innerHTML = '';
-
-        if (!data.quizzes.length) {
-          const empty = document.createElement('div');
-          empty.className = 'text-center text-yellow-300';
-          empty.textContent = 'No quizzes yet';
-          quizContainer.appendChild(empty);
+        const adminFlag = adminCheck.ok;
+        isAdmin = adminFlag;
+        mergeCachedMainData({ isAdmin: adminFlag });
+        if (latestMainData) {
+          renderQuizzes(latestMainData.quizzes, isAdmin);
         }
+      } catch (err) {
+        isAdmin = false;
+      }
+    })();
 
-        data.quizzes.forEach(q => {
-          const node = quizTpl.content.cloneNode(true);
-          const lobbyInput = node.querySelector('.lobby-id');
-          if (lobbyInput) lobbyInput.value = String(q.session_id ?? '');
-          const quizNameEl = node.querySelector('.quiz-name');
-          if (quizNameEl) quizNameEl.textContent = q.quiz_name ?? 'Untitled';
-          const statusEl = node.querySelector('.quiz-category');
-          const statusText = q.status && q.status !== 'null' ? q.status : '';
-          if (statusEl) statusEl.textContent = statusText ? `Status: ${statusText}` : '';
-          const metaEl = node.querySelector('.quiz-meta');
-          if (metaEl) {
-            const maxParticipants = q.max_participants && q.max_participants !== 'null' ? `Max: ${q.max_participants}` : '';
-            const startAt = q.start_at && q.start_at !== 'null' ? `Start: ${q.start_at}` : '';
-            const endAt = q.end_at && q.end_at !== 'null' ? `End: ${q.end_at}` : '';
-            const metaParts = [maxParticipants, startAt, endAt].filter(Boolean);
-            metaEl.textContent = metaParts.join(' · ');
-          }
-          const formEl = node.querySelector('form');
-          if (formEl) formEl.action = `${contextPath}/join-quiz`;
-          quizContainer.appendChild(node);
+    const mainDataPromise = (async () => {
+      try {
+        const res = await fetch(`${contextPath}/main/data`, {
+          method: 'GET',
+          headers: { 'AJAX-Requested-With': 'fetch', 'Accept': 'application/json' },
+          credentials: 'same-origin'
         });
-
-        // Only show "Create Quiz" button to admins
-        if (createTpl && isAdmin) {
-          quizContainer.appendChild(createTpl.content.cloneNode(true));
-        }
+        if (!res.ok) throw new Error('Network error: ' + res.status);
+        const data = await res.json();
+        renderMainData(data, { isAdmin });
+        setCachedMainData({
+          categories: data.categories,
+          quizzes: data.quizzes,
+          isAdmin
+        });
+      } catch (err) {
+        console.error('Failed to load data', err);
       }
-    } catch (err) {
-      console.error('Failed to load data', err);
-    }
+    })();
+
+    await Promise.allSettled([userPromise, adminPromise, mainDataPromise]);
   })();
 
   // Check admin access before navigating
